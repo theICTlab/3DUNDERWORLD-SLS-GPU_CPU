@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/zsh
 
 # Rename all jpgs in folder given by $1
 a=0

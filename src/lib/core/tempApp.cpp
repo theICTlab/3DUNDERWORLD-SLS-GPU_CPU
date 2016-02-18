@@ -1,16 +1,22 @@
 #include "fileReader.h"
+#include "log.hpp"
 
 int main()
 {
-    SLS::FileReader reader("myReader");
+    LOG::restartLog();
+    SLS::FileReader reader("rightReader");
+    std::cout<<"Loading"<<std::endl;
     reader.loadImages("../../../data/alexander/rightCam/dataset1/");
-    cv::namedWindow("test", cv::WINDOW_NORMAL);
-    //for(;;)
+    reader.loadConfig("../../../data/alexander/rightCam/calib/output/calib.xml");
+    std::cout<<"Undistorting"<<std::endl;
+    reader.undistortAll();
+    for(;;)
     {
-        cv::imshow("test", reader.getCurrentFrame());
-        cv::resizeWindow("test", 800, 600);
-        //if(cv::waitKey(0)=='q') ;
-        cv::waitKey(0);
+        cv::namedWindow("right", cv::WINDOW_NORMAL);
+        cv::imshow("right", reader.getNextFrame());
+        cv::resizeWindow("right", 800, 600);
+        if(cv::waitKey(100)==27) 
+            break;
     }
     return 0;
 }

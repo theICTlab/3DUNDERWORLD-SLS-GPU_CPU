@@ -18,18 +18,28 @@
 
 #pragma once
 #include <string>
+#include <array>
 #include <opencv2/opencv.hpp>
 namespace SLS
 {
+enum CAMERA_MAT{
+    CAMERA_MAT=0,
+    DISTOR_MAT,
+    ROT_MAT,
+    TRANS_MAT,
+    PARAM_COUNT
+};
 class Camera
 {
  protected:
     std::string name_;
+    std::array<cv::Mat, PARAM_COUNT> params_;
  public:
     Camera() = delete;
     explicit Camera(const std::string &cName):name_(cName) {}
     const std::string& getName() const {return name_;}
     void setName(const std::string &cName) {name_ = cName;}
+    const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_};
     // Interfaces
     virtual ~Camera(){};
     virtual void loadConfig(const std::string &configFile) = 0;
