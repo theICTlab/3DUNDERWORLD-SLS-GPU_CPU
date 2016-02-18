@@ -39,7 +39,7 @@ class Camera
     explicit Camera(const std::string &cName):name_(cName) {}
     const std::string& getName() const {return name_;}
     void setName(const std::string &cName) {name_ = cName;}
-    const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_};
+    const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_;}
     // Interfaces
     virtual ~Camera(){};
     virtual void loadConfig(const std::string &configFile) = 0;
