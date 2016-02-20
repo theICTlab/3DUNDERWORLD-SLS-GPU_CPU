@@ -316,6 +316,10 @@ void reconstruct()
 	}
 
 	//load projector and camera paramiters
+
+    /*
+     * Load Camera paramters
+     */
 	reconstructor->loadCameras();
 
 	//set reconstuction paramiters
