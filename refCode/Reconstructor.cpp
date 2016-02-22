@@ -120,6 +120,12 @@ void Reconstructor::decodePaterns()
 
 	cv::Point projPixel;
 	
+    /* 
+     * For each pixels
+     *  if mask is 1
+     *      getProjPixel
+     *      camPixel(i,j).push_back(cv::Point(i,j))
+     */
 	for(int i=0; i<w; i++)
 	{
 		for(int j=0; j<h; j++)
@@ -268,6 +274,14 @@ void Reconstructor::computeShadows()
 
 	shadowMask = cv::Mat(h,w,CV_8U,cv::Scalar(0));
 
+    /* For each pixel
+     *  blackval = leftCam
+     *  whiteVal =  rightCam
+     *  if (left - right) > treashold
+     *      set mask to 1
+     *  else
+     *      set mask to 0
+     */
 	for(int i=0; i<w; i++)
 	{
 		for(int j=0; j<h; j++)
@@ -322,16 +336,22 @@ void Reconstructor::runReconstruction()
 
 		//findProjectorCenter();
 		cameras[i].position = cv::Point3f(0,0,0);
+
+        //Convert the camera position to world position
 		cam2WorldSpace(cameras[i],cameras[i].position);
+
+        // cameras[i].position is the camera position in world space
 	
 		camera = &cameras[i];
+
+        //Init an array of cv points
 		camsPixels[i] = new cv::vector<cv::Point>[proj_h*proj_w];
 		camPixels = camsPixels[i];
 
 		loadCamImgs(camFolder[i],imgPrefix[i],imgSuffix[i]);
 
 		colorImgs.push_back(cv::Mat());
-		colorImgs[i] = color;
+		colorImgs[i] = color;   //Color is the first image of camera
 		computeShadows();
 		if(saveShadowMask_)
 		{
