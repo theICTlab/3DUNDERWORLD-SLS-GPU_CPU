@@ -291,7 +291,7 @@ void Reconstructor::computeShadows()
 			blackVal  = (float) Utilities::matGet2D( camImgs[1], i, j);
 			whiteVal  = (float) Utilities::matGet2D( camImgs[0], i, j);
 
-			if(whiteVal - blackVal > blackThreshold)
+			if(fabs(whiteVal - blackVal) > blackThreshold)
 			{
 				Utilities::matSet2D(shadowMask,i,j,1);
 			}

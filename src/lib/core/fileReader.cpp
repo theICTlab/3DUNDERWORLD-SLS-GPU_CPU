@@ -16,11 +16,29 @@ void FileReader::loadImages(const std::string& folder, bool isGL)
     {
         std::stringstream jpgss;
         jpgss<<std::setfill('0')<<std::setw(4)<<images_.size()<<".jpg";
-        cv::Mat img=cv::imread(ss.str()+jpgss.str(), CV_LOAD_IMAGE_COLOR);
+        std::string fName = ss.str()+jpgss.str();
+        cv::Mat img=cv::imread(fName, CV_LOAD_IMAGE_COLOR);
+        LOG::writeLog( "Reading image %s", fName.c_str());
         if (!img.data)
             break;
-        else
-            images_.push_back(img);
+        else 
+        {
+            
+            if( images_.size() == 0)    
+                //Copy the first image to color
+                img.copyTo(color_);
+
+            cv::Mat gray;
+            cv::cvtColor(img, gray, CV_BGR2GRAY);
+            images_.push_back(gray);
+        }
+    }
+    if (images_.empty())
+        LOG::writeLogErr(" No image readed from %s", ss.str().c_str());
+    else
+    {
+        resX_ = images_[0].cols;
+        resY_ = images_[0].rows;
     }
 }
 
@@ -44,7 +62,7 @@ const cv::Mat& FileReader::getNextFrame()
     return images_[frameIdx_];
 }
 
-void FileReader::undistortAll()
+void FileReader::undistort()
 {
     //Validate matrices
     for (size_t i=0; i<PARAM_COUNT; i++)
@@ -61,4 +79,10 @@ void FileReader::undistortAll()
     }
 }
 
+
+void FileReader::computeShadowsAndThreasholds()
+{
+    cv::Mat& brightImg=images_[0];
+    cv::Mat& darkImg=images_[1];
+}
 }

@@ -9,7 +9,7 @@ int main()
     reader.loadImages("../../../data/alexander/rightCam/dataset1/");
     reader.loadConfig("../../../data/alexander/rightCam/calib/output/calib.xml");
     std::cout<<"Undistorting"<<std::endl;
-    reader.undistortAll();
+    reader.undistort();
     for(;;)
     {
         cv::namedWindow("right", cv::WINDOW_NORMAL);

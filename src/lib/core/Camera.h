@@ -29,20 +29,36 @@ enum CAMERA_MAT{
     TRANS_MAT,
     PARAM_COUNT
 };
+
+/**
+ * @ Base class of camera
+ * 1. this class manages aquiring images form file/camera. 
+ * 2. loading configurations
+ * 3. Undistort images
+ * 4. Calculate shadows to discard
+ * 5. save colors
+ */
 class Camera
 {
  protected:
     std::string name_;
     std::array<cv::Mat, PARAM_COUNT> params_;
+    size_t resX_, resY_;        //Camera Resolution
+    std::vector<unsigned char> threasholds_; //Threashold for each pixel [0,255]
+    std::vector<unsigned char> shadowMask_; //Color mask
+    cv::Mat color_;     //Color image
  public:
     Camera() = delete;
     explicit Camera(const std::string &cName):name_(cName) {}
     const std::string& getName() const {return name_;}
     void setName(const std::string &cName) {name_ = cName;}
     const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_;}
+
     // Interfaces
     virtual ~Camera(){};
     virtual void loadConfig(const std::string &configFile) = 0;
     virtual const cv::Mat& getNextFrame() = 0;
+    virtual void undistort()=0;
+    virtual void computeShadowsAndThreasholds()=0;
 };
 }  // namespace SLS

@@ -39,6 +39,7 @@ class FileReader: public Camera
     ~FileReader(){}
     void loadConfig(const std::string& configFile) override;
     const cv::Mat& getNextFrame() override;
-    void undistortAll();
+    void undistort() override;
+    void computeShadowsAndThreasholds() override;
 };
 }
