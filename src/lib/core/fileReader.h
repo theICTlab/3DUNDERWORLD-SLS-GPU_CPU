@@ -26,15 +26,18 @@ class FileReader: public Camera
     std::vector<cv::Mat> undistortedImages_;
     size_t frameIdx_;
  public:
+    //Constructors
     FileReader() = delete;
     explicit FileReader(const std::string& cName):Camera(cName),frameIdx_(0){}
+
     //Extra functions
     void loadImages(const std::string& folder, bool isGL=false);
     void previousFrame() {frameIdx_=frameIdx_==0?frameIdx_:frameIdx_-1;}
-    void nextFrame() {frameIdx_=frameIdx_>=images_.size()?frameIdx_:frameIdx_+1;}
+    void nextFrame() override{frameIdx_=frameIdx_>=images_.size()?frameIdx_:frameIdx_+1;}
     const cv::Mat& getCurrentFrame() const {return images_[frameIdx_];}
     size_t getNumFrames() const { return images_.size(); }
     size_t getCurrentIdx() const {return frameIdx_;}
+    
     //Implementing interfaces
     ~FileReader(){}
     void loadConfig(const std::string& configFile) override;

@@ -34,10 +34,11 @@ protected:
     float* pointCloud_;
 public:
     Reconstructor():projector_{nullptr},pointCloud_{nullptr}{};
-    virtual ~Reconstructor(){};
+    virtual ~Reconstructor(){}
 
     // Interfaces
     virtual void renconstruct()=0;
+    virtual void addCamera(Camera* cam)=0;
 };
 } // namespace SLS
 

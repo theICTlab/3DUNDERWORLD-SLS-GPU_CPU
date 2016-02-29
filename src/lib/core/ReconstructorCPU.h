@@ -27,13 +27,17 @@ namespace SLS
  */
 class ReconstructorCPU: public Reconstructor
 {
+private:
+    std::vector<std::vector<std::vector<size_t>>> buckets_;
+    void initBuckets();
+    void generateBuckets();
 public:
     ReconstructorCPU(const size_t projX, const size_t projY): 
         Reconstructor()
         //projector_{new Projector(projX, projY)}
     {
         try{
-        projector_ = new Projector(projX, projY);
+            projector_ = new Projector(projX, projY);
         }
         catch(std::bad_alloc& ba)
         {
@@ -41,6 +45,9 @@ public:
             exit(0);
         }
     }
+    ~ReconstructorCPU() override;
+    //Interfaces
     void renconstruct() override;
+    void addCamera(Camera *cam) override;
 };
 } // namespace SLS

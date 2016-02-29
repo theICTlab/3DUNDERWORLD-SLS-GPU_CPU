@@ -3,6 +3,8 @@
 #include <iostream>
 #include <iomanip>
 #include "log.hpp"
+
+//using uchar=unsigned char;
 namespace SLS
 {
 void FileReader::loadImages(const std::string& folder, bool isGL)
@@ -82,7 +84,22 @@ void FileReader::undistort()
 
 void FileReader::computeShadowsAndThreasholds()
 {
+    /*
+     * Black threashold = 5;
+     */
     cv::Mat& brightImg=images_[0];
     cv::Mat& darkImg=images_[1];
+    shadowMask_.resize(resX_*resY_); 
+    threasholds_.resize(resX_*resY_);
+    //Column based
+    for (size_t i=0; i< resX_; i++)
+        for (size_t j=0; j<resY_; j++)
+        {
+            threasholds_[j+i*resY_] = brightImg.at<uchar>(j,i)-darkImg.at<uchar>(j,i);
+            if (threasholds_[j+i*resY_] > blackThreshold_)
+                shadowMask_.setBit(j+i*resY_);
+            else
+                shadowMask_.clearBit(j+i*resY_);
+        }
 }
 }

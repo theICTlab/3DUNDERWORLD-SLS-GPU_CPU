@@ -18,6 +18,7 @@
 
 #pragma once
 #include <iostream>
+#include <cmath>
 namespace SLS {
 
 /**
@@ -31,7 +32,11 @@ private:
 public:
     Projector() = delete;
     Projector(size_t width, size_t height):width_{width},height_{height}{}
-    ~Projector();
+    ~Projector(){};
     void getSize(size_t &w, size_t &h){w = width_; h = height_;}
+    size_t getRequiredNumFrames()const
+    {
+        return std::ceil(std::log2((float)width_*(float)height_));
+    }
 };
 }

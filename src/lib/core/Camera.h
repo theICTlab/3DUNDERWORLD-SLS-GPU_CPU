@@ -20,6 +20,8 @@
 #include <string>
 #include <array>
 #include <opencv2/opencv.hpp>
+#include <iostream>
+#include "Dynamic_Bitset.h"
 namespace SLS
 {
 enum CAMERA_MAT{
@@ -38,27 +40,36 @@ enum CAMERA_MAT{
  * 4. Calculate shadows to discard
  * 5. save colors
  */
+
 class Camera
 {
  protected:
     std::string name_;
     std::array<cv::Mat, PARAM_COUNT> params_;
     size_t resX_, resY_;        //Camera Resolution
+    
     std::vector<unsigned char> threasholds_; //Threashold for each pixel [0,255]
-    std::vector<unsigned char> shadowMask_; //Color mask
+    Dynamic_Bitset shadowMask_; //Color mask
     cv::Mat color_;     //Color image
+    uchar whiteThreshold_;
+    uchar blackThreshold_;
  public:
     Camera() = delete;
-    explicit Camera(const std::string &cName):name_(cName) {}
+    explicit Camera(const std::string &cName):name_(cName) 
+    {whiteThreshold_=250; blackThreshold_=5;}   //Hacking, need to read from file
     const std::string& getName() const {return name_;}
     void setName(const std::string &cName) {name_ = cName;}
     const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_;}
+    void getResolution(size_t x, size_t y) const{x=resX_; y=resY_;}
+    const unsigned char& getThreashold(const size_t &idx){return threasholds_[idx];}
+    bool queryMask(const size_t &idx){return shadowMask_.getBit(idx);}
 
     // Interfaces
-    virtual ~Camera(){};
+    virtual ~Camera(){}
     virtual void loadConfig(const std::string &configFile) = 0;
     virtual const cv::Mat& getNextFrame() = 0;
     virtual void undistort()=0;
     virtual void computeShadowsAndThreasholds()=0;
+    virtual void nextFrame()=0;
 };
 }  // namespace SLS
