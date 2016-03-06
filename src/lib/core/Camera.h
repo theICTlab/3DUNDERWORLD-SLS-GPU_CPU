@@ -22,15 +22,11 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include "Dynamic_Bitset.h"
+#include <glm/glm.hpp>
+
 namespace SLS
 {
-enum CAMERA_MAT{
-    CAMERA_MAT=0,
-    DISTOR_MAT,
-    ROT_MAT,
-    TRANS_MAT,
-    PARAM_COUNT
-};
+
 
 /**
  * @ Base class of camera
@@ -40,12 +36,18 @@ enum CAMERA_MAT{
  * 4. Calculate shadows to discard
  * 5. save colors
  */
+struct Ray
+{
+    glm::vec4 origin;
+    glm::vec4 dir;
+};
 
 class Camera
 {
  protected:
     std::string name_;
-    std::array<cv::Mat, PARAM_COUNT> params_;
+
+
     size_t resX_, resY_;        //Camera Resolution
     
     std::vector<unsigned char> threasholds_; //Threashold for each pixel [0,255]
@@ -59,12 +61,12 @@ class Camera
     {whiteThreshold_=250; blackThreshold_=5;}   //Hacking, need to read from file
     const std::string& getName() const {return name_;}
     void setName(const std::string &cName) {name_ = cName;}
-    const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_;}
     void getResolution(size_t x, size_t y) const{x=resX_; y=resY_;}
     const unsigned char& getThreashold(const size_t &idx){return threasholds_[idx];}
     bool queryMask(const size_t &idx){return shadowMask_.getBit(idx);}
 
     // Interfaces
+    virtual Ray getRay(const size_t &x, const size_t &y);
     virtual ~Camera(){}
     virtual void loadConfig(const std::string &configFile) = 0;
     virtual const cv::Mat& getNextFrame() = 0;

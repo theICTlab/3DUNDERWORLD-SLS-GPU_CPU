@@ -46,6 +46,8 @@ void FileReader::loadImages(const std::string& folder, bool isGL)
 
 void FileReader::loadConfig(const std::string& configFile)
 {
+    // Please refer this for those paramters.;w
+    // http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
     LOG::writeLog("Loading config from: %s\n", configFile.c_str());
     cv::FileStorage fs(configFile, cv::FileStorage::READ);
     fs.root()["Camera"]["Matrix"]>>params_[CAMERA_MAT];
@@ -56,7 +58,11 @@ void FileReader::loadConfig(const std::string& configFile)
     for (size_t i=0; i<PARAM_COUNT; i++)
         if (params_[i].empty())
             LOG::writeLogErr("Failed to load config %s\n", configFile.c_str());
-
+    LOG::writeLog("Loading Camera %s\n", name_.c_str());
+    //Write to camera transformation matrix
+    //Mat = R^T*(-T);
+    std::cout<<params_[ROT_MAT].size()<<std::endl;
+    
 }
 const cv::Mat& FileReader::getNextFrame() 
 {

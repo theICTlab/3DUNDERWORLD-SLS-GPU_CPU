@@ -19,16 +19,25 @@
 #include "Camera.h"
 namespace SLS
 {
+enum CAMERA_MAT{
+    CAMERA_MAT=0,
+    DISTOR_MAT,
+    ROT_MAT,
+    TRANS_MAT,
+    PARAM_COUNT
+};
 class FileReader: public Camera
 {
  private:
     std::vector<cv::Mat> images_;
     std::vector<cv::Mat> undistortedImages_;
     size_t frameIdx_;
+    std::array<cv::Mat, PARAM_COUNT> params_;
+    glm::mat4 camTransMat_; //Transformation matrix for camera
  public:
     //Constructors
     FileReader() = delete;
-    explicit FileReader(const std::string& cName):Camera(cName),frameIdx_(0){}
+    explicit FileReader(const std::string& cName):Camera(cName),frameIdx_(0),camTransMat_(glm::mat4(1.0)){}
 
     //Extra functions
     void loadImages(const std::string& folder, bool isGL=false);
@@ -37,6 +46,7 @@ class FileReader: public Camera
     const cv::Mat& getCurrentFrame() const {return images_[frameIdx_];}
     size_t getNumFrames() const { return images_.size(); }
     size_t getCurrentIdx() const {return frameIdx_;}
+    const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_;}
     
     //Implementing interfaces
     ~FileReader(){}
