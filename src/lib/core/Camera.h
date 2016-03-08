@@ -28,6 +28,7 @@ namespace SLS
 {
 
 
+
 /**
  * @ Base class of camera
  * 1. this class manages aquiring images form file/camera. 
@@ -66,7 +67,16 @@ class Camera
     bool queryMask(const size_t &idx){return shadowMask_.getBit(idx);}
 
     // Interfaces
-    virtual Ray getRay(const size_t &x, const size_t &y);
+    
+    /**
+     * @brief Get a ray in world space by given pixel
+     *
+     * @param x x coordinate of pixel
+     * @param y y coordinate of pixel
+     *
+     * @return Ray shot from camera to this pixel
+     */
+    virtual Ray getRay(const size_t &x, const size_t &y)=0;
     virtual ~Camera(){}
     virtual void loadConfig(const std::string &configFile) = 0;
     virtual const cv::Mat& getNextFrame() = 0;

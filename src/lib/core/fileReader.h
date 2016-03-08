@@ -49,7 +49,8 @@ class FileReader: public Camera
     const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_;}
     
     //Implementing interfaces
-    ~FileReader(){}
+    ~FileReader() override{}
+    Ray getRay(const size_t &x, const size_t &y) override;
     void loadConfig(const std::string& configFile) override;
     const cv::Mat& getNextFrame() override;
     void undistort() override;

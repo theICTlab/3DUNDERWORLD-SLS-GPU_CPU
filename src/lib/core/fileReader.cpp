@@ -1,5 +1,6 @@
 #include "fileReader.h"
 #include <sstream>
+#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <iomanip>
 #include "log.hpp"
@@ -46,7 +47,7 @@ void FileReader::loadImages(const std::string& folder, bool isGL)
 
 void FileReader::loadConfig(const std::string& configFile)
 {
-    // Please refer this for those paramters.;w
+    // Please refer to this link for paramters.
     // http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
     LOG::writeLog("Loading config from: %s\n", configFile.c_str());
     cv::FileStorage fs(configFile, cv::FileStorage::READ);
@@ -60,8 +61,30 @@ void FileReader::loadConfig(const std::string& configFile)
             LOG::writeLogErr("Failed to load config %s\n", configFile.c_str());
     LOG::writeLog("Loading Camera %s\n", name_.c_str());
     //Write to camera transformation matrix
-    //Mat = R^T*(-T);
-    std::cout<<params_[ROT_MAT].size()<<std::endl;
+    //Mat = R^T*(p-T) => R^T * T * P;
+    // Translation is performed before rotation
+    //-T
+    glm::mat4 translationMat(1.0);
+    translationMat[3][0]=-params_[TRANS_MAT].at<double>(0,0);
+    translationMat[3][1]=-params_[TRANS_MAT].at<double>(1,0);
+    translationMat[3][2]=-params_[TRANS_MAT].at<double>(2,0);
+    //R^T
+    glm::mat4 rotationMat(1.0);
+    for (int i=0; i<3; i++)
+        for (int j=0; j<3; j++)
+            rotationMat[i][j]=params_[ROT_MAT].at<double>(i,j);
+    camTransMat_ = rotationMat*translationMat;
+    //-T
+    //camTransMat_[3][0]=-params_[TRANS_MAT].at<double>(0,0);
+    //camTransMat_[3][1]=-params_[TRANS_MAT].at<double>(1,0);
+    //camTransMat_[3][2]=-params_[TRANS_MAT].at<double>(2,0);
+    //std::cout<<params_[ROT_MAT].at<double>(0,0)<<std::endl;
+    //std::cout<<"Rot\n"<<params_[ROT_MAT]<<std::endl;
+    //std::cout<<"Trans\n"<<params_[TRANS_MAT]<<std::endl;
+
+    std::cout<<glm::to_string(camTransMat_)<<std::endl;
+
+
     
 }
 const cv::Mat& FileReader::getNextFrame() 
@@ -107,5 +130,14 @@ void FileReader::computeShadowsAndThreasholds()
             else
                 shadowMask_.clearBit(j+i*resY_);
         }
+}
+Ray FileReader::getRay(const size_t &x, const size_t &y)
+{
+    Ray ray;
+    ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
+
+    //TODO: finish the ray function here
+    ray.dir.x = 1.0;
+    return ray;
 }
 }
