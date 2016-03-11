@@ -28,7 +28,7 @@ namespace SLS
 class ReconstructorCPU: public Reconstructor
 {
 private:
-    std::vector<std::vector<std::vector<size_t>>> buckets_;
+    std::vector<std::vector<std::vector<size_t>>> buckets_;//[camIdx][ProjPixelIdx][camPixelIdx]
     void initBuckets();
     void generateBuckets();
 public:

@@ -34,6 +34,8 @@ class FileReader: public Camera
     size_t frameIdx_;
     std::array<cv::Mat, PARAM_COUNT> params_;
     glm::mat4 camTransMat_; //Transformation matrix for camera
+    std::vector<Ray> rayTable;
+    
  public:
     //Constructors
     FileReader() = delete;
@@ -47,13 +49,22 @@ class FileReader: public Camera
     size_t getNumFrames() const { return images_.size(); }
     size_t getCurrentIdx() const {return frameIdx_;}
     const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_;}
+
+    /**
+     * @brief visualize raytable with point cloud, each ray is a unit vector
+     *
+     * @param fileName output obj file
+     */
+    void rayTableToPointCloud(std::string fileName) const;
     
     //Implementing interfaces
     ~FileReader() override{}
     Ray getRay(const size_t &x, const size_t &y) override;
+    Ray getRay(const size_t &idx) override{return getRay(idx/resY_, idx%resY_);}
     void loadConfig(const std::string& configFile) override;
     const cv::Mat& getNextFrame() override;
     void undistort() override;
     void computeShadowsAndThreasholds() override;
+    void setResolution (const size_t &x, const size_t &y) override {resX_ = x; resY_ = y; rayTable.resize(resX_*resY_);}
 };
 }

@@ -3,6 +3,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include "log.hpp"
 
 //using uchar=unsigned char;
@@ -10,6 +11,7 @@ namespace SLS
 {
 void FileReader::loadImages(const std::string& folder, bool isGL)
 {
+    LOG::startTimer("Loading image from %s ... ", folder.c_str());
     std::stringstream ss;
     if (folder.back() != '/')
         ss<<folder<<'/';
@@ -21,7 +23,6 @@ void FileReader::loadImages(const std::string& folder, bool isGL)
         jpgss<<std::setfill('0')<<std::setw(4)<<images_.size()<<".jpg";
         std::string fName = ss.str()+jpgss.str();
         cv::Mat img=cv::imread(fName, CV_LOAD_IMAGE_COLOR);
-        LOG::writeLog( "Reading image %s", fName.c_str());
         if (!img.data)
             break;
         else 
@@ -37,19 +38,22 @@ void FileReader::loadImages(const std::string& folder, bool isGL)
         }
     }
     if (images_.empty())
-        LOG::writeLogErr(" No image readed from %s", ss.str().c_str());
+        LOG::writeLogErr(" No image readed from %s ... ", ss.str().c_str());
     else
     {
         resX_ = images_[0].cols;
         resY_ = images_[0].rows;
+        rayTable.resize(resX_*resY_);
+        LOG::writeLog("%d images loaded ...", images_.size());
     }
+    LOG::endTimer('s');
 }
 
 void FileReader::loadConfig(const std::string& configFile)
 {
     // Please refer to this link for paramters.
     // http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
-    LOG::writeLog("Loading config from: %s\n", configFile.c_str());
+    LOG::writeLog("Loading config for \"%s\" from: %s\n", name_.c_str(), configFile.c_str());
     cv::FileStorage fs(configFile, cv::FileStorage::READ);
     fs.root()["Camera"]["Matrix"]>>params_[CAMERA_MAT];
     fs.root()["Camera"]["Distortion"]>>params_[DISTOR_MAT];
@@ -59,7 +63,6 @@ void FileReader::loadConfig(const std::string& configFile)
     for (size_t i=0; i<PARAM_COUNT; i++)
         if (params_[i].empty())
             LOG::writeLogErr("Failed to load config %s\n", configFile.c_str());
-    LOG::writeLog("Loading Camera %s\n", name_.c_str());
     //Write to camera transformation matrix
     //Mat = R^T*(p-T) => R^T * T * P;
     // Translation is performed before rotation
@@ -82,15 +85,29 @@ void FileReader::loadConfig(const std::string& configFile)
     //std::cout<<"Rot\n"<<params_[ROT_MAT]<<std::endl;
     //std::cout<<"Trans\n"<<params_[TRANS_MAT]<<std::endl;
 
-    std::cout<<glm::to_string(camTransMat_)<<std::endl;
 
+    //Generating raytable
+    LOG::startTimer("Generating ray lookup table with size of %d*%d...",
+            resX_, resY_);
+    for (size_t i=0; i<resX_; i++)
+        for (size_t j=0; j<resY_; j++){
+            Ray ray;
+            ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
 
-    
+            ray.dir.x = ((float)i-params_[CAMERA_MAT].at<double>(0,2))/params_[CAMERA_MAT].at<double>(0,0);
+            ray.dir.y = ((float)j-params_[CAMERA_MAT].at<double>(1,2))/params_[CAMERA_MAT].at<double>(1,1);
+            ray.dir.z=1.0;
+            ray.dir.w=0.0;
+            ray.dir=glm::normalize(ray.dir);
+            rayTable[j+i*resY_] = ray;
+        }
+    LOG::endTimer('s');
 }
 const cv::Mat& FileReader::getNextFrame() 
 {
-    frameIdx_ = (frameIdx_+1)%(images_.size());
-    return images_[frameIdx_];
+    //Return the current frame and move on
+    frameIdx_ = frameIdx_ % images_.size();
+    return images_[frameIdx_++];
 }
 
 void FileReader::undistort()
@@ -102,12 +119,14 @@ void FileReader::undistort()
             LOG::writeLogErr("No parameters set for undistortion\n");
             return;
         }
+    LOG::startTimer("Undistoring %d images ...", images_.size());
     for (auto &img : images_)
     {
         cv::Mat temp;
         cv::undistort(img, temp, params_[CAMERA_MAT], params_[DISTOR_MAT]);
         temp.copyTo(img);
     }
+    LOG::endTimer('s');
 }
 
 
@@ -124,20 +143,33 @@ void FileReader::computeShadowsAndThreasholds()
     for (size_t i=0; i< resX_; i++)
         for (size_t j=0; j<resY_; j++)
         {
-            threasholds_[j+i*resY_] = brightImg.at<uchar>(j,i)-darkImg.at<uchar>(j,i);
+            threasholds_[j+i*resY_] = (brightImg.at<uchar>(j,i)-darkImg.at<uchar>(j,i))/2;
             if (threasholds_[j+i*resY_] > blackThreshold_)
                 shadowMask_.setBit(j+i*resY_);
             else
                 shadowMask_.clearBit(j+i*resY_);
         }
+    std::string pgmFName=name_+".pgm";
+    LOG::writeLog("Writing mask to %s\n", pgmFName.c_str());
+    shadowMask_.writeToPGM(pgmFName.c_str(), resX_, resY_, true);
 }
 Ray FileReader::getRay(const size_t &x, const size_t &y)
 {
-    Ray ray;
-    ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
+    return rayTable[y+x*resY_];
+}
+void FileReader::rayTableToPointCloud(std::string fileName) const
+{
 
-    //TODO: finish the ray function here
-    ray.dir.x = 1.0;
-    return ray;
+    std::ofstream of(fileName);
+    for (size_t i=0; i<rayTable.size(); i++)
+    {
+        const auto& ray = rayTable[i];
+        if (shadowMask_.getBit(i))
+        {
+            auto endP = ray.origin+ray.dir*5000.0f;
+            of<<"v "<<endP.x<<" "<<endP.y<<" "<<endP.z<<std::endl;
+        }
+    }
+    of.close();
 }
 }

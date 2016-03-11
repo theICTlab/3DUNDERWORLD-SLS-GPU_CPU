@@ -23,6 +23,7 @@
 #include <iostream>
 #include "Dynamic_Bitset.h"
 #include <glm/glm.hpp>
+#include "Ray.h"
 
 namespace SLS
 {
@@ -37,11 +38,6 @@ namespace SLS
  * 4. Calculate shadows to discard
  * 5. save colors
  */
-struct Ray
-{
-    glm::vec4 origin;
-    glm::vec4 dir;
-};
 
 class Camera
 {
@@ -58,11 +54,11 @@ class Camera
     uchar blackThreshold_;
  public:
     Camera() = delete;
-    explicit Camera(const std::string &cName):name_(cName) 
+    explicit Camera(const std::string &cName):name_(cName),resX_(0),resY_(0)
     {whiteThreshold_=250; blackThreshold_=5;}   //Hacking, need to read from file
     const std::string& getName() const {return name_;}
     void setName(const std::string &cName) {name_ = cName;}
-    void getResolution(size_t x, size_t y) const{x=resX_; y=resY_;}
+    void getResolution(size_t &x, size_t &y) const{x=resX_; y=resY_;}
     const unsigned char& getThreashold(const size_t &idx){return threasholds_[idx];}
     bool queryMask(const size_t &idx){return shadowMask_.getBit(idx);}
 
@@ -77,6 +73,8 @@ class Camera
      * @return Ray shot from camera to this pixel
      */
     virtual Ray getRay(const size_t &x, const size_t &y)=0;
+    virtual Ray getRay(const size_t &idx)=0;
+    virtual void setResolution(const size_t &x, const size_t &y) {resX_ = x; resY_ = y;}
     virtual ~Camera(){}
     virtual void loadConfig(const std::string &configFile) = 0;
     virtual const cv::Mat& getNextFrame() = 0;

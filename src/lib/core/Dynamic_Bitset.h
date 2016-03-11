@@ -19,8 +19,11 @@
 
 #pragma once
 #include <iostream>
+#include <string>
 #include <vector>
 #include <bitset>
+#include <stdexcept>
+#include <cstdlib>
 using std::ostream;
 
 namespace SLS
@@ -136,6 +139,7 @@ public:
             res += ((unsigned int)bits[i])<<(i*BITS_PER_BYTE);
         return res;
     }
+    bool writeToPGM( std::string fileName, const size_t &w, const size_t &h, bool transpose=false);
 
     //Friend operators
     inline friend std::ostream& operator<<(std::ostream& os, const Dynamic_Bitset& db);
@@ -150,5 +154,3 @@ std::ostream& operator<<(std::ostream& os, const Dynamic_Bitset& db)
     return os;
 }
 };
-
-
