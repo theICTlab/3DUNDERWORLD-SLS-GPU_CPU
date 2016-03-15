@@ -126,8 +126,8 @@ void ReconstructorCPU::renconstruct()
             size_t cam0=buckets_[0][i][0];
             size_t cam1=buckets_[1][i][0];
 
-            LOG::writeLog("Cam0 %d,%d Cam1 %d,%d\n",cam0/y, cam0%y, cam1/y, cam1%y);
-            LOG::writeLog("Cam0 Ray: origin: %s dir %s, Cam1 Ray: origin %s dir %s\n", 
+            //LOG::writeLog("Cam0 %d,%d Cam1 %d,%d\n",cam0/y, cam0%y, cam1/y, cam1%y);
+            //LOG::writeLog("Cam0 Ray: origin: %s dir %s, Cam1 Ray: origin %s dir %s\n", 
                     glm::to_string(cameras_[0]->getRay(cam0).origin).c_str(),
                     glm::to_string(cameras_[0]->getRay(cam0).dir).c_str()
                     , glm::to_string(cameras_[1]->getRay(cam1).origin).c_str()

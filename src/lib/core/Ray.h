@@ -6,8 +6,8 @@ namespace SLS
 {
 struct Ray
 {
-    glm::vec4 origin;
-    glm::vec4 dir;
+    vec4 origin;
+    vec4 dir;
 };
 
 /**
@@ -44,7 +44,7 @@ inline glm::vec4 midPoint(const Ray &r1, const Ray &r2, float &dist)
 
     auto p_s = q_0 + t_c * v;
     auto q_c = p_0 + s_c * u;
-    dist = glm::distance(p_s, q_c);
+    dist = distance(p_s, q_c);
     return vec4((p_s + q_c)/2.0f, 1.0);
 }
 }
