@@ -113,32 +113,40 @@ void ReconstructorCPU::renconstruct()
      * */
     size_t x,y;
     cameras_[0]->getResolution(x,y);
-    LOG::startTimer("Reconstructing with CPU ... ");
     initBuckets();
 
+    LOG::startTimer();
     std::ofstream of("test.obj");
 
     for ( size_t i=0; i<buckets_[0].size(); i++)
     {
         if (!buckets_[1][i].empty() && !buckets_[0][i].empty())
         {
-            float dist=0.0;
-            size_t cam0=buckets_[0][i][0];
-            size_t cam1=buckets_[1][i][0];
+            const auto &cam0bucket = buckets_[0][i];
+            const auto &cam1bucket = buckets_[1][i];
+            //size_t cam0=buckets_[0][i][0];
+            //size_t cam1=buckets_[1][i][0];
+            float minDist=9999999999.0;
+            glm::vec4 minMidP(0.0f);
 
-            //LOG::writeLog("Cam0 %d,%d Cam1 %d,%d\n",cam0/y, cam0%y, cam1/y, cam1%y);
-            //LOG::writeLog("Cam0 Ray: origin: %s dir %s, Cam1 Ray: origin %s dir %s\n", 
-            //        glm::to_string(cameras_[0]->getRay(cam0).origin).c_str(),
-            //        glm::to_string(cameras_[0]->getRay(cam0).dir).c_str()
-            //        , glm::to_string(cameras_[1]->getRay(cam1).origin).c_str()
-            //        , glm::to_string(cameras_[1]->getRay(cam1).dir).c_str());
+            for (const auto& cam0P: cam0bucket)
+                for (const auto& cam1P: cam1bucket)
+                {
+                    float dist;
+                    auto midP=midPoint(cameras_[0]->getRay(cam0P), cameras_[1]->getRay(cam1P), dist);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        minMidP = midP;
+                    }
+                }
+            if (minDist > 500000.0f) continue;  //debugging the distance threashold
 
-            auto midP=midPoint(cameras_[0]->getRay(cam0), cameras_[1]->getRay(cam1), dist);
-            of<<"v "<<midP.x<<" "<<midP.y<<" "<<midP.z<<std::endl;
+            of<<"v "<<minMidP.x<<" "<<minMidP.y<<" "<<minMidP.z<<std::endl;
         }
     }
     of.close();
-    LOG::endTimer('s');
+    LOG::endTimer("Finished reconstruction in ");
     
 }
 

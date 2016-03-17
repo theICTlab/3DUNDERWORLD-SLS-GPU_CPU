@@ -77,8 +77,32 @@ namespace LOG
         vfprintf (file, message, argptr);
         va_end (argptr);
         fclose (file);
+
         start = std::chrono::steady_clock::now();
         return true;
+    }
+    bool startTimer()
+    {
+        start = std::chrono::steady_clock::now();
+        return true;
+    }
+    bool endTimer(const char* message, ...)
+    {
+        va_list argptr;
+        FILE* file = fopen (GL_LOG_FILE, "a");
+        if (!file) {
+            fprintf (
+                    stderr,
+                    "ERROR: could not open GL_LOG_FILE %s file for appending\n",
+                    GL_LOG_FILE
+                    );
+            return false;
+        }
+        va_start (argptr, message);
+        vfprintf (file, message, argptr);
+        va_end (argptr);
+        fclose(file);
+        return endTimer('s');
     }
     bool endTimer(const char unit)
     {
@@ -91,8 +115,10 @@ namespace LOG
             default:
                 return writeLog(" %fs\n",std::chrono::duration <double, std::ratio<1,1>> (diff).count());
         }
+        return true;
     }
 
+    //Prograss bar is slow. Use it while you are loading some big files in few iterations
     bool progress(const float &prog)
     {
         if (prog > 1.0) return false;

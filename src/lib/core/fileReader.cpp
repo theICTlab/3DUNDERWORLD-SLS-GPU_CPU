@@ -98,6 +98,7 @@ void FileReader::loadConfig(const std::string& configFile)
             ray.dir.y = ((float)j-params_[CAMERA_MAT].at<double>(1,2))/params_[CAMERA_MAT].at<double>(1,1);
             ray.dir.z=1.0;
             ray.dir.w=0.0;
+            ray.dir = camTransMat_*ray.dir;
             ray.dir=glm::normalize(ray.dir);
             rayTable[j+i*resY_] = ray;
         }
@@ -119,14 +120,14 @@ void FileReader::undistort()
             LOG::writeLogErr("No parameters set for undistortion\n");
             return;
         }
-    LOG::startTimer("Undistoring %d images ...", images_.size());
+    LOG::startTimer();
     for (auto &img : images_)
     {
         cv::Mat temp;
         cv::undistort(img, temp, params_[CAMERA_MAT], params_[DISTOR_MAT]);
         temp.copyTo(img);
     }
-    LOG::endTimer('s');
+    LOG::endTimer("Undistorted %d images in ", images_.size());
 }
 
 

@@ -56,6 +56,7 @@ int main()
     //    if (cv::waitKey(0)==27)
     //        break;
     //}
+    LOG::writeLog("DONE!\n");
     
     return 0;
 }
