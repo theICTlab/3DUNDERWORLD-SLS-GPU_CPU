@@ -60,7 +60,7 @@ class FileReader: public Camera
     //Implementing interfaces
     ~FileReader() override{}
     Ray getRay(const size_t &x, const size_t &y) override;
-    Ray getRay(const size_t &idx) override{return getRay(idx/resY_, idx%resY_);}
+    Ray getRay(const size_t &idx) override{return rayTable[idx];}
     void loadConfig(const std::string& configFile) override;
     const cv::Mat& getNextFrame() override;
     void undistort() override;

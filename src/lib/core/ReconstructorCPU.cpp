@@ -116,7 +116,7 @@ void ReconstructorCPU::renconstruct()
     LOG::startTimer("Reconstructing with CPU ... ");
     initBuckets();
 
-    std::ofstream of("test.txt");
+    std::ofstream of("test.obj");
 
     for ( size_t i=0; i<buckets_[0].size(); i++)
     {
@@ -128,10 +128,10 @@ void ReconstructorCPU::renconstruct()
 
             //LOG::writeLog("Cam0 %d,%d Cam1 %d,%d\n",cam0/y, cam0%y, cam1/y, cam1%y);
             //LOG::writeLog("Cam0 Ray: origin: %s dir %s, Cam1 Ray: origin %s dir %s\n", 
-                    glm::to_string(cameras_[0]->getRay(cam0).origin).c_str(),
-                    glm::to_string(cameras_[0]->getRay(cam0).dir).c_str()
-                    , glm::to_string(cameras_[1]->getRay(cam1).origin).c_str()
-                    , glm::to_string(cameras_[1]->getRay(cam1).dir).c_str());
+            //        glm::to_string(cameras_[0]->getRay(cam0).origin).c_str(),
+            //        glm::to_string(cameras_[0]->getRay(cam0).dir).c_str()
+            //        , glm::to_string(cameras_[1]->getRay(cam1).origin).c_str()
+            //        , glm::to_string(cameras_[1]->getRay(cam1).dir).c_str());
 
             auto midP=midPoint(cameras_[0]->getRay(cam0), cameras_[1]->getRay(cam1), dist);
             of<<"v "<<midP.x<<" "<<midP.y<<" "<<midP.z<<std::endl;
