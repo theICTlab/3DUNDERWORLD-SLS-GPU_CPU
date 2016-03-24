@@ -42,7 +42,7 @@ int main()
     SLS::ReconstructorCPU renconstruct(1024,768);
     renconstruct.addCamera(rightCam);
     renconstruct.addCamera(leftCam);
-    renconstruct.renconstruct();
+    //renconstruct.renconstruct();
 
 
 

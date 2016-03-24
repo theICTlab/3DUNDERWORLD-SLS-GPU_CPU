@@ -62,6 +62,12 @@ class FileReader: public Camera
     Ray getRay(const size_t &x, const size_t &y) override;
     Ray getRay(const size_t &idx) override{return rayTable[idx];}
     void loadConfig(const std::string& configFile) override;
+    void loadConfig(
+            const std::string& distMat,
+            const std::string& camMat,
+            const std::string& transMat,
+            const std::string& rotMat
+            );
     const cv::Mat& getNextFrame() override;
     void undistort() override;
     void computeShadowsAndThreasholds() override;

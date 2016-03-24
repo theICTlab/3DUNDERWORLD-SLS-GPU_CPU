@@ -49,6 +49,19 @@ void FileReader::loadImages(const std::string& folder, bool isGL)
     LOG::endTimer('s');
 }
 
+void FileReader::loadConfig(
+        const std::string& distMat,
+        const std::string& camMat,
+        const std::string& transMat,
+        const std::string& rotMat
+        )
+{
+    // Not implemented yet
+    cv::FileStorage fs(distMat, cv::FileStorage::READ);
+    
+}
+        
+
 void FileReader::loadConfig(const std::string& configFile)
 {
     // Please refer to this link for paramters.
@@ -59,6 +72,11 @@ void FileReader::loadConfig(const std::string& configFile)
     fs.root()["Camera"]["Distortion"]>>params_[DISTOR_MAT];
     fs.root()["Camera"]["Translation"]>>params_[TRANS_MAT];
     fs.root()["Camera"]["Rotation"]>>params_[ROT_MAT];
+    fs.release();
+    //Debug
+    std::cout<<"Debugging camera "<<name_<<std::endl;
+    for (int i=0; i< PARAM_COUNT; i++)
+        std::cout<<params_[i]<<std::endl;
     //Validation
     for (size_t i=0; i<PARAM_COUNT; i++)
         if (params_[i].empty())
