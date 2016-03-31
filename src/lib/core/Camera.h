@@ -47,7 +47,7 @@ class Camera
 
     size_t resX_, resY_;        //Camera Resolution
     
-    std::vector<unsigned char> threasholds_; //Threashold for each pixel [0,255]
+    std::vector<unsigned char> threasholds_; //Threashold for each pixel <-[0,255]
     Dynamic_Bitset shadowMask_; //Color mask
     cv::Mat color_;     //Color image
     uchar whiteThreshold_;
@@ -55,7 +55,7 @@ class Camera
  public:
     Camera() = delete;
     explicit Camera(const std::string &cName):name_(cName),resX_(0),resY_(0)
-    {whiteThreshold_=250; blackThreshold_=5;}   //Hacking, need to read from file
+    {whiteThreshold_=200; blackThreshold_=50;}   //Hacking, need to read from file
     const std::string& getName() const {return name_;}
     void setName(const std::string &cName) {name_ = cName;}
     void getResolution(size_t &x, size_t &y) const{x=resX_; y=resY_;}

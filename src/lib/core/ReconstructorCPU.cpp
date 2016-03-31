@@ -25,15 +25,6 @@ void ReconstructorCPU::addCamera(Camera *cam)
 }
 void ReconstructorCPU::generateBuckets()
 {
-    /*
-     * For each camera
-     *  Undistort
-     *  Calculate mask
-     *  Put pixel into projector bucket
-     * For each projector pixel
-     *  calculate the minimum distance of pixel within it
-     *  output result
-     */
     //Generating reconstruction bucket for each camera
     //for each camera
     //for (auto &cam : cameras_)
@@ -48,8 +39,9 @@ void ReconstructorCPU::generateBuckets()
         size_t x=0,y=0,xTimesY=0;
         cam->getResolution(x,y);
         xTimesY=x*y;
-        //For each camera pixle
-        assert(dynamic_cast<FileReader*>(cam)->getNumFrames() == projector_->getRequiredNumFrames()*2+2);
+
+        // For each camera pixle
+        //assert(dynamic_cast<FileReader*>(cam)->getNumFrames() == projector_->getRequiredNumFrames()*2+2);
 
 
         for ( size_t i=0; i<xTimesY; i++)
@@ -61,25 +53,10 @@ void ReconstructorCPU::generateBuckets()
 
             Dynamic_Bitset bits(projector_->getRequiredNumFrames());
 
-
             bool discard=false;
             // for each image
             while(bitIdx < projector_->getRequiredNumFrames())
             {
-                //std::cout<<dynamic_cast<FileReader*>(cam)->getCurrentIdx()<<std::endl;
-                //auto img = cam->getNextFrame();
-                //auto invImg = cam->getNextFrame();
-
-                //auto pixel = img.at<uchar>(i%y, i/y);
-                //auto invPixel = invImg.at<uchar>(i%y, i/y);
-                //
-                //cv::namedWindow("right", cv::WINDOW_NORMAL);
-                //cv::imshow("right", img);
-                //cv::namedWindow("left", cv::WINDOW_NORMAL);
-                //cv::imshow("left", invImg);
-                //cv::waitKey(0);
-                //std::cout<<dynamic_cast<FileReader*>(cam)->getCurrentIdx()<<std::endl;
-                //std::cout<<dynamic_cast<FileReader*>(cam)->getNumFrames()<<std::endl;
 
                 auto pixel = cam->getNextFrame().at<uchar>(i%y,i/y);
                 auto invPixel = cam->getNextFrame().at<uchar>(i%y,i/y);
@@ -128,6 +105,7 @@ void ReconstructorCPU::renconstruct()
             //size_t cam1=buckets_[1][i][0];
             float minDist=9999999999.0;
             glm::vec4 minMidP(0.0f);
+            //Refinement
 
             for (const auto& cam0P: cam0bucket)
                 for (const auto& cam1P: cam1bucket)
@@ -140,8 +118,6 @@ void ReconstructorCPU::renconstruct()
                         minMidP = midP;
                     }
                 }
-            if (minDist > 500000.0f) continue;  //debugging the distance threashold
-
             of<<"v "<<minMidP.x<<" "<<minMidP.y<<" "<<minMidP.z<<std::endl;
         }
     }

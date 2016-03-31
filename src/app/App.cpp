@@ -1,7 +1,7 @@
-#include "fileReader.h"
-#include "log.hpp"
+#include <core/fileReader.h>
+#include <core/log.hpp>
 #include <glm/gtx/string_cast.hpp>
-#include "ReconstructorCPU.h"
+#include <core/ReconstructorCPU.h>
 
 int main()
 {
@@ -42,7 +42,7 @@ int main()
     SLS::ReconstructorCPU renconstruct(1024,768);
     renconstruct.addCamera(rightCam);
     renconstruct.addCamera(leftCam);
-    //renconstruct.renconstruct();
+    renconstruct.renconstruct();
 
 
 

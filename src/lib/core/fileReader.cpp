@@ -74,34 +74,29 @@ void FileReader::loadConfig(const std::string& configFile)
     fs.root()["Camera"]["Rotation"]>>params_[ROT_MAT];
     fs.release();
     //Debug
-    std::cout<<"Debugging camera "<<name_<<std::endl;
-    for (int i=0; i< PARAM_COUNT; i++)
-        std::cout<<params_[i]<<std::endl;
     //Validation
     for (size_t i=0; i<PARAM_COUNT; i++)
         if (params_[i].empty())
             LOG::writeLogErr("Failed to load config %s\n", configFile.c_str());
     //Write to camera transformation matrix
-    //Mat = R^T*(p-T) => R^T * T * P;
+    //Mat = R^T*(p-T) => R^T * -T * P;
     // Translation is performed before rotation
     //-T
     glm::mat4 translationMat(1.0);
-    translationMat[3][0]=-params_[TRANS_MAT].at<double>(0,0);
-    translationMat[3][1]=-params_[TRANS_MAT].at<double>(1,0);
-    translationMat[3][2]=-params_[TRANS_MAT].at<double>(2,0);
-    //R^T
+    translationMat[3][0]=-params_[TRANS_MAT].at<double>(0);
+    translationMat[3][1]=-params_[TRANS_MAT].at<double>(1);
+    translationMat[3][2]=-params_[TRANS_MAT].at<double>(2);
+    std::cout<<glm::to_string(translationMat)<<std::endl;
+    //R^T, row base to column base, translated
     glm::mat4 rotationMat(1.0);
     for (int i=0; i<3; i++)
         for (int j=0; j<3; j++)
-            rotationMat[i][j]=params_[ROT_MAT].at<double>(i,j);
+            rotationMat[i][j]=params_[ROT_MAT].at<double>(j,i);
+    rotationMat = glm::inverse(rotationMat);
+    std::cout<<glm::to_string(rotationMat)<<std::endl;
     camTransMat_ = rotationMat*translationMat;
-    //-T
-    //camTransMat_[3][0]=-params_[TRANS_MAT].at<double>(0,0);
-    //camTransMat_[3][1]=-params_[TRANS_MAT].at<double>(1,0);
-    //camTransMat_[3][2]=-params_[TRANS_MAT].at<double>(2,0);
-    //std::cout<<params_[ROT_MAT].at<double>(0,0)<<std::endl;
-    //std::cout<<"Rot\n"<<params_[ROT_MAT]<<std::endl;
-    //std::cout<<"Trans\n"<<params_[TRANS_MAT]<<std::endl;
+
+
 
 
     //Generating raytable
