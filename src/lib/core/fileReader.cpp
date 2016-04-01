@@ -86,36 +86,35 @@ void FileReader::loadConfig(const std::string& configFile)
     translationMat[3][0]=-params_[TRANS_MAT].at<double>(0);
     translationMat[3][1]=-params_[TRANS_MAT].at<double>(1);
     translationMat[3][2]=-params_[TRANS_MAT].at<double>(2);
-    std::cout<<glm::to_string(translationMat)<<std::endl;
     //R^T, row base to column base, translated
     glm::mat4 rotationMat(1.0);
     for (int i=0; i<3; i++)
         for (int j=0; j<3; j++)
             rotationMat[i][j]=params_[ROT_MAT].at<double>(j,i);
     rotationMat = glm::inverse(rotationMat);
-    std::cout<<glm::to_string(rotationMat)<<std::endl;
     camTransMat_ = rotationMat*translationMat;
 
 
 
 
+    //No need to do this
     //Generating raytable
-    LOG::startTimer("Generating ray lookup table with size of %d*%d...",
-            resX_, resY_);
-    for (size_t i=0; i<resX_; i++)
-        for (size_t j=0; j<resY_; j++){
-            Ray ray;
-            ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
+    //LOG::startTimer("Generating ray lookup table with size of %d*%d...",
+    //        resX_, resY_);
+    //for (size_t i=0; i<resX_; i++)
+    //    for (size_t j=0; j<resY_; j++){
+    //        Ray ray;
+    //        ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
 
-            ray.dir.x = ((float)i-params_[CAMERA_MAT].at<double>(0,2))/params_[CAMERA_MAT].at<double>(0,0);
-            ray.dir.y = ((float)j-params_[CAMERA_MAT].at<double>(1,2))/params_[CAMERA_MAT].at<double>(1,1);
-            ray.dir.z=1.0;
-            ray.dir.w=0.0;
-            ray.dir = camTransMat_*ray.dir;
-            ray.dir=glm::normalize(ray.dir);
-            rayTable[j+i*resY_] = ray;
-        }
-    LOG::endTimer('s');
+    //        ray.dir.x = ((float)i-params_[CAMERA_MAT].at<double>(0,2))/params_[CAMERA_MAT].at<double>(0,0);
+    //        ray.dir.y = ((float)j-params_[CAMERA_MAT].at<double>(1,2))/params_[CAMERA_MAT].at<double>(1,1);
+    //        ray.dir.z=1.0;
+    //        ray.dir.w=0.0;
+    //        ray.dir = camTransMat_*ray.dir;
+    //        ray.dir=glm::normalize(ray.dir);
+    //        rayTable[j+i*resY_] = ray;
+    //    }
+    //LOG::endTimer('s');
 }
 const cv::Mat& FileReader::getNextFrame() 
 {
@@ -169,8 +168,48 @@ void FileReader::computeShadowsAndThreasholds()
 }
 Ray FileReader::getRay(const size_t &x, const size_t &y)
 {
-    return rayTable[y+x*resY_];
+        glm::vec2 undistorted = undistortPixel(glm::vec2(x, y));
+        Ray ray;
+        if (undistorted.x > resX_ || undistorted.y > resY_)
+        {
+            ray.dir = vec4(0.0);
+            LOG::writeLogErr("Invalid ray");
+            return ray;
+        }
+        ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
+        ray.dir.x = (undistorted.x-params_[CAMERA_MAT].at<double>(0,2))/params_[CAMERA_MAT].at<double>(0,0);
+        ray.dir.y = (undistorted.y-params_[CAMERA_MAT].at<double>(1,2))/params_[CAMERA_MAT].at<double>(1,1);
+        ray.dir.z=1.0;
+        ray.dir.w=0.0;
+        ray.dir = camTransMat_*ray.dir;
+        ray.dir=glm::normalize(ray.dir);
+        return ray;
 }
+Ray FileReader::getRay(const size_t &pixelIdx) 
+{
+        glm::vec2 undistorted = undistortPixel(pixelIdx);
+        Ray ray;
+
+        if (undistorted.x > resX_ || undistorted.y > resY_)
+        {
+            ray.dir = vec4(0.0);
+            LOG::writeLogErr("Invalid ray");
+            return ray;
+        }
+
+        ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
+        ray.dir.x = (undistorted.x-params_[CAMERA_MAT].at<double>(0,2))/params_[CAMERA_MAT].at<double>(0,0);
+        ray.dir.y = (undistorted.y-params_[CAMERA_MAT].at<double>(1,2))/params_[CAMERA_MAT].at<double>(1,1);
+        ray.dir.z=1.0;
+        ray.dir.w=0.0;
+        ray.dir = camTransMat_*ray.dir;
+        ray.dir=glm::normalize(ray.dir);
+
+        return ray;
+}
+
+
+
 void FileReader::rayTableToPointCloud(std::string fileName) const
 {
 
@@ -186,4 +225,47 @@ void FileReader::rayTableToPointCloud(std::string fileName) const
     }
     of.close();
 }
+
+glm::vec2 FileReader::undistortPixel(const glm::vec2 &distortedPixel) const
+{
+    double k[5] = {0.0};
+    double fx, fy, ifx, ify, cx, cy;
+    int iters = 1;
+
+    k[0] = params_[DISTOR_MAT].at<double> (0);
+    k[1] = params_[DISTOR_MAT].at<double> (1);
+    k[2] = params_[DISTOR_MAT].at<double> (2);
+    k[3] = params_[DISTOR_MAT].at<double> (3);
+    k[4] = 0;
+
+    iters = 5;
+
+    fx = params_[CAMERA_MAT].at<double>(0,0);
+    fy = params_[CAMERA_MAT].at<double>(1,1);
+    ifx = 1.0/fx;
+    ify = 1.0/fy;
+    cx = params_[CAMERA_MAT].at<double>(0,2);
+    cy = params_[CAMERA_MAT].at<double>(1,2);
+
+    double x,y,x0,y0;
+
+    x = distortedPixel.x;
+    y = distortedPixel.y;
+    x0 = (x-cx)*ifx;
+    x = x0;
+    y0 = (y-cy)*ify;
+    y = y0;
+
+    for(int jj = 0; jj < iters; jj++ )
+	{
+		double r2 = x*x + y*y;
+		double icdist = 1./(1 + ((k[4]*r2 + k[1])*r2 + k[0])*r2);
+		double deltaX = 2*k[2]*x*y + k[3]*(r2 + 2*x*x);
+		double deltaY = k[2]*(r2 + 2*y*y) + 2*k[3]*x*y;
+		x = (x0 - deltaX)*icdist;
+		y = (y0 - deltaY)*icdist;
+	}
+    return glm::vec2((float)(x*fx)+cx,(float)(y*fy)+cy);
+}
+
 }

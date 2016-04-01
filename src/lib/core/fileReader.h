@@ -35,11 +35,17 @@ class FileReader: public Camera
     std::array<cv::Mat, PARAM_COUNT> params_;
     glm::mat4 camTransMat_; //Transformation matrix for camera
     std::vector<Ray> rayTable;
+    glm::vec2 undistortPixel(const glm::vec2 &distortedPixel) const;
+    glm::vec2 undistortPixel(const size_t &distortedIdx) const
+    {
+        return undistortPixel(glm::vec2( distortedIdx/resY_, distortedIdx % resY_));
+    }
     
  public:
     //Constructors
     FileReader() = delete;
     explicit FileReader(const std::string& cName):Camera(cName),frameIdx_(0),camTransMat_(glm::mat4(1.0)){}
+
 
     //Extra functions
     void loadImages(const std::string& folder, bool isGL=false);
@@ -60,7 +66,9 @@ class FileReader: public Camera
     //Implementing interfaces
     ~FileReader() override{}
     Ray getRay(const size_t &x, const size_t &y) override;
-    Ray getRay(const size_t &idx) override{return rayTable[idx];}
+    //Ray getRay(const size_t &idx) override{return rayTable[idx];}
+    Ray getRay(const size_t &pixelIdx) override;
+    
     void loadConfig(const std::string& configFile) override;
     void loadConfig(
             const std::string& distMat,

@@ -55,7 +55,7 @@ class Camera
  public:
     Camera() = delete;
     explicit Camera(const std::string &cName):name_(cName),resX_(0),resY_(0)
-    {whiteThreshold_=200; blackThreshold_=50;}   //Hacking, need to read from file
+    {whiteThreshold_=5; blackThreshold_=40;}   //Hacking, need to read from file
     const std::string& getName() const {return name_;}
     void setName(const std::string &cName) {name_ = cName;}
     void getResolution(size_t &x, size_t &y) const{x=resX_; y=resY_;}
