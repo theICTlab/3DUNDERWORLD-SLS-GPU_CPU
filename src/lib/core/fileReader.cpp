@@ -157,7 +157,7 @@ void FileReader::computeShadowsAndThreasholds()
         for (size_t j=0; j<resY_; j++)
         {
             threasholds_[j+i*resY_] = (brightImg.at<uchar>(j,i)-darkImg.at<uchar>(j,i))/2;
-            if (threasholds_[j+i*resY_] > blackThreshold_)
+            if (threasholds_[j+i*resY_]*2 > blackThreshold_)
                 shadowMask_.setBit(j+i*resY_);
             else
                 shadowMask_.clearBit(j+i*resY_);
@@ -169,6 +169,8 @@ void FileReader::computeShadowsAndThreasholds()
 Ray FileReader::getRay(const size_t &x, const size_t &y)
 {
         glm::vec2 undistorted = undistortPixel(glm::vec2(x, y));
+        if (undistorted.x > resX_ || undistorted.y>resY_)
+            std::cout<<"Out of range! "<<resX_<<"\t"<<resY_<<std::endl;
         Ray ray;
         if (undistorted.x > resX_ || undistorted.y > resY_)
         {

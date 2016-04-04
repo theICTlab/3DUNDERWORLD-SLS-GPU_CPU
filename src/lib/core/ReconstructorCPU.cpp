@@ -55,7 +55,7 @@ void ReconstructorCPU::generateBuckets()
             bool discard=false;
 
             // for each image
-            while(bitIdx < projector_->getRequiredNumFrames()/2)
+            while(bitIdx < projector_->getRequiredNumFrames())
             {
 
                 auto frame = cam->getNextFrame();
@@ -68,8 +68,10 @@ void ReconstructorCPU::generateBuckets()
                 // Not considering shadow mask. But the following test should be
                 // more strict than shadow mask.
                 if (invPixel > pixel && invPixel-pixel >= cam->getThreashold(i))
+                //if (invPixel > pixel && invPixel-pixel >= cam->getWhiteThreshold())
                     bits.clearBit(bitIdx);
                 else if (pixel > invPixel && pixel-invPixel > cam->getThreashold(i))
+                //else if (pixel > invPixel && pixel-invPixel > cam->getWhiteThreshold())
                     bits.setBit(bitIdx);
                 else
                 {
@@ -84,24 +86,6 @@ void ReconstructorCPU::generateBuckets()
         }
     }
 
-    //Sanity check
-    //for (size_t camIdx = 0; camIdx < cameras_.size(); camIdx++)
-    //{
-    //    for (size_t i=0; i< buckets_[camIdx].size(); i++)
-    //    {
-    //        for (size_t j=0; j < buckets_[camIdx][i].size(); j++)
-    //        {
-    //            glm::vec2 p0(buckets_[camIdx][i][j]/4896, buckets_[camIdx][i][j]%4896);
-    //            for (size_t k=0; k < buckets_[camIdx][i].size(); k++)
-    //            {
-    //                glm::vec2 p1(buckets_[camIdx][i][k]/4896, buckets_[camIdx][i][j]%4896);
-    //                float dist = glm::distance(p0, p1);
-    //                if (dist > 100)
-    //                    LOG::writeLog("Huge distance %f\n", dist);
-    //            }
-    //        }
-    //    }
-    //}
 }
 
 void ReconstructorCPU::renconstruct()
@@ -116,39 +100,55 @@ void ReconstructorCPU::renconstruct()
 
     LOG::startTimer();
     std::ofstream of("test.obj");
+    std::ofstream ofAvg("testAvg.obj");
 
     for ( size_t i=0; i<buckets_[0].size(); i++)
     {
-        if (!buckets_[1][i].empty() && !buckets_[0][i].empty())
+        //Progress
+        const auto &cam0bucket = buckets_[0][i];
+        const auto &cam1bucket = buckets_[1][i];
+        if ((!cam0bucket.empty()) && (!cam1bucket.empty()))
         {
-            const auto &cam0bucket = buckets_[0][i];
-            const auto &cam1bucket = buckets_[1][i];
-            //size_t cam0=buckets_[0][i][0];
-            //size_t cam1=buckets_[1][i][0];
             float minDist=9999999999.0;
             glm::vec4 minMidP(0.0f);
-            //Refinement
+
+            //auto midP = midPointBkp(
+            //        cameras_[0]->getRay(cam0bucket[0]),
+            //        cameras_[1]->getRay(cam1bucket[0]),
+            //        minDist);
+            //if (minDist > 10) continue;
+            //of<<"v "<<midP.x<<" "<<midP.y<<" "<<midP.z<<std::endl;
+
+            glm::vec4 pointSum(0.0);
+            size_t pointCount=0;
 
             for (const auto& cam0P: cam0bucket)
                 for (const auto& cam1P: cam1bucket)
                 {
-                    float dist;
-                    Ray ray0 = cameras_[0]->getRay(cam0P);
-                    Ray ray1 = cameras_[1]->getRay(cam1P);
-
-                    if (glm::length(ray0.dir) < 0.5 || glm::length(ray1.dir) < 0.5) continue;
+                    float dist=0.0;
                     
                     auto midP=midPointBkp(cameras_[0]->getRay(cam0P), cameras_[1]->getRay(cam1P), dist);
+                    if (dist < -0.5) continue;
                     if (dist < minDist)
                     {
                         minDist = dist;
                         minMidP = midP;
                     }
+                    //if (dist < 0.5)
+                    {
+                        pointSum += midP;
+                        pointCount++;
+                    }
                 }
+            if (minDist > 1.0) continue;
             of<<"v "<<minMidP.x<<" "<<minMidP.y<<" "<<minMidP.z<<std::endl;
+            if (pointCount != 0)
+                ofAvg<<"v "<<pointSum.x / (float) pointCount<<" "<<pointSum.y / (float) pointCount<<" "<<pointSum.z / (float) pointCount<<std::endl;
+            unsigned char r, g, b;
         }
     }
     of.close();
+    ofAvg.close();
     LOG::endTimer("Finished reconstruction in ");
 }
 

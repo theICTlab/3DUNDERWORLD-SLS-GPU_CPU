@@ -31,9 +31,9 @@ class Reconstructor
 protected:
     std::vector<Camera*> cameras_;
     Projector* projector_;
-    float* pointCloud_;
+    std::vector<float> pointCloud_;
 public:
-    Reconstructor():projector_{nullptr},pointCloud_{nullptr}{};
+    Reconstructor():projector_{nullptr}{};
     virtual ~Reconstructor(){}
 
     // Interfaces

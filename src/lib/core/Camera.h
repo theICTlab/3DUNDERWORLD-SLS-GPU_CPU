@@ -61,6 +61,15 @@ class Camera
     void getResolution(size_t &x, size_t &y) const{x=resX_; y=resY_;}
     const unsigned char& getThreashold(const size_t &idx){return threasholds_[idx];}
     bool queryMask(const size_t &idx){return shadowMask_.getBit(idx);}
+    uchar getWhiteThreshold() const {return whiteThreshold_;}
+    uchar getblackThreshold() const {return blackThreshold_;}
+    void getColor(size_t x, size_t y, unsigned char &r, unsigned char &g, unsigned char &b) const
+    {
+        auto color = color_.at<cv::Vec3b>(y, x);
+        b = color.val[0];
+        g = color.val[1];
+        r = color.val[2];
+    }
 
     // Interfaces
     
