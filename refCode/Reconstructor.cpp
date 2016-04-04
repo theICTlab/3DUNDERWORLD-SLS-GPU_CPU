@@ -486,6 +486,7 @@ void Reconstructor::triangulation(cv::vector<cv::Point> *cam1Pixels, VirtualCame
 		for(int j=0; j<h; j++)
 		{
 			
+            //Progress bar
 			if(load != (int) (((j+(float)i*h)/((float)w*h))*100))
 			{
 				load =  (int) (((j+(float)i*h)/((float)w*h))*100);

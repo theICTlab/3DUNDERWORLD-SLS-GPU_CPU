@@ -42,4 +42,25 @@ inline glm::vec4 midPoint(const Ray &r1, const Ray &r2, float &dist)
     return vec4((p_1+q_1)/2.0f, 1.0f);
 
 }
+inline glm::vec4 midPointBkp( const Ray &r1, const Ray &r2, float &dist)
+{
+    glm::vec3 v1 (r1.dir);
+    glm::vec3 v2 (r2.dir);
+    glm::vec3 p1 (r1.origin);
+    glm::vec3 p2 (r2.origin);
+    glm::vec3 v12 = p1-p2;
+    float v1_dot_v1 = dot(v1, v1);
+    float v2_dot_v2 = dot(v2, v2);
+    float v1_dot_v2 = dot(v1, v2); 
+    float v12_dot_v1 = dot(v12, v1);
+    float v12_dot_v2 = dot(v12, v2);
+
+    float denom = v1_dot_v1 * v2_dot_v2 - v1_dot_v2 * v1_dot_v2;
+
+    float s =  (v1_dot_v2/denom) * v12_dot_v2 - (v2_dot_v2/denom) * v12_dot_v1;
+    float t = -(v1_dot_v2/denom) * v12_dot_v1 + (v1_dot_v1/denom) * v12_dot_v2;
+    dist = glm::length(p1+s*v1-p2-t*v2);
+    return vec4((p1+s*v1+p2+t*v2)/2.0f, 1.0);
+
+}
 }

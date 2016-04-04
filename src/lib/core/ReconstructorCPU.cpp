@@ -138,7 +138,7 @@ void ReconstructorCPU::renconstruct()
 
                     if (glm::length(ray0.dir) < 0.5 || glm::length(ray1.dir) < 0.5) continue;
                     
-                    auto midP=midPoint(cameras_[0]->getRay(cam0P), cameras_[1]->getRay(cam1P), dist);
+                    auto midP=midPointBkp(cameras_[0]->getRay(cam0P), cameras_[1]->getRay(cam1P), dist);
                     if (dist < minDist)
                     {
                         minDist = dist;
