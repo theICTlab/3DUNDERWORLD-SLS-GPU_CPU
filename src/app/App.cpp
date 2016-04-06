@@ -1,4 +1,5 @@
 #include <core/fileReader.h>
+#include <core/Reconstructor.h>
 #include <core/log.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <core/ReconstructorCPU.h>
@@ -42,13 +43,13 @@ int main()
     //rightCam->rayTableToPointCloud("testRight.obj");
 
     
-    SLS::ReconstructorCPU renconstruct(1024,768);
-    renconstruct.addCamera(rightCam);
-    renconstruct.addCamera(leftCam);
-    renconstruct.renconstruct();
+    SLS::ReconstructorCPU reconstruct(1024,768);
+    reconstruct.addCamera(rightCam);
+    reconstruct.addCamera(leftCam);
+    reconstruct.renconstruct();
 
-
-
+    SLS::exportOBJ("test.obj",  reconstruct);
+    SLS::exportPLY("test.ply",  reconstruct);
 
     //for (;;)
     //{

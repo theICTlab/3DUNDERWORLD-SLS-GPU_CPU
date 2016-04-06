@@ -67,10 +67,10 @@ void ReconstructorCPU::generateBuckets()
 
                 // Not considering shadow mask. But the following test should be
                 // more strict than shadow mask.
-                if (invPixel > pixel && invPixel-pixel >= cam->getThreashold(i))
+                if (invPixel > pixel && invPixel-pixel >= cam->getWhiteThreshold())
                 //if (invPixel > pixel && invPixel-pixel >= cam->getWhiteThreshold())
                     bits.clearBit(bitIdx);
-                else if (pixel > invPixel && pixel-invPixel > cam->getThreashold(i))
+                else if (pixel > invPixel && pixel-invPixel > cam->getWhiteThreshold())
                 //else if (pixel > invPixel && pixel-invPixel > cam->getWhiteThreshold())
                     bits.setBit(bitIdx);
                 else
@@ -99,28 +99,18 @@ void ReconstructorCPU::renconstruct()
     initBuckets();
 
     LOG::startTimer();
-    std::ofstream of("test.obj");
-    std::ofstream ofAvg("testAvg.obj");
 
     for ( size_t i=0; i<buckets_[0].size(); i++)
     {
         //Progress
         const auto &cam0bucket = buckets_[0][i];
         const auto &cam1bucket = buckets_[1][i];
+        size_t minCam0Idx=0;
+        size_t minCam1Idx=0;
         if ((!cam0bucket.empty()) && (!cam1bucket.empty()))
         {
             float minDist=9999999999.0;
             glm::vec4 minMidP(0.0f);
-
-            //auto midP = midPointBkp(
-            //        cameras_[0]->getRay(cam0bucket[0]),
-            //        cameras_[1]->getRay(cam1bucket[0]),
-            //        minDist);
-            //if (minDist > 10) continue;
-            //of<<"v "<<midP.x<<" "<<midP.y<<" "<<midP.z<<std::endl;
-
-            glm::vec4 pointSum(0.0);
-            size_t pointCount=0;
 
             for (const auto& cam0P: cam0bucket)
                 for (const auto& cam1P: cam1bucket)
@@ -133,22 +123,26 @@ void ReconstructorCPU::renconstruct()
                     {
                         minDist = dist;
                         minMidP = midP;
-                    }
-                    //if (dist < 0.5)
-                    {
-                        pointSum += midP;
-                        pointCount++;
+                        minCam0Idx = cam0P;
+                        minCam1Idx = cam1P;
                     }
                 }
+
             if (minDist > 1.0) continue;
-            of<<"v "<<minMidP.x<<" "<<minMidP.y<<" "<<minMidP.z<<std::endl;
-            if (pointCount != 0)
-                ofAvg<<"v "<<pointSum.x / (float) pointCount<<" "<<pointSum.y / (float) pointCount<<" "<<pointSum.z / (float) pointCount<<std::endl;
-            unsigned char r, g, b;
+
+
+            pointCloud_.push_back(minMidP.x);
+            pointCloud_.push_back(minMidP.y);
+            pointCloud_.push_back(minMidP.z);
+            unsigned char r0, g0, b0;
+            unsigned char r1, g1, b1;
+            cameras_[0]->getColor(minCam0Idx, r0, g0, b0);
+            cameras_[1]->getColor(minCam1Idx, r1, g1, b1);
+            pointCloud_.push_back((float)(r0+r1)/255.0f);
+            pointCloud_.push_back((float)(g0+g1)/255.0f);
+            pointCloud_.push_back((float)(b0+b1)/255.0f);
         }
     }
-    of.close();
-    ofAvg.close();
     LOG::endTimer("Finished reconstruction in ");
 }
 
