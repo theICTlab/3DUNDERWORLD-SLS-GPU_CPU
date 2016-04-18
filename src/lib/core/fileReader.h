@@ -19,18 +19,17 @@
 #include "Camera.h"
 namespace SLS
 {
-enum CAMERA_MAT{
-    CAMERA_MAT=0,
-    DISTOR_MAT,
-    ROT_MAT,
-    TRANS_MAT,
-    PARAM_COUNT
-};
 class FileReader: public Camera
 {
- private:
+protected:
+     enum CAMERA_MAT{
+         CAMERA_MAT=0,
+         DISTOR_MAT,
+         ROT_MAT,
+         TRANS_MAT,
+         PARAM_COUNT
+     };
     std::vector<cv::Mat> images_;
-    std::vector<cv::Mat> undistortedImages_;
     size_t frameIdx_;
     std::array<cv::Mat, PARAM_COUNT> params_;
     glm::mat4 camTransMat_; //Transformation matrix for camera
@@ -41,10 +40,11 @@ class FileReader: public Camera
         return undistortPixel(glm::vec2( distortedIdx/resY_, distortedIdx % resY_));
     }
     
- public:
+public:
     //Constructors
     FileReader() = delete;
-    explicit FileReader(const std::string& cName):Camera(cName),frameIdx_(0),camTransMat_(glm::mat4(1.0)){}
+    FileReader(const std::string& cName):
+        Camera(cName),frameIdx_(0),camTransMat_(glm::mat4(1.0)){}
 
 
     //Extra functions

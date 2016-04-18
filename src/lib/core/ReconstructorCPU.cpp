@@ -63,8 +63,6 @@ void ReconstructorCPU::generateBuckets()
                 auto pixel = frame.at<uchar>(i%y,i/y);
                 auto invPixel = invFrame.at<uchar>(i%y,i/y);
 
-
-
                 // Not considering shadow mask. But the following test should be
                 // more strict than shadow mask.
                 if (invPixel > pixel && invPixel-pixel >= cam->getWhiteThreshold())

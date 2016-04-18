@@ -24,7 +24,5 @@ namespace LOG
     bool progress(const float &prog);
 
 
-
-
 }
 

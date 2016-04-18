@@ -31,6 +31,7 @@ namespace SLS
 class Dynamic_Bitset{
 private:
     std::vector<unsigned char> bits;
+protected:
     const size_t BITS_PER_BYTE;
 
     /* Set or clear a bit in uchar
@@ -81,14 +82,14 @@ public:
      *
      * @return number of bits
      */
-    size_t size() const {return bits.size()*BITS_PER_BYTE;}
+    virtual size_t size() const {return bits.size()*BITS_PER_BYTE;}
 
     /**
      * @brief Resize bit array length, will set bit array to 0
      *
      * @param sz number of bits
      */
-    void resize(const size_t &sz) {bits.resize((sz+BITS_PER_BYTE-1)/ BITS_PER_BYTE, 0);}
+    virtual void resize(const size_t &sz) {bits.resize((sz+BITS_PER_BYTE-1)/ BITS_PER_BYTE, 0);}
 
     /**
      * @brief Set a bit to 1
@@ -135,7 +136,7 @@ public:
         if ( bits.size() > sizeof(unsigned int) )
             throw std::overflow_error("Bit array is too long for uint");
         unsigned int res=0;
-        for (size_t i=0; i<bits.size(); i++)
+        for (size_t i=0; i<bits.size(); i++)    //This size is number of bytes
             res += ((unsigned int)bits[i])<<(i*BITS_PER_BYTE);
         return res;
     }
