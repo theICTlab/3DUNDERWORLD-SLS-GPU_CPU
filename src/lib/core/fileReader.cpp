@@ -156,8 +156,8 @@ void FileReader::computeShadowsAndThreasholds()
     for (size_t i=0; i< resX_; i++)
         for (size_t j=0; j<resY_; j++)
         {
-            threasholds_[j+i*resY_] = (brightImg.at<uchar>(j,i)-darkImg.at<uchar>(j,i))/2;
-            if (threasholds_[j+i*resY_]*2 > blackThreshold_)
+            threasholds_[j+i*resY_] = (brightImg.at<uchar>(j,i)-darkImg.at<uchar>(j,i));
+            if (threasholds_[j+i*resY_] > blackThreshold_)
                 shadowMask_.setBit(j+i*resY_);
             else
                 shadowMask_.clearBit(j+i*resY_);

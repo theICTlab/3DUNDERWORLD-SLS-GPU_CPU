@@ -24,6 +24,8 @@
 #include <bitset>
 #include <stdexcept>
 #include <cstdlib>
+#include <cassert>
+#include <cstring>
 using std::ostream;
 
 namespace SLS
@@ -75,7 +77,15 @@ public:
      *
      * @param sz number of bits 
      */
-    Dynamic_Bitset(const size_t &sz):BITS_PER_BYTE{8}{resize(sz);}
+    explicit Dynamic_Bitset(const size_t &sz):BITS_PER_BYTE{8}{resize(sz);}
+    Dynamic_Bitset(const size_t &sz, unsigned char* b):BITS_PER_BYTE{8}
+    {
+        bits.resize(sz);
+        std::cout<<sz<<std::endl;
+        std::cout<<bits.size()<<std::endl;
+        assert(sz == bits.size());
+        memcpy( &bits[0], b, sz);
+    }
 
     /**
      * @brief Get number of bits

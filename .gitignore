@@ -1,2 +1,12 @@
+.ycm_extra_conf.*
 .DS_Store
+build
+*.pgm
+*.log
+temp
+data
+!data/alexander
+YCM-Generator
+*.swp
+
 
