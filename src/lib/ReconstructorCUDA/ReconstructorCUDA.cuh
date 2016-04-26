@@ -17,6 +17,14 @@ public:
 };
 
 
+__global__ void testBitset_kernel(
+        const uchar * imgs,
+        size_t numimgs,
+        size_t XtimesY,
+        uchar whiteThreshold,
+        Dynamic_Bitset_Array_GPU mask,
+        Dynamic_Bitset_Array_GPU patterns
+        );
 __global__ void buildBucket_kernel(
         const uchar * imgs,
         size_t numimgs,

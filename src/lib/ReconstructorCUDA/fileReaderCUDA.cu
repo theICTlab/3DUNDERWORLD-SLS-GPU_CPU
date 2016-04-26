@@ -15,19 +15,15 @@ __global__ void computeMask_kernel(
 {
     uint idx = blockIdx.x*blockDim.x + threadIdx.x;
     uint stride = blockDim.x * gridDim.x;
-    const size_t BITS_PER_BYTE = mask.BITS_PER_BYTE;
-    while (idx < mask.bitsPerElem / BITS_PER_BYTE)
+    //const size_t BITS_PER_BYTE = mask.BITS_PER_BYTE;
+    while (idx < resX*resY)
     {
-        for (size_t i=0; i< BITS_PER_BYTE; i++)
-        {
-        uchar b = brightImg[idx*BITS_PER_BYTE+i];
-        uchar d = darkImg[idx*BITS_PER_BYTE+i];
-        //size_t idxColBased = (idx%resX)*resY + idx/resY; 
+        uchar b = brightImg[idx];
+        uchar d = darkImg[idx];
         if (b - d > blackThreashold)
-            mask.setBit(idx*BITS_PER_BYTE+i,0);
+            mask.setBit(0,idx);
         else
-            mask.clearBit(idx*BITS_PER_BYTE+i,0);
-        }
+            mask.clearBit(0,idx);
         idx += stride;
     }
 }
@@ -53,13 +49,14 @@ void FileReaderCUDA::computeShadowsAndThreasholds()
     }
 
     // Intialize maskGPU_
-    maskGPU_ = new Dynamic_Bitset_Array(1, brightImg.rows*brightImg.cols);
+    maskGPU_ = new Dynamic_Bitset_Array(brightImg.rows*brightImg.cols, 1);
     computeMask_kernel<<<200,200>>> (
             brightImg_d, darkImg_d, 
             blackThreshold_,
             resX_, resY_,
             maskGPU_->getGPUOBJ());
-    maskGPU_->writeToPGM("test_"+name_+".pgm", 0,resX_, resY_, false);
+    gpuErrchk( cudaPeekAtLastError());
+    maskGPU_->writeToPGM(name_+"_mask.pgm", resX_, resY_, false, 1);
 
     // Clean up
     gpuErrchk(cudaFree(brightImg_d));

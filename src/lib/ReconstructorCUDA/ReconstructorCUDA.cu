@@ -34,6 +34,8 @@ void ReconstructorCUDA::renconstruct()
         gpuErrchk(cudaMalloc((void**)&images_d, sizeof(uchar)*xTimesY*projector_->getRequiredNumFrames()*2));
         Dynamic_Bitset_Array bitsetArray(xTimesY, projector_->getRequiredNumFrames());
 
+        //Skip first two frames;
+        cam->getNextFrame(); cam->getNextFrame();
         //Preparing data
         for (size_t i=0; i<projector_->getRequiredNumFrames(); i++)
         {
@@ -47,7 +49,9 @@ void ReconstructorCUDA::renconstruct()
         }
         FileReaderCUDA *cudaCam = dynamic_cast<FileReaderCUDA*> (cam);
         assert(cam != nullptr);
-        buildBucket_kernel<<<200, 200>>> (
+        //buildBucket_kernel<<<200, 200>>> 
+        buildBucket_kernel<<<200,200>>>
+        (
                 images_d, 
                 projector_->getRequiredNumFrames(),
                 xTimesY,
@@ -58,8 +62,9 @@ void ReconstructorCUDA::renconstruct()
         //Check for errors
         gpuErrchk(cudaPeekAtLastError());
 
-        uint *patternDec_d = nullptr;
+        uint *patternDec_d;
         gpuErrchk( cudaMalloc((void**)&patternDec_d, sizeof(uint)*xTimesY));
+        gpuErrchk( cudaMemset(patternDec_d, 200, sizeof(uint)*xTimesY));
 
         bucket2uint_kernel<<<200,200>>> (
                 bitsetArray.getGPUOBJ(),
@@ -73,8 +78,11 @@ void ReconstructorCUDA::renconstruct()
 
         uint *patternDec_h = new uint[xTimesY];
         printf("Device: %p, Host: %p and sizeof uint is %d\n", patternDec_d, patternDec_h, sizeof(uint));
+
         gpuErrchk( cudaMemcpy(patternDec_h, patternDec_d, sizeof(uint)*xTimesY, cudaMemcpyDeviceToHost));
-        assert( uint2PGM( "test"+cam->getName()+".pgm", x, y, patternDec_h,(uint)1048576 ));
+
+
+        //assert( uint2PGM( "test"+cam->getName()+".pgm", x, y, patternDec_h,(uint)1048576 ));
 
         delete[] patternDec_h;
         gpuErrchk(cudaFree(patternDec_d));
@@ -83,10 +91,29 @@ void ReconstructorCUDA::renconstruct()
 }
 
 // Kernels 
+//
+__global__ void testBitset_kernel(
+        const uchar * imgs,
+        size_t numImgs,
+        size_t XtimesY,
+        uchar whiteThreshold,
+        Dynamic_Bitset_Array_GPU mask,
+        Dynamic_Bitset_Array_GPU patterns
+        )
+{
+    uint idx = blockIdx.x*blockDim.x + threadIdx.x;
+    uint stride = blockDim.x * gridDim.x;
+    while (idx < XtimesY)
+    {
+        //
+        patterns.setBit(idx%40, idx);
+        idx += stride;
+    }
+}
 
 __global__ void buildBucket_kernel(
         const uchar * imgs,
-        size_t numimgs,
+        size_t numImgs,
         size_t XtimesY,
         uchar whiteThreshold,
         Dynamic_Bitset_Array_GPU mask,
@@ -96,27 +123,19 @@ __global__ void buildBucket_kernel(
     uint idx = blockIdx.x*blockDim.x + threadIdx.x;
     uint stride = blockDim.x * gridDim.x;
     const size_t BITS_PER_BYTE = mask.BITS_PER_BYTE;
-    while (idx < XtimesY)
+    while (idx < XtimesY)   // For each pixel
     {
-        // each thread take care of 8 bits (a byte) to avoid race condition
-        for (size_t i=0; i< BITS_PER_BYTE; i++)
+        for (size_t i = 0; i<numImgs; i++)
         {
-            size_t pixelIdx = idx*BITS_PER_BYTE+i;
-
-            if (!mask.getBit(pixelIdx, 0)) continue;
-
-            for (size_t bitIdx = 0; bitIdx < numimgs; bitIdx++)
-            {
-                uchar pixel = imgs[pixelIdx + XtimesY*(2*bitIdx)];
-                uchar invPixel = imgs[pixelIdx + XtimesY * (2*bitIdx+1)];
-                // TODO: Set elemnt at bitIdx and modify mask
-                if (invPixel > pixel && invPixel-pixel >= whiteThreshold)
-                    patterns.clearBit(bitIdx, pixelIdx);
-                else if (pixel > invPixel && pixel-invPixel > whiteThreshold)
-                    patterns.setBit(bitIdx, pixelIdx);
-                else
-                    mask.clearBit(pixelIdx, 0);
-            }
+            if (!mask.getBit(0, idx)) continue;
+            uchar pixel = imgs[ idx + XtimesY*(2*i)];
+            uchar invPixel = imgs[ idx + XtimesY*(2*i+1)];
+            if (invPixel > pixel && invPixel-pixel >= whiteThreshold)
+                patterns.clearBit(i, idx);
+            else if (pixel > invPixel && pixel-invPixel > whiteThreshold)
+                patterns.setBit(i, idx);
+            else
+                mask.clearBit(0, idx);
         }
         idx += stride;
     }

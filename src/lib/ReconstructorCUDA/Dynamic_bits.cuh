@@ -3,10 +3,12 @@
  */
 #pragma once
 #include "CUDA_Error.cuh"
+#include <vector>
 
 
 namespace SLS
 {
+
 
 /**
  * @brief A dynamic bitset array in GPU
@@ -78,6 +80,11 @@ struct Dynamic_Bitset_Array_GPU
     __device__ __host__ size_t getBitsPerElem() const { return bitsPerElem;}
     __device__ unsigned int to_uint(const size_t &elem)
     {
+        if (bitsPerElem > sizeof(uint)*BITS_PER_BYTE)   // Break if longer than uint
+        {
+            __threadfence();
+            asm("trap;");
+        }
         unsigned char *e = &bits[(elem * bitsPerElem)/BITS_PER_BYTE];
         unsigned int res = 0;
         for (size_t i=0; i<bitsPerElem/BITS_PER_BYTE; i++)
@@ -112,6 +119,57 @@ public:
         Dynamic_Bitset_Array_GPU obj{bits, BITS_PER_BYTE, numElem, bitsPerElem};
         return obj;
     }
-    bool writeToPGM( std::string fileName, size_t elemIdx ,const size_t &w, const size_t &h, bool transpose=false);
+
+    /**
+     * @brief Write an element to PGM file
+     *
+     * @param fileName
+     * @param elemIdx
+     * @param w
+     * @param h
+     * @param transpose False if data is row based, otherwise, column based.
+     *
+     * @return true if writen
+     */
+    bool writeElemToPGM( std::string fileName, size_t elemIdx ,const size_t &w, const size_t &h, bool transpose=false);
+
+    /**
+     * @brief Write it to gray scale image
+     *
+     * @param fileName
+     * @param w
+     * @param h
+     * @param transpose
+     * @param maxValue Maximum value, if not set, is defined by number of bits
+     *
+     * @return true if success.
+     */
+    bool writeToPGM( std::string fileName, size_t w, size_t h, bool transpose=false, unsigned int maxValue=0);
+    std::vector<unsigned int>
+        toUintArray() const;
 };
+namespace Kernel
+{
+__global__ void toUintArray(
+        Dynamic_Bitset_Array_GPU bitsArray,
+        unsigned int *uintArray
+        );
+
+/**
+ * @brief Convert binary array to normalized uint array.
+ *
+ * @param bitsArray 
+ * @param capValue  The value that normalized to
+ * @param maxValue  The maximum value that might exist in the array
+ * @param *uintArray
+ *
+ * @return 
+ */
+__global__ void toNormalizedUintArray(
+        Dynamic_Bitset_Array_GPU bitsArray,
+        unsigned int capValue,
+        unsigned int maxValue,
+        unsigned int *uintArray
+        );
+}// namespace Kernel
 }
