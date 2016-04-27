@@ -62,30 +62,33 @@ void ReconstructorCUDA::renconstruct()
         //Check for errors
         gpuErrchk(cudaPeekAtLastError());
 
-        uint *patternDec_d;
-        gpuErrchk( cudaMalloc((void**)&patternDec_d, sizeof(uint)*xTimesY));
-        gpuErrchk( cudaMemset(patternDec_d, 200, sizeof(uint)*xTimesY));
+        bitsetArray.writeToPGM("patter"+cam->getName()+".pgm", x, y, false,4800);
 
-        bucket2uint_kernel<<<200,200>>> (
-                bitsetArray.getGPUOBJ(),
-                xTimesY,
-                patternDec_d);
+        //uint *patternDec_d;
+        //gpuErrchk( cudaMalloc((void**)&patternDec_d, sizeof(uint)*xTimesY));
+        //gpuErrchk( cudaMemset(patternDec_d, 200, sizeof(uint)*xTimesY));
 
-        gpuErrchk(cudaPeekAtLastError());
+        //bucket2uint_kernel<<<200,200>>> (
+        //        bitsetArray.getGPUOBJ(),
+        //        xTimesY,
+        //        patternDec_d);
+
+        //gpuErrchk(cudaPeekAtLastError());
 
         // debugging the pattern by write the to file
 
 
-        uint *patternDec_h = new uint[xTimesY];
-        printf("Device: %p, Host: %p and sizeof uint is %d\n", patternDec_d, patternDec_h, sizeof(uint));
+        //uint *patternDec_h = new uint[xTimesY];
+        //printf("Device: %p, Host: %p and sizeof uint is %d\n", patternDec_d, patternDec_h, sizeof(uint));
 
-        gpuErrchk( cudaMemcpy(patternDec_h, patternDec_d, sizeof(uint)*xTimesY, cudaMemcpyDeviceToHost));
+        //gpuErrchk( cudaMemcpy(patternDec_h, patternDec_d, sizeof(uint)*xTimesY, cudaMemcpyDeviceToHost));
 
 
         //assert( uint2PGM( "test"+cam->getName()+".pgm", x, y, patternDec_h,(uint)1048576 ));
 
-        delete[] patternDec_h;
-        gpuErrchk(cudaFree(patternDec_d));
+        //delete[] patternDec_h;
+        //gpuErrchk(cudaFree(patternDec_d));
+
         gpuErrchk(cudaFree(images_d));
     }
 }
