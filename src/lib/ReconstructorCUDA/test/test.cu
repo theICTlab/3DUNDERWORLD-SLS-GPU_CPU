@@ -44,6 +44,7 @@ int main()
     reconstructor.addCamera(rightCamera);
     reconstructor.addCamera(leftCamera);
     reconstructor.renconstruct();
+    exportOBJVec4("test.obj", reconstructor);
 
     return 0;
 }

@@ -1,7 +1,7 @@
 #pragma once
+#define GLM_FORCE_CUDA
 #include <glm/glm.hpp>
 //#include <glm/gtx/string_cast.hpp>
-#include <iostream>
 #include "log.hpp"
 using namespace glm;
 namespace SLS
@@ -56,7 +56,7 @@ inline glm::vec4 midPointBkp( const Ray &r1, const Ray &r2, float &dist)
     float v12_dot_v2 = dot(v12, v2);
 
     float denom = v1_dot_v1 * v2_dot_v2 - v1_dot_v2 * v1_dot_v2;
-    if (std::abs(denom) < 0.1)
+    if (glm::abs(denom) < 0.1)
     {
             dist = -1.0;
             return vec4(0.0);

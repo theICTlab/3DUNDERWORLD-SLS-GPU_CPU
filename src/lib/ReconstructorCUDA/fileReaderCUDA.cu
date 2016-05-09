@@ -62,4 +62,35 @@ void FileReaderCUDA::computeShadowsAndThreasholds()
     gpuErrchk(cudaFree(brightImg_d));
     gpuErrchk(cudaFree(darkImg_d));
 }
+
+void FileReaderCUDA::loadConfig(const std::string& configFile){
+    FileReader::loadConfig(configFile);
+    // Copy config file to GPU
+    float tmpVal[9];
+
+    // Camera matrix
+    // Convert to float array
+    for (size_t i=0; i<3; i++)
+        for (size_t j=0; j<3; j++)
+            tmpVal[i*3+j] = params_[CAMERA_MAT].at<double>(i,j);
+    gpuErrchk (cudaMemcpy (params_d_[CAMERA_MAT], tmpVal, sizeof(float)*9, cudaMemcpyHostToDevice));
+    // Distortion coefficients
+    for (size_t i=0; i<5; i++)
+        tmpVal[i] = params_[DISTOR_MAT].at<double>(i);
+    gpuErrchk (cudaMemcpy (params_d_[DISTOR_MAT], tmpVal, sizeof(float)*5, cudaMemcpyHostToDevice));
+    // Rotation matrix
+    for (size_t i=0; i<3; i++)
+        for (size_t j=0; j<3; j++)
+            tmpVal[i*3+j] = params_[ROT_MAT].at<double>(i,j);
+    gpuErrchk (cudaMemcpy (params_d_[ROT_MAT], tmpVal, sizeof(float)*9, cudaMemcpyHostToDevice));
+    // Translation vector
+    for (size_t i=0; i<3; i++)
+        tmpVal[i] = params_[TRANS_MAT].at<double>(i);
+    gpuErrchk (cudaMemcpy (params_d_[TRANS_MAT], tmpVal, sizeof(float)*3, cudaMemcpyHostToDevice));
+
+    // Transformation matrix
+    gpuErrchk (cudaMemcpy (camTransMat_d_, &camTransMat_[0][0], sizeof(float)*16, cudaMemcpyHostToDevice));
+    
+}
+
 } // namespace SLS

@@ -94,9 +94,6 @@ void FileReader::loadConfig(const std::string& configFile)
     rotationMat = glm::inverse(rotationMat);
     camTransMat_ = rotationMat*translationMat;
 
-
-
-
     //No need to do this
     //Generating raytable
     //LOG::startTimer("Generating ray lookup table with size of %d*%d...",

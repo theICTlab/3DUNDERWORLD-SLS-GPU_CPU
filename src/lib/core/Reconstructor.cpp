@@ -43,4 +43,19 @@ namespace SLS
 
         LOG::endTimer();
     }
+    void exportOBJVec4( std::string fileName ,const Reconstructor& reconstructor)
+    {
+        LOG::startTimer("Exporting PLY to %s ... ", fileName.c_str());
+
+        std::ofstream of(fileName, std::ofstream::out);
+        const auto &pointCloud = reconstructor.pointCloud_;
+        for (size_t i=0; i<pointCloud.size(); i+=4)
+        {
+            if (pointCloud[i+3] == 0 ) continue;
+            of<<"v "<<pointCloud[i]<<" "<<pointCloud[i+1]<<" "<<pointCloud[i+2]<<std::endl;
+        }
+        of.close();
+
+        LOG::endTimer();
+    }
 }

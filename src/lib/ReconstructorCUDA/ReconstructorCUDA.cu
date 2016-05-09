@@ -19,7 +19,21 @@ void ReconstructorCUDA::addCamera(Camera *cam)
 }
 void ReconstructorCUDA::renconstruct()
 {
-    // For each camera
+    // For each camera, hack
+    GPUBuckets buckets[2] =
+    {
+        GPUBuckets( (1<<20)-1,21),
+        GPUBuckets( (1<<20)-1,21)
+    };
+    
+    /**** Profile *****/
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start);
+    /**/
+
+
     for(size_t camIdx = 0; camIdx < cameras_.size(); camIdx++)
     {
         auto &cam = cameras_[camIdx];
@@ -49,9 +63,8 @@ void ReconstructorCUDA::renconstruct()
         }
         FileReaderCUDA *cudaCam = dynamic_cast<FileReaderCUDA*> (cam);
         assert(cam != nullptr);
-        //buildBucket_kernel<<<200, 200>>> 
-        buildBucket_kernel<<<200,200>>>
-        (
+
+        Kernel::genPatternArray<<<200,200>>> (
                 images_d, 
                 projector_->getRequiredNumFrames(),
                 xTimesY,
@@ -61,60 +74,71 @@ void ReconstructorCUDA::renconstruct()
                 );
         //Check for errors
         gpuErrchk(cudaPeekAtLastError());
+        gpuErrchk(cudaFree(images_d)); // Release the heavy image array
 
-        bitsetArray.writeToPGM("patter"+cam->getName()+".pgm", x, y, false,4800);
-
-        //uint *patternDec_d;
-        //gpuErrchk( cudaMalloc((void**)&patternDec_d, sizeof(uint)*xTimesY));
-        //gpuErrchk( cudaMemset(patternDec_d, 200, sizeof(uint)*xTimesY));
-
-        //bucket2uint_kernel<<<200,200>>> (
-        //        bitsetArray.getGPUOBJ(),
-        //        xTimesY,
-        //        patternDec_d);
-
-        //gpuErrchk(cudaPeekAtLastError());
-
-        // debugging the pattern by write the to file
+        Kernel::buildBuckets<<<200, 200>>> (
+             cudaCam->getMask()->getGPUOBJ(),
+             bitsetArray.getGPUOBJ(),
+             xTimesY,
+             buckets[camIdx].getGPUOBJ()
+            );
+        gpuErrchk(cudaPeekAtLastError());
 
 
-        //uint *patternDec_h = new uint[xTimesY];
-        //printf("Device: %p, Host: %p and sizeof uint is %d\n", patternDec_d, patternDec_h, sizeof(uint));
-
-        //gpuErrchk( cudaMemcpy(patternDec_h, patternDec_d, sizeof(uint)*xTimesY, cudaMemcpyDeviceToHost));
-
-
-        //assert( uint2PGM( "test"+cam->getName()+".pgm", x, y, patternDec_h,(uint)1048576 ));
-
-        //delete[] patternDec_h;
-        //gpuErrchk(cudaFree(patternDec_d));
-
-        gpuErrchk(cudaFree(images_d));
+        //bitsetArray.writeToPPM("patter16"+cam->getName()+".pgm", x, y, false,(1<<16)-1);
+        //bitsetArray.writeToPPM("patter17"+cam->getName()+".pgm", x, y, false,(1<<17)-1);
+        //bitsetArray.writeToPPM("patter18"+cam->getName()+".pgm", x, y, false,(1<<18)-1);
+        //bitsetArray.writeToPPM("patter19"+cam->getName()+".pgm", x, y, false,(1<<19)-1);
+        //bitsetArray.writeToPPM("patter20"+cam->getName()+".ppm", x, y, false,(1<<20)-1);
     }
+
+
+    // A lot of hacks down there, need to be refactored
+    auto camera0 = dynamic_cast<FileReaderCUDA*>(cameras_[0]);
+    auto camera1 = dynamic_cast<FileReaderCUDA*>(cameras_[1]);
+
+    float* cloud = nullptr;
+
+    gpuErrchk ( cudaMalloc((void**)&cloud, buckets[0].getNumBKTs()*sizeof(float)*4));
+
+    // Reconstructing point cloud
+    LOG::writeLog("Reconstructing point cloud ...\n");
+    Kernel::getPointCloud2Cam<<<200,200>>>(
+            buckets[0].getGPUOBJ(),
+            camera0->getMask()->getGPUOBJ(),
+            camera0->getDeviceCamMat(),
+            camera0->getDeviceDistMat(),
+            camera0->getDeviceCamTransMat(),
+
+            buckets[1].getGPUOBJ(),
+            camera1->getMask()->getGPUOBJ(),
+            camera1->getDeviceCamMat(),
+            camera1->getDeviceDistMat(),
+            camera1->getDeviceCamTransMat(),
+
+            4896,3264,
+
+            cloud
+            );
+    gpuErrchk( cudaPeekAtLastError());
+    pointCloud_.resize(buckets[0].getNumBKTs()*4);
+    gpuErrchk( 
+            cudaMemcpy(  &pointCloud_[0],cloud, buckets[0].getNumBKTs()*sizeof(float)*4, cudaMemcpyDeviceToHost));
+    /**** Profile *****/
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    LOG::writeLog("GPU Time : %fms\n", milliseconds);
+    /*****/
+    gpuErrchk( cudaFree(cloud));
+    LOG::writeLog("Done\n");
 }
 
+namespace Kernel{
 // Kernels 
-//
-__global__ void testBitset_kernel(
-        const uchar * imgs,
-        size_t numImgs,
-        size_t XtimesY,
-        uchar whiteThreshold,
-        Dynamic_Bitset_Array_GPU mask,
-        Dynamic_Bitset_Array_GPU patterns
-        )
-{
-    uint idx = blockIdx.x*blockDim.x + threadIdx.x;
-    uint stride = blockDim.x * gridDim.x;
-    while (idx < XtimesY)
-    {
-        //
-        patterns.setBit(idx%40, idx);
-        idx += stride;
-    }
-}
 
-__global__ void buildBucket_kernel(
+__global__ void genPatternArray(
         const uchar * imgs,
         size_t numImgs,
         size_t XtimesY,
@@ -125,12 +149,17 @@ __global__ void buildBucket_kernel(
 {
     uint idx = blockIdx.x*blockDim.x + threadIdx.x;
     uint stride = blockDim.x * gridDim.x;
-    const size_t BITS_PER_BYTE = mask.BITS_PER_BYTE;
     while (idx < XtimesY)   // For each pixel
     {
         for (size_t i = 0; i<numImgs; i++)
         {
-            if (!mask.getBit(0, idx)) continue;
+            if (!mask.getBit(0, idx)) 
+            {
+                // set the bit to black, unnecessary
+                for (size_t j=0; j<numImgs; j++)
+                    patterns.clearBit(j, idx);
+                continue;
+            }
             uchar pixel = imgs[ idx + XtimesY*(2*i)];
             uchar invPixel = imgs[ idx + XtimesY*(2*i+1)];
             if (invPixel > pixel && invPixel-pixel >= whiteThreshold)
@@ -144,18 +173,109 @@ __global__ void buildBucket_kernel(
     }
 }
 
-__global__ void bucket2uint_kernel(
+
+__global__ void buildBuckets(
+        Dynamic_Bitset_Array_GPU mask,
         Dynamic_Bitset_Array_GPU patterns,
         size_t XtimesY,
-        uint * output)
+
+        GPUBucketsObj bkts
+        )
 {
     uint idx = blockIdx.x*blockDim.x + threadIdx.x;
     uint stride = blockDim.x * gridDim.x;
-    while (idx < XtimesY)
+    while (idx < XtimesY)   // For each pixel
     {
-        output[idx] = patterns.to_uint(idx);
+        if (mask.getBit(0, idx))
+            bkts.add2Bucket(idx, patterns.to_uint(idx));
         idx += stride;
     }
 }
 
+__global__ void getPointCloud2Cam(
+        GPUBucketsObj buckets0,
+        Dynamic_Bitset_Array_GPU mask0,
+        float *camMat0,
+        float *distMat0,
+        float *camTransMat0,
+
+        GPUBucketsObj buckets1,
+        Dynamic_Bitset_Array_GPU mask1,
+        float *camMat1,
+        float *distMat1,
+        float *camTransMat1,
+
+
+        uint camResX,
+        uint camResY,
+
+        float* pointCloud
+        )
+{
+    //Each thread takes care of one projector pixel
+    uint idx = blockIdx.x*blockDim.x + threadIdx.x;
+    uint stride = blockDim.x * gridDim.x;
+    while (idx < buckets0.NUM_BKTS_)   // For each pixel
+    {
+        if ( buckets0.count_[idx] == 0 || buckets1.count_[idx] == 0) 
+        {
+            memset( &pointCloud[4*idx], 0, sizeof(float)*4);
+        }
+        else
+        {
+            //Undistorted pixels
+            float minDist = 99999.0;
+            float minMidPoint[4];
+
+            for (uint i=0; i<buckets0.count_[idx]; i++)
+                for (uint j=0; j<buckets1.count_[idx]; j++)
+                {
+
+                    float undistorted0[2];
+                    float undistorted1[2];
+
+                    //Pick the first pixel in both buckets to test
+                    undistortPixel(
+                            buckets0.data_[idx*buckets0.MAX_CNT_PER_BKT_+i],
+                            camResX, camResY,
+                            camMat0, distMat0,
+                            undistorted0);
+                    undistortPixel(
+                            buckets1.data_[idx*buckets1.MAX_CNT_PER_BKT_+j],
+                            camResX, camResY,
+                            camMat1, distMat1,
+                            undistorted1);
+
+                    float origin0[4];
+                    float origin1[4];
+                    float dir0[4];
+                    float dir1[4];
+
+                    getRay(undistorted0, camMat0, camTransMat0, 
+                            origin0, dir0);
+                    getRay(undistorted1, camMat1, camTransMat1, 
+                            origin1, dir1);
+
+                    float midPoint[4];
+
+                    auto dist = getMidPoint(
+                            origin0, dir0, origin1, dir1,
+                            midPoint);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        memcpy (minMidPoint, midPoint, sizeof(float)*4);
+                    }
+                }
+            if (minDist < 0.3)
+                memcpy ( &pointCloud[4*idx], minMidPoint, sizeof(float)*4);
+            else
+                memset( &pointCloud[4*idx], 0, sizeof(float)*4);
+
+        }
+        idx += stride;
+    }
+}
+
+} // namespace Kernel
 } // namespace SLS

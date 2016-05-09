@@ -78,7 +78,7 @@ struct Dynamic_Bitset_Array_GPU
     }
     __device__ __host__ size_t getNumElem() const { return numElem;}
     __device__ __host__ size_t getBitsPerElem() const { return bitsPerElem;}
-    __device__ unsigned int to_uint(const size_t &elem)
+    __device__ unsigned int to_uint(const size_t &elem) const
     {
         if (bitsPerElem > sizeof(uint)*BITS_PER_BYTE)   // Break if longer than uint
         {
@@ -144,10 +144,24 @@ public:
      *
      * @return true if success.
      */
-    bool writeToPGM( std::string fileName, size_t w, size_t h, bool transpose=false, unsigned int maxValue=0);
-    std::vector<unsigned int>
-        toUintArray() const;
+    bool writeToPGM( std::string fileName, size_t w, size_t h, bool transposed=false, unsigned int maxValue=0);
+
+    /**
+     * @brief Write it to color ppm images
+     *
+     * @param fileName
+     * @param w
+     * @param h
+     * @param transpose
+     * @param maxValue Maximum value, if not set, is defined by number of bits
+     *
+     * @return true if success.
+     */
+    bool writeToPPM( std::string fileName, size_t w, size_t h, bool transposed=false, unsigned int maxValue=0);
+
 };
+
+// ==== Kernels == 
 namespace Kernel
 {
 __global__ void toUintArray(
@@ -158,10 +172,10 @@ __global__ void toUintArray(
 /**
  * @brief Convert binary array to normalized uint array.
  *
- * @param bitsArray 
+ * @param bitsArray input bit array
  * @param capValue  The value that normalized to
- * @param maxValue  The maximum value that might exist in the array
- * @param *uintArray
+ * @param maxValue  The maximum value that exist in the array
+ * @param *uintArray output Array
  *
  * @return 
  */

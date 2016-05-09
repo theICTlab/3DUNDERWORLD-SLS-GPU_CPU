@@ -41,9 +41,11 @@ public:
     virtual void addCamera(Camera* cam)=0;
     friend void exportPLY( std::string fileName ,const Reconstructor& reconstructor);
     friend void exportOBJ( std::string fileName ,const Reconstructor& reconstructor);
+    friend void exportOBJVec4( std::string fileName ,const Reconstructor& reconstructor);
 };
     void exportPLY( std::string fileName ,const Reconstructor& reconstructor);
     void exportOBJ( std::string fileName ,const Reconstructor& reconstructor);
+    void exportOBJVec4( std::string fileName ,const Reconstructor& reconstructor);
 
 } // namespace SLS
 
