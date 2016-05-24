@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "cv.h"
+#include <opencv2/opencv.hpp>
 #include <stdio.h>
 #include <string.h>
 #include <iostream>

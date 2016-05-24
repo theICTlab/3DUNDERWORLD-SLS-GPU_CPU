@@ -7,19 +7,15 @@
 //* License: Check the file License.md                                                                       *
 //------------------------------------------------------------------------------------------------------------
 
-#include "StdAfx.h"
 #include "Reconstructor.h"
 
 
 Reconstructor::Reconstructor(int numOfCams_)
 {
 	numOfCams = numOfCams_;
-	pathSet=false;
+	pathSet[0]=false;
+	pathSet[1]=false;
 
-	shadowMask = NULL;
-
-	decRows = NULL;
-	decCols = NULL;
 
 	points3DProjView = NULL;
 
@@ -120,16 +116,9 @@ void Reconstructor::decodePaterns()
 
 	cv::Point projPixel;
 	
-    /* 
-     * For each pixels
-     *  if mask is 1
-     *      getProjPixel
-     *      camPixel(i,j).push_back(cv::Point(i,j))
-     */
-	for(int i=0; i<w; i++)
-	{
-		for(int j=0; j<h; j++)
-		{
+    // For each pixel
+	for(int i=0; i<w; i++) {
+		for(int j=0; j<h; j++) {
 
 			//if the pixel is not shadow reconstruct
 			if(shadowMask.at<uchar>(j,i))
@@ -160,19 +149,19 @@ void Reconstructor::loadCameras()
 		std::string path;
 		
 		path = camFolder[i];
-		path += "input/cam_matrix.txt";
+		path += "calib/output/cam_matrix.txt";
 		cameras[i].loadCameraMatrix(path.c_str());
 
 		path = camFolder[i];
-		path += "input/cam_distortion.txt";
+		path += "calib/output/cam_distortion.txt";
 		cameras[i].loadDistortion(path.c_str());
 
 		path = camFolder[i];
-		path += "input/cam_rotation_matrix.txt";
+		path += "calib/output/cam_rotation_matrix.txt";
 		cameras[i].loadRotationMatrix(path.c_str());
 
 		path = camFolder[i];
-		path += "input/cam_trans_vectror.txt";
+		path += "calib/output/cam_trans_vectror.txt";
 		cameras[i].loadTranslationVector(path.c_str());
 
 		cameras[i].height=0;
@@ -207,7 +196,6 @@ void Reconstructor::loadCamImgs( std::string folder,std::string prefix,std::stri
 		if(tmp.empty())
 		{
 			std::cout<<"\nError loading cam image "<<i+1<<". Press Any Key to Exit.";
-			getch();
 			exit(-1);
 		}
 
@@ -229,6 +217,7 @@ void Reconstructor::loadCamImgs( std::string folder,std::string prefix,std::stri
 		{
 			color = tmp;
 		}
+        // Convert color to gray
 		cv::cvtColor(tmp, tmp, CV_BGR2GRAY);
 
 		camImgs.push_back(tmp);

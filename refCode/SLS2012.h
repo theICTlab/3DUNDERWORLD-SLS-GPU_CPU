@@ -12,8 +12,7 @@
 #ifndef __SLS_2012_H__
 #define __SLS_2012_H__
 
-#include "cv.h"
-#include <direct.h>
+#include <opencv2/opencv.hpp>
 
 extern int proj_h;
 extern int proj_w;

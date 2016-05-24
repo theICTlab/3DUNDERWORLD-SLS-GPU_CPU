@@ -47,7 +47,7 @@ class Camera
 
     size_t resX_, resY_;        //Camera Resolution
     
-    std::vector<unsigned char> threasholds_; //Threashold for each pixel <-[0,255]
+    std::vector<unsigned char> thresholds_; //Threshold for each pixel <-[0,255]
     Dynamic_Bitset shadowMask_; //Color mask
     cv::Mat color_;     //Color image
     uchar whiteThreshold_;
@@ -55,11 +55,11 @@ class Camera
  public:
     Camera() = delete;
     explicit Camera(const std::string &cName):name_(cName),resX_(0),resY_(0)
-    {whiteThreshold_=5; blackThreshold_=5;}   //Hacking, need to read from file
+    {whiteThreshold_=5; blackThreshold_=40;}   //Hacking, need to read from file
     const std::string& getName() const {return name_;}
     void setName(const std::string &cName) {name_ = cName;}
     void getResolution(size_t &x, size_t &y) const{x=resX_; y=resY_;}
-    const unsigned char& getThreashold(const size_t &idx){return threasholds_[idx];}
+    const unsigned char& getThreashold(const size_t &idx){return thresholds_[idx];}
     bool queryMask(const size_t &idx){return shadowMask_.getBit(idx);}
     uchar getWhiteThreshold() const {return whiteThreshold_;}
     uchar getblackThreshold() const {return blackThreshold_;}
@@ -93,7 +93,7 @@ class Camera
     virtual void loadConfig(const std::string &configFile) = 0;
     virtual const cv::Mat& getNextFrame() = 0;
     virtual void undistort()=0;
-    virtual void computeShadowsAndThreasholds()=0;
+    virtual void computeShadowsAndThresholds()=0;
     virtual void nextFrame()=0;
 };
 }  // namespace SLS

@@ -22,8 +22,8 @@ void ReconstructorCUDA::renconstruct()
     // For each camera, hack
     GPUBuckets buckets[2] =
     {
-        GPUBuckets( (1<<20)-1,21),
-        GPUBuckets( (1<<20)-1,21)
+        GPUBuckets( 1024*768,21),
+        GPUBuckets( 1024*768,21)
     };
     
     /**** Profile *****/
@@ -89,7 +89,7 @@ void ReconstructorCUDA::renconstruct()
         //bitsetArray.writeToPPM("patter17"+cam->getName()+".pgm", x, y, false,(1<<17)-1);
         //bitsetArray.writeToPPM("patter18"+cam->getName()+".pgm", x, y, false,(1<<18)-1);
         //bitsetArray.writeToPPM("patter19"+cam->getName()+".pgm", x, y, false,(1<<19)-1);
-        //bitsetArray.writeToPPM("patter20"+cam->getName()+".ppm", x, y, false,(1<<20)-1);
+        bitsetArray.writeToPPM("patter20"+cam->getName()+".ppm", x, y, false,(1<<20)-1);
     }
 
 
@@ -187,7 +187,7 @@ __global__ void buildBuckets(
     while (idx < XtimesY)   // For each pixel
     {
         if (mask.getBit(0, idx))
-            bkts.add2Bucket(idx, patterns.to_uint(idx));
+            bkts.add2Bucket(idx, patterns.to_uint_gray(idx, 10, 10));
         idx += stride;
     }
 }

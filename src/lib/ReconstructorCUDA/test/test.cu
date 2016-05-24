@@ -44,7 +44,7 @@ int main()
     reconstructor.addCamera(rightCamera);
     reconstructor.addCamera(leftCamera);
     reconstructor.renconstruct();
-    exportOBJVec4("test.obj", reconstructor);
+    exportPLYGrid("test.ply", reconstructor);
 
     return 0;
 }

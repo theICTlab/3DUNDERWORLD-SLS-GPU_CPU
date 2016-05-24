@@ -12,12 +12,10 @@
 #ifndef __GRAY_CODES_H__
 #define __GRAY_CODES_H__
 
-#include "stdafx.h"
 #include <iostream>
 #include <fstream>
 using std::ofstream;
-#include "cv.h"
-#include "highgui.h"
+#include <opencv2/opencv.hpp>
 #include <math.h>
 #include "Utilities.h"
 
@@ -41,8 +39,8 @@ class GrayCodes	{
 
 		void save();
 		static int grayToDec(cv::vector<bool> gray);
-		int GrayCodes::getNumOfRowBits();
-		int GrayCodes::getNumOfColBits();
+		int getNumOfRowBits();
+		int getNumOfColBits();
 		
 	protected:
 		IplImage* grayCodes[GRAY_MAX_NUM];

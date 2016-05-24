@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
+#include <glm/glm.hpp>
 using std::ostream;
 
 namespace SLS
@@ -99,7 +100,10 @@ public:
      *
      * @param sz number of bits
      */
-    virtual void resize(const size_t &sz) {bits.resize((sz+BITS_PER_BYTE-1)/ BITS_PER_BYTE, 0);}
+    virtual void resize(const size_t &sz) {
+        bits.resize((sz+BITS_PER_BYTE-1)/ BITS_PER_BYTE, 0);
+        memset(&(bits[0]), 0, sizeof(unsigned char)*bits.size());
+    }
 
     /**
      * @brief Set a bit to 1
@@ -150,7 +154,25 @@ public:
             res += ((unsigned int)bits[i])<<(i*BITS_PER_BYTE);
         return res;
     }
-    bool writeToPGM( std::string fileName, const size_t &w, const size_t &h, bool transpose=false);
+    glm::uvec2 to_uint_gray () const
+    {
+        unsigned num = to_uint(); //Gray code
+        //Extract lower 10
+        unsigned xDec = num & 0x3FFU;
+        //Extract higher 10
+        unsigned yDec = num >> 10;
+
+        // Convert lower and higher to reflected dec
+        for (unsigned bit=1U<<31; bit>1; bit>>=1) {
+            if (xDec & bit) xDec ^= bit >> 1;
+        }
+
+        for (unsigned bit=1U<<31; bit>1; bit>>=1) {
+            if (yDec & bit) yDec ^= bit >> 1;
+        }
+        return glm::uvec2(xDec, yDec);
+    }
+    bool writeToPGM(std::string fileName, const size_t &w, const size_t &h, bool transpose=false);
 
     //Friend operators
     inline friend std::ostream& operator<<(std::ostream& os, const Dynamic_Bitset& db);

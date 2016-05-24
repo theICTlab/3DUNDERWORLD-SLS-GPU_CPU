@@ -34,16 +34,8 @@ private:
 public:
     ReconstructorCPU(const size_t projX, const size_t projY): 
         Reconstructor()
-        //projector_{new Projector(projX, projY)}
     {
-        try{
             projector_ = new Projector(projX, projY);
-        }
-        catch(std::bad_alloc& ba)
-        {
-            LOG::writeLogErr("Bad allocation\n");
-            exit(0);
-        }
     }
     ~ReconstructorCPU() override;
     //Interfaces

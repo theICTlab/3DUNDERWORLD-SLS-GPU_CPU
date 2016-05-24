@@ -25,11 +25,16 @@ struct GPUBucketsObj
     uint NUM_BKTS_;
     __device__ void add2Bucket(uint val, uint bktIdx)
     {
+        if (bktIdx > NUM_BKTS_-1)
+        {
+            return;
+        }
         data_[atomicAdd(&count_[bktIdx], 1)+bktIdx*MAX_CNT_PER_BKT_] = val;
         //if (bktIdx * MAX_CNT_PER_BKT_ > (1<<20)-1)
         //    printf("Too big!\n");
     }
 };
+
 class GPUBuckets
 {
 private:
@@ -82,6 +87,7 @@ __global__ void getPointCloud2Cam(
         uint camResY,
 
         float* pointCloud
+
         );
 
         

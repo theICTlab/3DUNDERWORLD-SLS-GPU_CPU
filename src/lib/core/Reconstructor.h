@@ -32,6 +32,7 @@ protected:
     std::vector<Camera*> cameras_;
     Projector* projector_;
     std::vector<float> pointCloud_;
+    std::vector<uint> idx_;
 public:
     Reconstructor():projector_{nullptr}{};
     virtual ~Reconstructor(){}
@@ -39,10 +40,12 @@ public:
     // Interfaces
     virtual void renconstruct()=0;
     virtual void addCamera(Camera* cam)=0;
+    friend void exportPLYGrid(std::string fileName, const Reconstructor& reconstructor);
     friend void exportPLY( std::string fileName ,const Reconstructor& reconstructor);
     friend void exportOBJ( std::string fileName ,const Reconstructor& reconstructor);
     friend void exportOBJVec4( std::string fileName ,const Reconstructor& reconstructor);
 };
+    void exportPLYGrid(std::string fileName, const Reconstructor& reconstructor);
     void exportPLY( std::string fileName ,const Reconstructor& reconstructor);
     void exportOBJ( std::string fileName ,const Reconstructor& reconstructor);
     void exportOBJVec4( std::string fileName ,const Reconstructor& reconstructor);

@@ -34,9 +34,11 @@ public:
     Projector(size_t width, size_t height):width_{width},height_{height}{}
     ~Projector(){};
     void getSize(size_t &w, size_t &h){w = width_; h = height_;}
-    size_t getRequiredNumFrames()const
+    size_t getWidth() const {return width_;}
+    size_t getHeight() const {return height_;}
+    size_t getRequiredNumFrames() const
     {
-        return std::ceil(std::log2((float)width_*(float)height_));
+        return (size_t )std::ceil(std::log2((float)width_*(float)height_));
     }
 };
 }

@@ -9,19 +9,18 @@
 
 #pragma once
 
-#include "stdafx.h"
-#include "cv.h"
-#include "highgui.h"
+#include <cstdio>
+#include <cstdlib>
+#include <opencv2/opencv.hpp>
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include <conio.h>
+//#include <conio.h>
 #include "GrayCodes.h"
 #include "VirtualCamera.h"
 #include "Utilities.h"
 #include "PointCloudImage.h"
 #include "SLS2012.h"
-#include "Sample.h"
 
 #define RECONSTRUCTION_SAMPLING_ON
 #define SAMPLES_NUM 25
@@ -60,6 +59,7 @@ class Reconstructor
 		void disableSavingShadowMask();
 	private:
 		
+        
 		int numOfCams;
 
 		VirtualCamera *camera;//general functions use this instead of camera1 or camera2
@@ -67,18 +67,18 @@ class Reconstructor
 		cv::vector<cv::Point> **camsPixels;
 		cv::vector<cv::Point> *camPixels; //general functions use this instead of cam1Pixels or cam2Pixels
 
-		void Reconstructor::loadCamImgs(std::string folder,std::string prefix,std::string suffix);
+		void loadCamImgs(std::string folder,std::string prefix,std::string suffix);
 		void unloadCamImgs();
 
 		void computeShadows();
 
-		void Reconstructor::cam2WorldSpace(VirtualCamera cam, cv::Point3f &p);
+		void cam2WorldSpace(VirtualCamera cam, cv::Point3f &p);
 		
-		bool Reconstructor::getProjPixel(int x, int y, cv::Point &p_out);
+		bool getProjPixel(int x, int y, cv::Point &p_out);
 
 		void decodePaterns();
 
-		void Reconstructor::triangulation(cv::vector<cv::Point> *cam1Pixels, VirtualCamera cameras1, cv::vector<cv::Point> *cam2Pixels, VirtualCamera cameras2, int cam1index, int cam2index);
+		void triangulation(cv::vector<cv::Point> *cam1Pixels, VirtualCamera cameras1, cv::vector<cv::Point> *cam2Pixels, VirtualCamera cameras2, int cam1index, int cam2index);
 		
 		std::string *camFolder;
 		std::string *imgPrefix;
@@ -108,8 +108,8 @@ class Reconstructor
 		bool raySampling_;
 		bool saveShadowMask_;
 
-		//access
-		int Reconstructor::ac(int x,int y)
+		//acress
+		int ac(int x,int y)
 		{
 			return x*proj_h+y;
 		}

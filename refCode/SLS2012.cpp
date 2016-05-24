@@ -322,9 +322,10 @@ void reconstruct()
      */
 	reconstructor->loadCameras();
 
-	//set reconstuction paramiters
+	//set reconstuction parameters
 	reconstructor->setBlackThreshold(black_threshold);
 	reconstructor->setWhiteThreshold(white_threshold);
+
 	
 	if(autoContrast)
 		reconstructor->enableAutoContrast();

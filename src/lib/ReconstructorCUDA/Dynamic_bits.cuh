@@ -4,6 +4,8 @@
 #pragma once
 #include "CUDA_Error.cuh"
 #include <vector>
+#include <cuda_runtime.h>
+#include <cuda.h>
 
 
 namespace SLS
@@ -78,6 +80,7 @@ struct Dynamic_Bitset_Array_GPU
     }
     __device__ __host__ size_t getNumElem() const { return numElem;}
     __device__ __host__ size_t getBitsPerElem() const { return bitsPerElem;}
+
     __device__ unsigned int to_uint(const size_t &elem) const
     {
         if (bitsPerElem > sizeof(uint)*BITS_PER_BYTE)   // Break if longer than uint
@@ -92,6 +95,68 @@ struct Dynamic_Bitset_Array_GPU
         return res;
     }
 
+    // Hack to swap lower 10 bits with heigher 10 bits
+    __device__ unsigned to_uint_gray(const size_t &elem, unsigned numLowerBits, unsigned numHigherBits) const
+    {
+        if (bitsPerElem > sizeof(uint)*BITS_PER_BYTE)   // Break if longer than uint
+        {
+            __threadfence();
+            asm("trap;");
+        }
+        //Lower
+        unsigned lower = 0;
+
+        bool lowestBit = getBit(0, elem);
+        if(lowestBit)
+            lower += 1<<(numLowerBits-1);
+        for (unsigned i=1; i<numLowerBits; i++)
+        {
+            lowestBit = getBit(i, elem) != lowestBit;
+            if (lowestBit)
+                lower += (unsigned)1<<(numLowerBits-i-1);
+        }
+
+    
+        //for (unsigned i=0; i<numLowerBits; i++)
+        //    lower += getBit(i, elem)?1<<(numLowerBits-1-i):0;
+        //if (numLowerBits < 32)
+        //{
+        //    lower = lower ^ (lower>>16);
+        //    lower = lower ^ (lower>>8);
+        //    lower = lower ^ (lower>>4);
+        //    lower = lower ^ (lower>>2);
+        //    lower = lower ^ (lower>>1);
+        //}
+
+        //Higher
+        unsigned heigher = 0;
+        lowestBit = getBit(numLowerBits, elem);
+        if (lowestBit)
+            heigher += 1<<(numHigherBits-1);
+        for (unsigned i=1; i<numHigherBits; i++)
+        {
+            lowestBit = getBit(i+numLowerBits, elem) != lowestBit;
+            if (lowestBit)
+                heigher += 1<<(numHigherBits-i-1);
+        }
+        //for (unsigned i=0; i< numHigherBits; i++)
+        //    heigher += getBit(i+numLowerBits, elem)?1<<(numHigherBits-i-1):0;
+        //if (numHigherBits < 32)
+        //{
+        //    heigher = heigher ^ (lower>>16);
+        //    heigher = heigher ^ (lower>>8);
+        //    heigher = heigher ^ (lower>>4);
+        //    heigher = heigher ^ (lower>>2);
+        //    heigher = heigher ^ (lower>>1);
+        //}
+
+        if (lower >= 768 || heigher >= 1024)
+        {
+            return 1024*768+1;
+        }
+
+        return lower*1024+heigher;
+    }
 };
 
 class Dynamic_Bitset_Array{

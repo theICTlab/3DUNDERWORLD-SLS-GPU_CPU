@@ -62,13 +62,18 @@ public:
      * @param fileName output obj file
      */
     void rayTableToPointCloud(std::string fileName) const;
-    
+
     //Implementing interfaces
-    ~FileReader() override{}
+    ~FileReader() override{
+       for (auto image: images_)
+           image.release();
+        for (auto param: params_)
+            param.release();
+    }
     Ray getRay(const size_t &x, const size_t &y) override;
     //Ray getRay(const size_t &idx) override{return rayTable[idx];}
     Ray getRay(const size_t &pixelIdx) override;
-    
+
     void loadConfig(const std::string& configFile) override;
     void loadConfig(
             const std::string& distMat,
@@ -78,7 +83,8 @@ public:
             );
     const cv::Mat& getNextFrame() override;
     void undistort() override;
-    void computeShadowsAndThreasholds() override;
+    void computeShadowsAndThresholds() override;
     void setResolution (const size_t &x, const size_t &y) override {resX_ = x; resY_ = y; rayTable.resize(resX_*resY_);}
+    const unsigned char getWhiteThreshold(size_t i) const { return thresholds_[i];}
 };
 }

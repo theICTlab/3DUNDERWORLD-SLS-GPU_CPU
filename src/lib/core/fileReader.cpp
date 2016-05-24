@@ -1,10 +1,7 @@
 #include "fileReader.h"
-#include <sstream>
 #include <glm/gtx/string_cast.hpp>
-#include <iostream>
 #include <iomanip>
 #include <fstream>
-#include "log.hpp"
 
 //using uchar=unsigned char;
 namespace SLS
@@ -27,23 +24,24 @@ void FileReader::loadImages(const std::string& folder, bool isGL)
             break;
         else 
         {
-            
-            if( images_.size() == 0)    
+            if( images_.size() == 0)
                 //Copy the first image to color
                 img.copyTo(color_);
 
             cv::Mat gray;
             cv::cvtColor(img, gray, CV_BGR2GRAY);
-            images_.push_back(gray);
+            images_.push_back(gray.clone());
         }
+        img.release();
     }
     if (images_.empty())
-        LOG::writeLogErr(" No image readed from %s ... ", ss.str().c_str());
+        LOG::writeLogErr(" No image read from %s ... ", ss.str().c_str());
     else
     {
         resX_ = images_[0].cols;
         resY_ = images_[0].rows;
-        rayTable.resize(resX_*resY_);
+        //rayTable.resize(resX_*resY_);
+        thresholds_.resize(resY_*resX_, whiteThreshold_);
         LOG::writeLog("%d images loaded ...", images_.size());
     }
     LOG::endTimer('s');
@@ -73,6 +71,7 @@ void FileReader::loadConfig(const std::string& configFile)
     fs.root()["Camera"]["Translation"]>>params_[TRANS_MAT];
     fs.root()["Camera"]["Rotation"]>>params_[ROT_MAT];
     fs.release();
+
     //Debug
     //Validation
     for (size_t i=0; i<PARAM_COUNT; i++)
@@ -140,7 +139,7 @@ void FileReader::undistort()
 }
 
 
-void FileReader::computeShadowsAndThreasholds()
+void FileReader::computeShadowsAndThresholds()
 {
     /*
      * Black threashold = 5;
@@ -148,16 +147,19 @@ void FileReader::computeShadowsAndThreasholds()
     cv::Mat& brightImg=images_[0];
     cv::Mat& darkImg=images_[1];
     shadowMask_.resize(resX_*resY_); 
-    threasholds_.resize(resX_*resY_);
+    cv::waitKey(0);
     //Column based
     for (size_t i=0; i< resX_; i++)
         for (size_t j=0; j<resY_; j++)
         {
-            threasholds_[j+i*resY_] = (brightImg.at<uchar>(j,i)-darkImg.at<uchar>(j,i));
-            if (threasholds_[j+i*resY_] > blackThreshold_)
+            auto diff = brightImg.at<uchar>(j,i) - darkImg.at<uchar>(j,i);
+            if (diff > blackThreshold_)
                 shadowMask_.setBit(j+i*resY_);
             else
                 shadowMask_.clearBit(j+i*resY_);
+#ifdef AUTO_CONTRAST
+            thresholds_[j+i*resY_]=diff/2;
+#endif
         }
     std::string pgmFName=name_+".pgm";
     LOG::writeLog("Writing mask to %s\n", pgmFName.c_str());
@@ -166,8 +168,6 @@ void FileReader::computeShadowsAndThreasholds()
 Ray FileReader::getRay(const size_t &x, const size_t &y)
 {
         glm::vec2 undistorted = undistortPixel(glm::vec2(x, y));
-        if (undistorted.x > resX_ || undistorted.y>resY_)
-            std::cout<<"Out of range! "<<resX_<<"\t"<<resY_<<std::endl;
         Ray ray;
         if (undistorted.x > resX_ || undistorted.y > resY_)
         {
@@ -250,10 +250,9 @@ glm::vec2 FileReader::undistortPixel(const glm::vec2 &distortedPixel) const
 
     x = distortedPixel.x;
     y = distortedPixel.y;
-    x0 = (x-cx)*ifx;
-    x = x0;
-    y0 = (y-cy)*ify;
-    y = y0;
+
+	x0 = x = (x - cx)*ifx;
+	y0 = y = (y - cy)*ify;
 
     for(int jj = 0; jj < iters; jj++ )
 	{
