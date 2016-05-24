@@ -44,18 +44,20 @@ void ReconstructorCPU::generateBuckets()
         for (size_t i = 0; i < xTimesY; i++) {
             if (!cam->queryMask(i)) // No need to process if in shadow
                 continue;
-            cam->nextFrame();
-            cam->nextFrame();//skip first two frames
+
+            cam->getNextFrame();
+            cam->getNextFrame();//skip first two frames
 
             Dynamic_Bitset bits(projector_->getRequiredNumFrames());
 
             bool discard = false;
-
             // for each frame
             for (int bitIdx = projector_->getRequiredNumFrames() - 1; bitIdx >= 0; bitIdx--) {
             //for (int bitIdx = 0; bitIdx <projector_->getRequiredNumFrames(); bitIdx++) {
 
+                //std::cout<<((FileReader*)cam)->getCurrentIdx()<<std::endl;
                 auto frame = cam->getNextFrame();
+                //std::cout<<((FileReader*)cam)->getCurrentIdx()<<std::endl;
                 auto invFrame = cam->getNextFrame();
                 unsigned char pixel = frame.at<uchar>(i % y, i / y);
                 unsigned char invPixel = invFrame.at<uchar>(i % y, i / y);
@@ -63,7 +65,8 @@ void ReconstructorCPU::generateBuckets()
                 // Not considering shadow mask. But the following test should be
                 // more strict than shadow mask.
                 if (invPixel > pixel && invPixel - pixel >= ((FileReader*)cam)->getWhiteThreshold(i)) {
-                    // No need to do anything since the array is intialized as all zeros
+                    // No need to do anything since the array is initialized as all zeros
+                    bits.clearBit((size_t) bitIdx);
                     continue;
                     //std::cout<<"-----\n"<<bits<<std::endl;
                     //bits.clearBit(bitIdx);
@@ -71,17 +74,15 @@ void ReconstructorCPU::generateBuckets()
                     //std::cout<<bits<<std::endl;
                    
                 }
-                else if (pixel > invPixel && pixel - invPixel > ((FileReader*)cam)->getWhiteThreshold(i)) {
-                    //std::cout<<"-----\n"<<bits<<std::endl;
+                else if (pixel > invPixel && pixel - invPixel > 
+                        ((FileReader*)cam)->getWhiteThreshold(i)) {
                     bits.setBit((size_t )bitIdx);
-                    //std::cout<<std::setw(bits.size()-bitIdx)<<"s"<<std::endl;
-                    //std::cout<<bits<<std::endl;
-                    
+
                 }
                 else {
-                    //discard this pixel
+                    cam->clearMask(i);
                     discard = true;
-                    break;
+                    continue;
                 }
             } // end for each frame
             if (!discard) {
@@ -113,7 +114,7 @@ void ReconstructorCPU::generateBuckets()
             for (unsigned i = 0; i < w * h; i++) {   // i row based
                 auto bucketIdx = (i % w) * h + i / w;   // bucketIdx is col based
                 if (!buckets_[0][bucketIdx].empty())
-                    putc((unsigned char) 255, pFp);
+                    putc((unsigned char) buckets_[0][bucketIdx].size()*255/60, pFp);
                 else
                     putc((unsigned char) 0, pFp);
             }
@@ -231,9 +232,9 @@ void ReconstructorCPU::renconstruct()
 
             //if (minDist < 0.3) //Setting threshold
             {
-                pointCloud_.push_back(minMidP.x);
-                pointCloud_.push_back(minMidP.y);
-                pointCloud_.push_back(minMidP.z);
+                pointCloud_.push_back(midPointAvg.x);
+                pointCloud_.push_back(midPointAvg.y);
+                pointCloud_.push_back(midPointAvg.z);
                 pointCloud_.push_back(1);
                 unsigned char r0, g0, b0;
                 unsigned char r1, g1, b1;

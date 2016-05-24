@@ -61,6 +61,8 @@ class Camera
     void getResolution(size_t &x, size_t &y) const{x=resX_; y=resY_;}
     const unsigned char& getThreashold(const size_t &idx){return thresholds_[idx];}
     bool queryMask(const size_t &idx){return shadowMask_.getBit(idx);}
+    void setMask(const size_t &idx){ shadowMask_.setBit(idx);}
+    void clearMask(const size_t &idx){ shadowMask_.clearBit(idx);}
     uchar getWhiteThreshold() const {return whiteThreshold_;}
     uchar getblackThreshold() const {return blackThreshold_;}
 
@@ -94,6 +96,5 @@ class Camera
     virtual const cv::Mat& getNextFrame() = 0;
     virtual void undistort()=0;
     virtual void computeShadowsAndThresholds()=0;
-    virtual void nextFrame()=0;
 };
 }  // namespace SLS

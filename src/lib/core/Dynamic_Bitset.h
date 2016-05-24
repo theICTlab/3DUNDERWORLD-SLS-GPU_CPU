@@ -158,9 +158,9 @@ public:
     {
         unsigned num = to_uint(); //Gray code
         //Extract lower 10
-        unsigned xDec = num & 0x3FFU;
+        unsigned yDec = num & 0x3FFU;
         //Extract higher 10
-        unsigned yDec = num >> 10;
+        unsigned xDec = num >> 10;
 
         // Convert lower and higher to reflected dec
         for (unsigned bit=1U<<31; bit>1; bit>>=1) {
