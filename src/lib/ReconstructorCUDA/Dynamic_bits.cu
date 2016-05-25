@@ -7,6 +7,7 @@ namespace SLS
 bool Dynamic_Bitset_Array::writeElemToPGM( std::string fileName, size_t elemIdx, const size_t &w, const size_t &h, bool transpose)
 {
     const size_t numBytes = (bitsPerElem)/BITS_PER_BYTE;
+    std::cout<< numBytes <<"\t"<< bitsPerElem<<std::endl;
     unsigned char *startBit = &bits[numBytes*elemIdx];
     unsigned char bits_h[numBytes];
     gpuErrchk(cudaMemcpy(bits_h, startBit, numBytes, cudaMemcpyDeviceToHost));
@@ -129,7 +130,11 @@ __global__ void toNormalizedUintArray(
     uint stride = blockDim.x * gridDim.x;
     while (idx < bitsArray.numElem)
     {
-        uintArray[idx] = (uint)((long unsigned int)bitsArray.to_uint(idx) * (long unsigned int)capValue / maxValue);
+        //auto val2 = bitsArray.to_uint_gray(idx);
+        //uint val = val2.x + val2.y*1024;
+        uint val = bitsArray.to_uint(idx);
+
+        uintArray[idx] = (uint)((long unsigned int)val * (long unsigned int)capValue / maxValue);
         idx += stride;
     }
 }

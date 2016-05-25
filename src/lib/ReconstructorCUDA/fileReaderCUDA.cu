@@ -56,7 +56,7 @@ void FileReaderCUDA::computeShadowsAndThresholds()
             resX_, resY_,
             maskGPU_->getGPUOBJ());
     gpuErrchk( cudaPeekAtLastError());
-    //maskGPU_->writeToPGM(name_+"_mask.pgm", resX_, resY_, false, 1);
+    maskGPU_->writeToPGM(name_+"_mask.pgm", resX_, resY_, false, 1);
 
     // Clean up
     gpuErrchk(cudaFree(brightImg_d));

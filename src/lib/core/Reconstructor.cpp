@@ -95,7 +95,7 @@ namespace SLS
         const auto &pointCloud = reconstructor.pointCloud_;
         for (size_t i=0; i<pointCloud.size(); i+=4)
         {
-            if (pointCloud[i+3] == 0 ) continue;
+            if (pointCloud[i+3] < 0.5 ) continue;
             of<<"v "<<pointCloud[i]<<" "<<pointCloud[i+1]<<" "<<pointCloud[i+2]<<std::endl;
         }
         of.close();
