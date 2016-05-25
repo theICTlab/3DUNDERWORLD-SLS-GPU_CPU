@@ -1,3 +1,4 @@
+#include <device_launch_parameters.h>
 #include "ReconstructorCUDA.cuh"
 #include "fileReaderCUDA.cuh"
 namespace SLS
@@ -17,13 +18,13 @@ void ReconstructorCUDA::addCamera(Camera *cam)
 {
     cameras_.push_back(cam);
 }
-void ReconstructorCUDA::renconstruct()
+void ReconstructorCUDA::reconstruct()
 {
     // For each camera, hack
     GPUBuckets buckets[2] =
     {
-        GPUBuckets( 1024*768,21),
-        GPUBuckets( 1024*768,21)
+        GPUBuckets( 1024*768,100),
+        GPUBuckets( 1024*768,100)
     };
     
     /**** Profile *****/
@@ -36,20 +37,20 @@ void ReconstructorCUDA::renconstruct()
 
     for(size_t camIdx = 0; camIdx < cameras_.size(); camIdx++)
     {
-        auto &cam = cameras_[camIdx];
+        FileReaderCUDA* cam = (FileReaderCUDA*)cameras_[camIdx];
         LOG::writeLog("Generating reconstruction bucket for \"%s\" ... \n", cam->getName().c_str());
-        cam->computeShadowsAndThreasholds();    // can it be done in GPU?
+        cam->computeShadowsAndThresholds();    // can it be done in GPU? Yes
         size_t x=0,y=0,xTimesY=0;
         cam->getResolution(x,y);
         xTimesY=x*y;
-        cam->nextFrame();cam->nextFrame();//skip first two frames
+        //Skip first two frames
+        cam->getNextFrame();
+        cam->getNextFrame();
         // Load all images into GPU memory
         uchar *images_d=nullptr;
         gpuErrchk(cudaMalloc((void**)&images_d, sizeof(uchar)*xTimesY*projector_->getRequiredNumFrames()*2));
         Dynamic_Bitset_Array bitsetArray(xTimesY, projector_->getRequiredNumFrames());
 
-        //Skip first two frames;
-        cam->getNextFrame(); cam->getNextFrame();
         //Preparing data
         for (size_t i=0; i<projector_->getRequiredNumFrames(); i++)
         {
@@ -61,15 +62,13 @@ void ReconstructorCUDA::renconstruct()
             gpuErrchk( cudaMemcpy( &images_d[xTimesY*(2*i+1)], invFrm.data, 
                     sizeof(uchar)*xTimesY, cudaMemcpyHostToDevice));
         }
-        FileReaderCUDA *cudaCam = dynamic_cast<FileReaderCUDA*> (cam);
-        assert(cam != nullptr);
 
         Kernel::genPatternArray<<<200,200>>> (
                 images_d, 
                 projector_->getRequiredNumFrames(),
                 xTimesY,
-                cam->getWhiteThreshold(),
-                cudaCam->getMask()->getGPUOBJ(),
+                cam->getWhiteThreshold(0),
+                cam->getMask()->getGPUOBJ(),
                 bitsetArray.getGPUOBJ()
                 );
         //Check for errors
@@ -77,7 +76,7 @@ void ReconstructorCUDA::renconstruct()
         gpuErrchk(cudaFree(images_d)); // Release the heavy image array
 
         Kernel::buildBuckets<<<200, 200>>> (
-             cudaCam->getMask()->getGPUOBJ(),
+             cam->getMask()->getGPUOBJ(),
              bitsetArray.getGPUOBJ(),
              xTimesY,
              buckets[camIdx].getGPUOBJ()
@@ -94,9 +93,8 @@ void ReconstructorCUDA::renconstruct()
 
 
     // A lot of hacks down there, need to be refactored
-    auto camera0 = dynamic_cast<FileReaderCUDA*>(cameras_[0]);
-    auto camera1 = dynamic_cast<FileReaderCUDA*>(cameras_[1]);
-
+    auto camera0 = (FileReaderCUDA*)(cameras_[0]);
+    auto camera1 = (FileReaderCUDA*)(cameras_[1]);
     float* cloud = nullptr;
 
     gpuErrchk ( cudaMalloc((void**)&cloud, buckets[0].getNumBKTs()*sizeof(float)*4));
@@ -115,9 +113,7 @@ void ReconstructorCUDA::renconstruct()
             camera1->getDeviceCamMat(),
             camera1->getDeviceDistMat(),
             camera1->getDeviceCamTransMat(),
-
             4896,3264,
-
             cloud
             );
     gpuErrchk( cudaPeekAtLastError());
@@ -186,8 +182,9 @@ __global__ void buildBuckets(
     uint stride = blockDim.x * gridDim.x;
     while (idx < XtimesY)   // For each pixel
     {
-        if (mask.getBit(0, idx))
-            bkts.add2Bucket(idx, patterns.to_uint_gray(idx, 10, 10));
+        glm::uvec2 bkt2v = patterns.to_uint_gray(idx);
+        if (bkt2v.x < 1024 && bkt2v.y < 768 && mask.getBit(0, idx))
+            bkts.add2Bucket(idx, bkt2v.x+bkt2v.y*1024);
         idx += stride;
     }
 }
@@ -220,12 +217,16 @@ __global__ void getPointCloud2Cam(
         if ( buckets0.count_[idx] == 0 || buckets1.count_[idx] == 0) 
         {
             memset( &pointCloud[4*idx], 0, sizeof(float)*4);
+            pointCloud[4*idx+3] = float(0.0);
         }
         else
         {
             //Undistorted pixels
             float minDist = 99999.0;
             float minMidPoint[4];
+
+            float avgPoint[4];
+            uint ptCount = 0;
 
             for (uint i=0; i<buckets0.count_[idx]; i++)
                 for (uint j=0; j<buckets1.count_[idx]; j++)
@@ -261,17 +262,25 @@ __global__ void getPointCloud2Cam(
                     auto dist = getMidPoint(
                             origin0, dir0, origin1, dir1,
                             midPoint);
+                    avgPoint[0] += midPoint[0];
+                    avgPoint[1] += midPoint[1];
+                    avgPoint[2] += midPoint[2];
+                    avgPoint[3] += midPoint[3];
+                    ptCount++;
                     if (dist < minDist)
                     {
                         minDist = dist;
                         memcpy (minMidPoint, midPoint, sizeof(float)*4);
                     }
                 }
-            if (minDist < 0.3)
-                memcpy ( &pointCloud[4*idx], minMidPoint, sizeof(float)*4);
-            else
-                memset( &pointCloud[4*idx], 0, sizeof(float)*4);
-
+            //if (minDist < 0.3)
+            avgPoint[0] /= (float)ptCount;
+            avgPoint[1] /= (float)ptCount;
+            avgPoint[2] /= (float)ptCount;
+            avgPoint[3] = 1.0;
+            memcpy ( &pointCloud[4*idx], avgPoint, sizeof(float)*4);
+            //else
+                //memset( &pointCloud[4*idx], 0, sizeof(float)*4);
         }
         idx += stride;
     }

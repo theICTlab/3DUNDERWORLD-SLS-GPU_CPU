@@ -24,7 +24,7 @@ public:
             gpuErrchk( cudaMalloc((void**)&params_d_[TRANS_MAT], sizeof(float)*3));
             gpuErrchk( cudaMalloc((void**)&camTransMat_d_, sizeof(float)*16));
         };
-    void computeShadowsAndThreasholds() override;
+    void computeShadowsAndThresholds() override;
 
     void loadConfig(const std::string& configFile) override;
     ~FileReaderCUDA() override {
@@ -44,7 +44,7 @@ public:
 __global__ void computeMask_kernel(
         unsigned char *brightImg,
         unsigned char *darkImg,
-        uchar blackThreashold,
+        uchar blackThreshold,
         size_t resX,
         size_t resY,
         Dynamic_Bitset_Array_GPU mask

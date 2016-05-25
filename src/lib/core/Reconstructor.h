@@ -38,7 +38,7 @@ public:
     virtual ~Reconstructor(){}
 
     // Interfaces
-    virtual void renconstruct()=0;
+    virtual void reconstruct()=0;
     virtual void addCamera(Camera* cam)=0;
     friend void exportPLYGrid(std::string fileName, const Reconstructor& reconstructor);
     friend void exportPLY( std::string fileName ,const Reconstructor& reconstructor);

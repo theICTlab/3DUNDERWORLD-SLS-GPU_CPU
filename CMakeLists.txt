@@ -4,6 +4,13 @@ project( SLS )
 find_package( OpenCV REQUIRED )
 set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -O3")
 include_directories(./src/lib)
+#Detecting CUDA
+find_package(CUDA)
+IF (${CUDA_FOUND})
+    add_subdirectory(./src/lib/ReconstructorCUDA)
+ENDIF(${CUDA_FOUND})
+
+
 
 add_subdirectory(./src/lib/core)
 add_subdirectory(./src/app)

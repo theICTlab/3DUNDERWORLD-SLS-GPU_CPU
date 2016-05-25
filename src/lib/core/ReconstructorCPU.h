@@ -39,7 +39,7 @@ public:
     }
     ~ReconstructorCPU() override;
     //Interfaces
-    void renconstruct() override;
+    void reconstruct() override;
     void addCamera(Camera *cam) override;
 };
 } // namespace SLS

@@ -84,6 +84,6 @@ public:
     void undistort() override;
     void computeShadowsAndThresholds() override;
     void setResolution (const size_t &x, const size_t &y) override {resX_ = x; resY_ = y; rayTable.resize(resX_*resY_);}
-    const unsigned char getWhiteThreshold(size_t i) const { return thresholds_[i];}
+    unsigned char getWhiteThreshold(size_t i) const { return thresholds_[i];}
 };
 }

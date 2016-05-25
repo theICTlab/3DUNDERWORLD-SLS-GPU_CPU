@@ -22,7 +22,7 @@ int main()
     SLS::ReconstructorCPU reconstruct(1024,768);
     reconstruct.addCamera(rightCam);
     reconstruct.addCamera(leftCam);
-    reconstruct.renconstruct();
+    reconstruct.reconstruct();
 
     //SLS::exportOBJ("test.obj",  reconstruct);
     SLS::exportPLYGrid("test.ply",  reconstruct);

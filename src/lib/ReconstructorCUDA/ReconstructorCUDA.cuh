@@ -13,7 +13,7 @@ public:
      ReconstructorCUDA(const size_t projX, const size_t projY);
     ~ReconstructorCUDA() override;
     void addCamera(Camera *cam) override;
-    void renconstruct() override;
+    void reconstruct() override;
 };
 
 struct GPUBucketsObj
@@ -21,8 +21,8 @@ struct GPUBucketsObj
     uint *data_;
     //size_t *offsets_;
     uint *count_; // num of element in buckets
-    uint MAX_CNT_PER_BKT_;
-    uint NUM_BKTS_;
+    const uint MAX_CNT_PER_BKT_;
+    const uint NUM_BKTS_;
     __device__ void add2Bucket(uint val, uint bktIdx)
     {
         if (bktIdx > NUM_BKTS_-1)
@@ -51,6 +51,8 @@ public:
         gpuErrchk (cudaMemset( data_, 0, sizeof(uint)*MAX_CNT_PER_BKT_*NUM_BKTS_));
         gpuErrchk (cudaMalloc( (void**)&count_, sizeof(uint)*NUM_BKTS_));
         gpuErrchk (cudaMemset( count_, 0, sizeof(uint)*NUM_BKTS_));
+        if (data_ && count_)
+            std::cout<<"Allocating "<<MAX_CNT_PER_BKT_<<"\t"<<NUM_BKTS_<<std::endl;
 
     }
     GPUBucketsObj getGPUOBJ() 
@@ -92,14 +94,6 @@ __global__ void getPointCloud2Cam(
 
         
 
-__global__ void testBitset(
-        const uchar * imgs,
-        size_t numimgs,
-        size_t XtimesY,
-        uchar whiteThreshold,
-        Dynamic_Bitset_Array_GPU mask,
-        Dynamic_Bitset_Array_GPU patterns
-        );
 __global__ void genPatternArray(
         const uchar * imgs,
         size_t numimgs,

@@ -94,100 +94,18 @@ void ReconstructorCPU::generateBuckets()
                 }
             }
         }
-    }
-
-    // Intensive debugging area===================
-    int count=0;
-    for (int i = 0; i < 1024*768; i++) {
-        if ((!buckets_[0][i].empty()) && (!buckets_[1][i].empty()))
-            count++;
-    }
-    std::cout<<"Matched pixels: "<<count<<std::endl;
-
-    // Write to binary ppm
-    {
-        FILE *pFp = std::fopen("testBucket0.ppm", "wb");
-        size_t w = 1024;
-        size_t h = 768;
-        if (pFp) {
-            std::fprintf(pFp, "P5\n%zu\n%zu\n%d\n", (size_t )w, (size_t )h, 255);
-            for (unsigned i = 0; i < w * h; i++) {   // i row based
-                auto bucketIdx = (i % w) * h + i / w;   // bucketIdx is col based
-                if (!buckets_[0][bucketIdx].empty())
-                    putc((unsigned char) buckets_[0][bucketIdx].size()*255/60, pFp);
-                else
-                    putc((unsigned char) 0, pFp);
-            }
-            std::fclose(pFp);
+        unsigned  maxCount = 0;
+        for (const auto &bucket: buckets_[camIdx]){
+            if (bucket.size() > maxCount)
+                maxCount = bucket.size();
         }
+        std::cout<<"Max count = "<<maxCount<<std::endl;
     }
-    // Write to binary ppm
-    {
-        FILE *pFp = std::fopen("testBucket1.ppm", "wb");
-        size_t w = 1024;
-        size_t h = 768;
-        if (pFp) {
-            std::fprintf(pFp, "P5\n%zu\n%zu\n%d\n", (size_t) w, (size_t) h, 255);
-            for (unsigned i = 0; i < w * h; i++) {
-                auto bucketIdx = (i % w) * h + i / w;
-                if (!buckets_[1][bucketIdx].empty())
-                    putc((unsigned char) 255, pFp);
-                else
-                    putc((unsigned char) 0, pFp);
-            }
-            std::fclose(pFp);
-
-        }
-    }
-    //// Write to binary
-    //{
-    //    for (size_t i=0; i< buckets_[0].size(); i++)
-    //    {
-    //        if (!buckets_[0][i].empty() && !(buckets_[1][i].empty())){
-    //            cv::Mat projImg(cv::Mat(768, 1024, CV_8UC1, cv::Scalar(0)));
-    //            cv::Mat camImg(3264, 4896, CV_8UC1, cv::Scalar(0));
-    //            projImg.at<uchar>(i%768, i/768) = 255;
-    //            //for (unsigned i=0; i< 768; i++)
-    //            //    for (unsigned j=0; j< 768; j++)
-    //            //        projImg.at<uchar>(i,j) = 255;
-    //            const auto &patch = buckets_[0][i];
-    //            const auto &patch1 = buckets_[1][i];
-    //            std::cout<<i%768<<"\t"<<i/768<<std::endl;
-    //            std::cout<<patch.size()<<std::endl;
-    //            const auto smallerPatch=patch.size()<patch1.size()?patch:patch1;
-    //            for (unsigned j=0; j<smallerPatch.size(); j++){
-    //                std::cout<<"============\n";
-    //                std::cout<<patch[i]%3264<<"\t"<<patch[i]/3264<<std::endl;
-    //                std::cout<<patch1[i]%3264<<"\t"<<patch1[i]/3264<<std::endl;
-    //            }
-    //            //for (const auto &element: patch){
-    //            //    camImg.at<uchar>(element%3264, element/3264) = 255;
-    //            //    std::cout<<element%3264<<"\t"<<element/3264<<std::endl;
-    //            //}
-    //            cv::namedWindow("CamImage", CV_WINDOW_NORMAL);
-    //            cv::namedWindow("projImage", CV_WINDOW_NORMAL);
-    //            cv::imshow("projImage", projImg);
-    //            cv::imshow("CamImage", camImg);
-    //            cv::waitKey(0);
-    //            projImg.release();
-    //            camImg.release();
-    //            break;
-    //        }
-    //    }
-    //}
-
-
-
-
 
 }
 
-void ReconstructorCPU::renconstruct()
+void ReconstructorCPU::reconstruct()
 {
-    /* Assuming there are two cameras 
-     * For each projector pixel,
-     * find the min dis
-     * */
     size_t x,y;
     cameras_[0]->getResolution(x,y);
     initBuckets();
@@ -229,7 +147,6 @@ void ReconstructorCPU::renconstruct()
                     }
                 }
             midPointAvg = midPointAvg/ptCount;
-
             //if (minDist < 0.3) //Setting threshold
             {
                 pointCloud_.push_back(midPointAvg.x);

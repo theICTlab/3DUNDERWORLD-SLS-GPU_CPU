@@ -1,3 +1,6 @@
+/*
+ * CUDA error handling class
+ */
 #pragma once
 #include <cuda_runtime.h>
 #include <core/log.hpp>

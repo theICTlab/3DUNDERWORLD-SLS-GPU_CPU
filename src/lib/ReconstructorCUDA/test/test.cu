@@ -37,14 +37,12 @@ int main()
 
     rightCamera->loadConfig("/home/tsing/project/SLS/data/alexander/rightCam/calib/output/calib.xml");
     leftCamera->loadConfig("/home/tsing/project/SLS/data/alexander/leftCam/calib/output/calib.xml");
-    rightCamera->computeShadowsAndThreasholds();
-    leftCamera->computeShadowsAndThreasholds();
 
     SLS::ReconstructorCUDA reconstructor(1024, 768);
     reconstructor.addCamera(rightCamera);
     reconstructor.addCamera(leftCamera);
-    reconstructor.renconstruct();
-    exportPLYGrid("test.ply", reconstructor);
+    reconstructor.reconstruct();
+    exportOBJVec4("test.obj", reconstructor);
 
     return 0;
 }
