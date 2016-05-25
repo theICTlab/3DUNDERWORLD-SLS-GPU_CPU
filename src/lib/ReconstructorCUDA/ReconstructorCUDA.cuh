@@ -2,6 +2,7 @@
 #include <core/Reconstructor.h>
 #include <core/log.hpp>
 #include "Dynamic_bits.cuh"
+#include <vector>
 
 namespace SLS
 {
@@ -66,6 +67,19 @@ public:
         gpuErrchk (cudaFree(count_));
     }
     uint getNumBKTs() const{ return NUM_BKTS_;}
+
+    // Debug func
+    uint getMaxCount() const
+    {
+        std::vector<uint> count_h;
+        count_h.resize(NUM_BKTS_);
+        gpuErrchk( cudaMemcpy( &(count_h[0]), count_, sizeof(uint)*NUM_BKTS_, cudaMemcpyDeviceToHost));
+        uint max = 0;
+        for (const auto& num: count_h)
+            if (num > max)
+                max = num;
+        return max;
+    }
 
 };
 

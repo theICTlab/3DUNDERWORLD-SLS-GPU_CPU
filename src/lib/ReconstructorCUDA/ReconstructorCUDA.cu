@@ -84,6 +84,7 @@ void ReconstructorCUDA::reconstruct()
         gpuErrchk(cudaPeekAtLastError());
 
 
+        std::cout<<buckets[camIdx].getMaxCount()<<std::endl;
         //bitsetArray.writeToPPM("patter16"+cam->getName()+".pgm", x, y, false,(1<<16)-1);
         //bitsetArray.writeToPPM("patter17"+cam->getName()+".pgm", x, y, false,(1<<17)-1);
         //bitsetArray.writeToPPM("patter18"+cam->getName()+".pgm", x, y, false,(1<<18)-1);

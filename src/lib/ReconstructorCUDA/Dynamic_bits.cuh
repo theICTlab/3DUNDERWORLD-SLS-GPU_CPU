@@ -98,9 +98,9 @@ struct Dynamic_Bitset_Array_GPU
     {
         //Hack, separate lower 10 and higher 10 bits
         unsigned num = to_uint(elem);
-        unsigned yDec = num & 0x3FFU;
+        unsigned xDec = num & 0x3FFU;
         //Extract higher 10
-        unsigned xDec = num >> 10;
+        unsigned yDec = num >> 10;
 
         // Convert lower and higher to reflected dec
         for (unsigned bit=1U<<31; bit>1; bit>>=1) {
