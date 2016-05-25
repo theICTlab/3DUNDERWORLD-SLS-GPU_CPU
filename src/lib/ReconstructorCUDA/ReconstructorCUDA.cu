@@ -23,8 +23,8 @@ void ReconstructorCUDA::reconstruct()
     // For each camera, hack
     GPUBuckets buckets[2] =
     {
-        GPUBuckets( 1024*768,100),
-        GPUBuckets( 1024*768,100)
+        GPUBuckets( 1024*768,110),
+        GPUBuckets( 1024*768,110)
     };
     
     /**** Profile *****/
