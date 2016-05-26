@@ -82,14 +82,6 @@ void ReconstructorCUDA::reconstruct()
              buckets[camIdx].getGPUOBJ()
             );
         gpuErrchk(cudaPeekAtLastError());
-
-        std::cout<<buckets[camIdx].getMaxCount(camIdx)<<std::endl;
-        cv::waitKey(0);
-        //bitsetArray.writeToPPM("patter16"+cam->getName()+".pgm", x, y, false,(1<<16)-1);
-        //bitsetArray.writeToPPM("patter17"+cam->getName()+".pgm", x, y, false,(1<<17)-1);
-        //bitsetArray.writeToPPM("patter18"+cam->getName()+".pgm", x, y, false,(1<<18)-1);
-        //bitsetArray.writeToPPM("patter19"+cam->getName()+".pgm", x, y, false,(1<<19)-1);
-        //bitsetArray.writeToPPM("patter20"+cam->getName()+".ppm", x, y, false,(1<<20)-1);
     }
 
 
@@ -97,6 +89,8 @@ void ReconstructorCUDA::reconstruct()
     auto camera0 = (FileReaderCUDA*)(cameras_[0]);
     auto camera1 = (FileReaderCUDA*)(cameras_[1]);
     float* cloud = nullptr;
+    size_t resX, resY;
+    camera0->getResolution(resX, resY);
 
     gpuErrchk ( cudaMalloc((void**)&cloud, buckets[0].getNumBKTs()*sizeof(float)*4));
 
@@ -114,7 +108,7 @@ void ReconstructorCUDA::reconstruct()
             camera1->getDeviceCamMat(),
             camera1->getDeviceDistMat(),
             camera1->getDeviceCamTransMat(),
-            4896,3264,
+            resX,resY,
             cloud
             );
     gpuErrchk( cudaPeekAtLastError());
@@ -227,10 +221,11 @@ __global__ void getPointCloud2Cam(
             float minMidPoint[4];
 
             float avgPoint[4];
+            memset(avgPoint, 0, sizeof(float)*4);
             uint ptCount = 0;
 
-            for (uint i=0; i<buckets0.count_[idx]-1; i++)
-                for (uint j=0; j<buckets1.count_[idx]-1; j++)
+            for (uint i=0; i<buckets0.count_[idx]; i++)
+                for (uint j=0; j<buckets1.count_[idx]; j++)
                 {
 
                     float undistorted0[2];
@@ -279,7 +274,7 @@ __global__ void getPointCloud2Cam(
             avgPoint[1] /= (float)ptCount;
             avgPoint[2] /= (float)ptCount;
             avgPoint[3] = 1.0;
-            memcpy ( &pointCloud[4*idx], minMidPoint, sizeof(float)*4);
+            memcpy ( &pointCloud[4*idx], avgPoint, sizeof(float)*4);
             //else
                 //memset( &pointCloud[4*idx], 0, sizeof(float)*4);
         }

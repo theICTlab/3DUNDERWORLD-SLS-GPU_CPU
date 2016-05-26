@@ -7,3 +7,6 @@ IF(${CUDA_FOUND})
     cuda_add_executable(SLS_GPU ./App_CUDA.cu)
     target_link_libraries(SLS_GPU core sls_gpu)
 ENDIF(${CUDA_FOUND})
+
+add_executable(SLS_CALIB App_Calib.cpp)
+target_link_libraries(SLS_CALIB core sls_calib)

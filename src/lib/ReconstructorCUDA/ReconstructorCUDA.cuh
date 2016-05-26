@@ -54,8 +54,6 @@ public:
         gpuErrchk (cudaMemset( data_, 0, sizeof(uint)*MAX_CNT_PER_BKT_*NUM_BKTS_));
         gpuErrchk (cudaMalloc( (void**)&count_, sizeof(uint)*NUM_BKTS_));
         gpuErrchk (cudaMemset( count_, 0, sizeof(uint)*NUM_BKTS_));
-        if (data_ && count_)
-            std::cout<<"Allocating "<<MAX_CNT_PER_BKT_<<"\t"<<NUM_BKTS_<<std::endl;
 
     }
     GPUBucketsObj getGPUOBJ() 

@@ -176,8 +176,8 @@ Ray FileReader::getRay(const size_t &x, const size_t &y)
             return ray;
         }
         ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
-        ray.dir.x = (undistorted.x-params_[CAMERA_MAT].at<double>(0,2))/params_[CAMERA_MAT].at<double>(0,0);
-        ray.dir.y = (undistorted.y-params_[CAMERA_MAT].at<double>(1,2))/params_[CAMERA_MAT].at<double>(1,1);
+        ray.dir.x = (undistorted.x-(float)params_[CAMERA_MAT].at<double>(0,2))/(float)params_[CAMERA_MAT].at<double>(0,0);
+        ray.dir.y = (undistorted.y-(float)params_[CAMERA_MAT].at<double>(1,2))/(float)params_[CAMERA_MAT].at<double>(1,1);
         ray.dir.z=1.0;
         ray.dir.w=0.0;
         ray.dir = camTransMat_*ray.dir;
@@ -229,7 +229,7 @@ glm::vec2 FileReader::undistortPixel(const glm::vec2 &distortedPixel) const
 {
     double k[5] = {0.0};
     double fx, fy, ifx, ify, cx, cy;
-    int iters = 1;
+    int iters = 5;
 
     k[0] = params_[DISTOR_MAT].at<double> (0);
     k[1] = params_[DISTOR_MAT].at<double> (1);
@@ -237,7 +237,6 @@ glm::vec2 FileReader::undistortPixel(const glm::vec2 &distortedPixel) const
     k[3] = params_[DISTOR_MAT].at<double> (3);
     k[4] = 0;
 
-    iters = 5;
 
     fx = params_[CAMERA_MAT].at<double>(0,0);
     fy = params_[CAMERA_MAT].at<double>(1,1);
