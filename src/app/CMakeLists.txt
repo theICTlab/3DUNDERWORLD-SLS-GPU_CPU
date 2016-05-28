@@ -10,3 +10,6 @@ ENDIF(${CUDA_FOUND})
 
 add_executable(SLS_CALIB App_Calib.cpp)
 target_link_libraries(SLS_CALIB core sls_calib)
+
+add_executable(SLS_GRAYCODE App_Graycode.cpp)
+target_link_libraries(SLS_GRAYCODE core sls_graycode)

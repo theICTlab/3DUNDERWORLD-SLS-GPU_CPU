@@ -27,12 +27,12 @@ namespace SLS {
  */
 class Projector
 {
-private:
+protected:
     size_t width_, height_;
 public:
     Projector() = delete;
     Projector(size_t width, size_t height):width_{width},height_{height}{}
-    ~Projector(){};
+    virtual ~Projector(){};
     void getSize(size_t &w, size_t &h){w = width_; h = height_;}
     size_t getWidth() const {return width_;}
     size_t getHeight() const {return height_;}

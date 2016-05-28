@@ -11,6 +11,7 @@ IF (${CUDA_FOUND})
 ENDIF(${CUDA_FOUND})
 
 
+add_subdirectory(./src/lib/GrayCode)
 add_subdirectory(./src/lib/calibration)
 add_subdirectory(./src/lib/core)
 add_subdirectory(./src/app)

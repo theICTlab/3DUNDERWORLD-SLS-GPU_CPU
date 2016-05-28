@@ -1,4 +1,5 @@
 #include <calibration/Calibrator.hpp>
+#include <thread>
 
 namespace SLS
 {
@@ -37,19 +38,17 @@ namespace SLS
 
     }
 
-    cv::vector<cv::Point2f>  manualMarkCheckBoard(cv::Mat img)
+    cv::vector<cv::Point2f>  Calibrator::manualMarkCheckBoard(cv::Mat img)
     {
 
         cv::vector<cv::Point2f> corners;
 
         cv::namedWindow("Mark Calibration Board",CV_WINDOW_NORMAL);
         cv::resizeWindow("Mark Calibration Board",800,600);
-
         //Set a mouse callback
         cv::setMouseCallback( "Mark Calibration Board",calib_board_corners_mouse_callback, (void*) &corners);
 
         bool ok = false;
-
         while(!ok)
         {
             corners.clear();
@@ -83,9 +82,9 @@ namespace SLS
                     curNumOfCorners++;
 
                 }
-
                 cv::imshow("Mark Calibration Board", img_copy);
-                cv::waitKey(2);
+                //Showing in the loop
+                cv::waitKey(5);
             }
 
             //Draw corners and lines		
@@ -102,7 +101,7 @@ namespace SLS
             while( key!='n' && key!='r' )
             {
                 cv::imshow("Mark Calibration Board", img_copy );
-                key = cv::waitKey();
+                key = cv::waitKey(0);
             }
 
             //if enter set ok as true to stop the loop or repeat the selection process
@@ -110,7 +109,6 @@ namespace SLS
                 ok = true;
             else
                 ok = false;
-
             img_copy.release();
         }
 
@@ -122,7 +120,7 @@ namespace SLS
     {
 
         std::vector<cv::Point> corners;
-        for(int i=0; i<rectanglePoints.size(); i++)
+        for(unsigned i=0; i<rectanglePoints.size(); i++)
         {
             corners.push_back(rectanglePoints[i]);
         }
@@ -137,7 +135,7 @@ namespace SLS
         background.copyTo(img,mask);
 
     }
-    float markWhite(cv::Mat img)
+    float markWhite(const cv::Mat &img)
     {
 
         float white;
@@ -153,15 +151,12 @@ namespace SLS
 
         while(!ok)
         {
-            cv::Mat img_copy;
-            img.copyTo(img_copy);
-
+            cv::Mat img_copy=img.clone();
             cv::resizeWindow("Mark White",800,600);
 
             int pointsCount=0;
             point.val[2]=0;
-
-            while(pointsCount==0)
+            while(pointsCount<1)
             {
                 if(point.val[2]==1)
                 {
@@ -172,9 +167,8 @@ namespace SLS
                     pointsCount++;
                     point.val[2]=0;
                 }
-
-                cv::imshow("Mark White", img_copy );
-                cv::waitKey(2);
+                cv::imshow("Mark White", img_copy);
+                cv::waitKey(5);
             }
 
 
@@ -199,48 +193,44 @@ namespace SLS
 
         return white;
     }
-    bool findCornersInCamImg(cv::Mat img,cv::vector<cv::Point2f> *camCorners,cv::vector<cv::Point3f> *objCorners, cv::Size squareSize)
+    
+    bool Calibrator::findCornersInCamImg(cv::Mat img,cv::vector<cv::Point2f> *camCorners,cv::vector<cv::Point3f> *objCorners, cv::Size squareSize)
     {
 
+        cv::Mat img_copy=img.clone();   // keep a cpy of it
+        cv::Mat img_grey;
         //copy camera img
-        cv::Mat img_grey=img.clone();
-        cv::Mat img_copy;
-        img.copyTo(img_copy);
-
         int numOfCornersX;
         int numOfCornersY;
-
         bool found=false;
 
         //find the corners
         while(!found)
         {
-            //convert the copy to gray
-            //cv::cvtColor( img, img_grey, CV_RGB2GRAY );
-            img.copyTo(img_copy);
-
-            //ask user to mark 4 corners of the checkboard
+            img_grey=img.clone();
+            //ask user to mark 4 corners of the checkerboard
             cv::vector<cv::Point2f> chessBoardCorners = manualMarkCheckBoard(img_copy);
 
-            //ask user to mark a white point on checkboard
+            //ask user to mark a white point on checkerboard
             float color = markWhite(img_grey);
 
+            // Modify rectangle
             drawOutsideOfRectangle(img_grey,chessBoardCorners, color);
 
             //show img to user
+            // Create an async task to show image
             cv::namedWindow("Calibration",CV_WINDOW_NORMAL);
             cv::resizeWindow("Calibration",800,600);
-
-            cv::imshow("Calibration",img_grey);
-            cv::waitKey(20);
+            std::thread imgAsync( showImgAsync, img_grey, "Calibration");
 
             system("clear");
-
             //ask the number of squares in img
             std::cout<<"Give number of squares on x axis: ";
             std::cin>>numOfCornersX;
             std::cout<<"Give number of squares on y axis: ";
             std::cin>>numOfCornersY;
+
+            imgAsync.join();
 
             if(numOfCornersX<=0 || numOfCornersY<=0)
                 break;
@@ -261,9 +251,9 @@ namespace SLS
 
             cv::drawChessboardCorners(img_copy, cvSize(numOfCornersX,numOfCornersY), *camCorners, found);
 
-            int key = cv::waitKey(1);
+            int key = cv::waitKey(5);
 
-            if(key==13)
+            if(key=='n')
                 break;
 
             std::cout<<"\nPress 'Enter' to continue or 'ESC' to repeat the procedure.\n";
@@ -272,21 +262,23 @@ namespace SLS
             {
                 cv::imshow("Calibration", img_copy );
 
-                key = cv::waitKey(1);
+                key = cv::waitKey(0);
 
                 if(key=='r')
                     found=false;
                 if(key=='n')
                     break;
             }
+            if (!found)
+            {
+                std::cout<<"No squres found, doing it again\n";
+                cv::destroyWindow("Calibration");
+                img_grey.release();
+            }
         }
         //if corners found find subPixel
         if(found)
         {
-
-            //convert the copy to gray
-            //cv::cvtColor( img, img_grey, CV_RGB2GRAY );
-
             //find sub pix of the corners
             cv::cornerSubPix(img_grey, *camCorners, cvSize(20,20), cvSize(-1,-1), cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
 
@@ -322,6 +314,14 @@ namespace SLS
 
     void Calibrator::Calibrate(FileReader *cam, const std::string& calibImgsDir, const std::string& calibFile)
     {
+        //Value to generate
+        cv::Mat camMatrix;
+        cv::Mat distortion;
+        cv::Mat rotationMatrix;
+        cv::Mat translationVector;
+        cv::Size camImageSize;
+        cv::Size squareSize(33, 33);
+
         //Load calibration images
         cam->loadImages(calibImgsDir);
 
@@ -330,18 +330,74 @@ namespace SLS
         cv::vector<cv::vector<cv::Point3f>> objBoardCornersCam;
         imgBoardCornersCam.clear();
         objBoardCornersCam.clear();
-        for (size_t i=0; i<cam->getNumFrames(); i++)
+        for (size_t i=0; i<cam->getNumFrames()-1; i++)
         {
             cv::vector<cv::Point2f> cCam;
             cv::vector<cv::Point3f> cObj;
-            auto &img = cam->getNextFrame();
-            
-            findCornersInCamImg(img, &cCam, &cObj, cv::Size(20, 20));
+            auto img = cam->getNextFrame().clone();
+            findCornersInCamImg(img, &cCam, &cObj, squareSize);
             if (cCam.size())
             {
                 imgBoardCornersCam.push_back(cCam);
                 objBoardCornersCam.push_back(cObj);
             }
         }
+        cv::vector<cv::Mat> camRotationVectors;
+        cv::vector<cv::Mat> camTranslationVectors;
+
+        cv::calibrateCamera(objBoardCornersCam,imgBoardCornersCam,camImageSize,camMatrix, distortion, camRotationVectors,camTranslationVectors,0,
+		cv::TermCriteria( (cv::TermCriteria::COUNT)+(cv::TermCriteria::EPS), 30, DBL_EPSILON) );
+
+        //Find extrinsic
+        auto extImg = cam->getNextFrame().clone();
+        cv::vector<cv::Point2f> imgPoints;
+        cv::vector<cv::Point3f> objPoints3D;
+        findCornersInCamImg(extImg, &imgPoints, &objPoints3D, squareSize );
+        cv::Mat rVec;
+
+        //find extrinsics rotation & translation
+        bool r = cv::solvePnP(objPoints3D,imgPoints,camMatrix,distortion,rVec,translationVector);
+        cv::Rodrigues(rVec,rotationMatrix);
+        std::cout<<rotationMatrix<<"\n\n\n"<<translationVector<<"\n\n\n";
+
+        //          Save calib data	
+        cv::FileStorage fs(calibFile, cv::FileStorage::WRITE);
+
+        fs << "Camera" << "{:";
+        fs<< "Calibrated" << r << "Matrix" << camMatrix << "Distortion" << distortion<<"Translation"<<translationVector<<"Rotation"<<rotationMatrix;
+        fs<<"Height" << camImageSize.height<<"Width" << camImageSize.width;
+        fs<<"}";
+
+
+        fs << "BoardSquare" << "{:";
+        fs << "Height" << squareSize.height << "Width" << squareSize.width; 
+        fs<<"}";
+
+        fs << "ExtractedFeatures" << "{:";
+
+        fs << "CameraImages" << "{:";
+
+        int size = imgBoardCornersCam.size();
+        fs << "NumberOfImgs" << size;
+
+        for(int i=0; i<imgBoardCornersCam.size(); i++)
+        {
+
+            std::stringstream name;
+            name << "Image" << i+1;
+            fs<<name.str()<< "{:";
+
+            fs<<"BoardCorners"<<imgBoardCornersCam[i];
+            fs<<"ObjBoardCorners"<<objBoardCornersCam[i];
+
+            fs<<"}";
+
+        }
+        fs<<"}";
+        fs<<"}";
+
+        fs.release();
+
+
     }
 } // namespace SLS
