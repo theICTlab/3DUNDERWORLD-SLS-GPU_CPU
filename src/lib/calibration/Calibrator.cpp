@@ -3,6 +3,8 @@
 
 namespace SLS
 {
+    std::condition_variable Calibrator::cv;
+    bool Calibrator::closeAsynImg=false;
     // Callbacks !!
     void calib_board_corners_mouse_callback( int event, int x, int y, int flags, void* param )
     {
@@ -11,13 +13,11 @@ namespace SLS
 
         switch( event )
         {
-
             case CV_EVENT_LBUTTONDOWN:
-                if(corners->size() ==4)
+                if(corners->size() < 4)
+                    corners->push_back(cv::Point(x,y));
+                else
                     break;
-                corners->push_back(cv::Point(x,y));
-                break;
-
         }
     }
 
@@ -25,17 +25,14 @@ namespace SLS
     {
 
         CvScalar *point= (CvScalar*) param;
-
         switch( event )
         {
             case CV_EVENT_LBUTTONDOWN:
-
                 point->val[0]=x;
                 point->val[1]=y;
                 point->val[2]=1;
                 break;
         }
-
     }
 
     cv::vector<cv::Point2f>  Calibrator::manualMarkCheckBoard(cv::Mat img)
@@ -194,7 +191,7 @@ namespace SLS
         return white;
     }
     
-    bool Calibrator::findCornersInCamImg(cv::Mat img,cv::vector<cv::Point2f> *camCorners,cv::vector<cv::Point3f> *objCorners, cv::Size squareSize)
+    bool Calibrator::findCornersInCamImg(const cv::Mat &img,cv::vector<cv::Point2f> &camCorners,cv::vector<cv::Point3f> &objCorners, cv::Size squareSize)
     {
 
         cv::Mat img_copy=img.clone();   // keep a cpy of it
@@ -221,6 +218,8 @@ namespace SLS
             // Create an async task to show image
             cv::namedWindow("Calibration",CV_WINDOW_NORMAL);
             cv::resizeWindow("Calibration",800,600);
+            closeAsynImg = false;
+            // Kick the thread
             std::thread imgAsync( showImgAsync, img_grey, "Calibration");
 
             system("clear");
@@ -230,6 +229,11 @@ namespace SLS
             std::cout<<"Give number of squares on y axis: ";
             std::cin>>numOfCornersY;
 
+            // Close the thread
+            closeAsynImg = true;
+            // Notify it
+            cv.notify_one();
+            // Wait for it to finish
             imgAsync.join();
 
             if(numOfCornersX<=0 || numOfCornersY<=0)
@@ -245,11 +249,19 @@ namespace SLS
             numOfCornersY--;
 
 
-            found=cv::findChessboardCorners(img_grey, cvSize(numOfCornersX,numOfCornersY), *camCorners, CV_CALIB_CB_ADAPTIVE_THRESH );
+            found=cv::findChessboardCorners(img_grey, cvSize(numOfCornersX,numOfCornersY), camCorners, CV_CALIB_CB_ADAPTIVE_THRESH );
 
-            std::cout<<"found = "<<camCorners->size()<<"\n";
+            std::cout<<"found = "<<camCorners.size()<<"\n";
+            if (!found)
+            {
+                std::cout<<"DEBUGGGGGGGGGGGGGGGGGGGGG\n";
+                std::cout<<numOfCornersX<<"\t"<<numOfCornersY<<std::endl;
+                std::cout<<camCorners.size()<<std::endl;
+                imshow("DEBUG", img_grey);
+                cv::waitKey(0);
+            }
+                
 
-            cv::drawChessboardCorners(img_copy, cvSize(numOfCornersX,numOfCornersY), *camCorners, found);
 
             int key = cv::waitKey(5);
 
@@ -260,6 +272,7 @@ namespace SLS
 
             while(found)
             {
+                cv::drawChessboardCorners(img_copy, cvSize(numOfCornersX,numOfCornersY), camCorners, found);
                 cv::imshow("Calibration", img_copy );
 
                 key = cv::waitKey(0);
@@ -271,7 +284,7 @@ namespace SLS
             }
             if (!found)
             {
-                std::cout<<"No squres found, doing it again\n";
+                std::cout<<"No squres found, do it again ...\n";
                 cv::destroyWindow("Calibration");
                 img_grey.release();
             }
@@ -280,7 +293,7 @@ namespace SLS
         if(found)
         {
             //find sub pix of the corners
-            cv::cornerSubPix(img_grey, *camCorners, cvSize(20,20), cvSize(-1,-1), cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
+            cv::cornerSubPix(img_grey, camCorners, cvSize(20,20), cvSize(-1,-1), cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
 
             system("clear");
 
@@ -301,11 +314,13 @@ namespace SLS
                     p.x = j*squareSize.width;
                     p.y = i*squareSize.height;
                     p.z = 0;
-                    objCorners->push_back(p);
+                    objCorners.push_back(p);
                 }
             }
 
         }
+        img_grey.release();
+        img_copy.release();
 
         cv::destroyWindow("Calibration");
         return found;
@@ -319,11 +334,16 @@ namespace SLS
         cv::Mat distortion;
         cv::Mat rotationMatrix;
         cv::Mat translationVector;
-        cv::Size camImageSize;
         cv::Size squareSize(33, 33);
+        cv::Size camImageSize;
 
         //Load calibration images
         cam->loadImages(calibImgsDir);
+        size_t width, height;
+        cam->getResolution(width, height); 
+        camImageSize.height = height;
+        camImageSize.width = width;
+
 
         //Extract corners
         cv::vector<cv::vector<cv::Point2f>> imgBoardCornersCam;
@@ -335,7 +355,7 @@ namespace SLS
             cv::vector<cv::Point2f> cCam;
             cv::vector<cv::Point3f> cObj;
             auto img = cam->getNextFrame().clone();
-            findCornersInCamImg(img, &cCam, &cObj, squareSize);
+            findCornersInCamImg(img, cCam, cObj, squareSize);
             if (cCam.size())
             {
                 imgBoardCornersCam.push_back(cCam);
@@ -345,14 +365,15 @@ namespace SLS
         cv::vector<cv::Mat> camRotationVectors;
         cv::vector<cv::Mat> camTranslationVectors;
 
+        // Find intrinsic
         cv::calibrateCamera(objBoardCornersCam,imgBoardCornersCam,camImageSize,camMatrix, distortion, camRotationVectors,camTranslationVectors,0,
 		cv::TermCriteria( (cv::TermCriteria::COUNT)+(cv::TermCriteria::EPS), 30, DBL_EPSILON) );
 
-        //Find extrinsic
+        // Find extrinsic
         auto extImg = cam->getNextFrame().clone();
         cv::vector<cv::Point2f> imgPoints;
         cv::vector<cv::Point3f> objPoints3D;
-        findCornersInCamImg(extImg, &imgPoints, &objPoints3D, squareSize );
+        findCornersInCamImg(extImg, imgPoints, objPoints3D, squareSize );
         cv::Mat rVec;
 
         //find extrinsics rotation & translation

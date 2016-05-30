@@ -1,17 +1,23 @@
 #pragma once
 #include <core/fileReader.h>
 #include <string>
+#include <condition_variable>
 
 namespace SLS
 {
 class Calibrator
 {
 
+    static std::condition_variable cv;
+    static bool closeAsynImg;
 
     static void showImgAsync(const cv::Mat &img, const std::string &windowName)
     {
-        cv::imshow(windowName, img);
-        cv::waitKey(30);
+        while (!closeAsynImg)
+        {
+            cv::imshow(windowName, img);
+            cv::waitKey(30);
+        }
     }
     /**
      * @brief   Manually pick for extrenal corners of a image of checkerboard
@@ -32,7 +38,7 @@ class Calibrator
      *
      * @return 
      */
-    static bool findCornersInCamImg(cv::Mat img,cv::vector<cv::Point2f> *camCorners,cv::vector<cv::Point3f> *objCorners, cv::Size squareSize);
+    static bool findCornersInCamImg(const cv::Mat &img,cv::vector<cv::Point2f> &camCorners,cv::vector<cv::Point3f> &objCorners, cv::Size squareSize);
 public:
     static void Calibrate(FileReader *cam, const std::string& calibImgsDir, const std::string &calibFile);
 };
