@@ -119,6 +119,8 @@ void ReconstructorCPU::reconstruct()
         const auto &cam1bucket = buckets_[1][i];
         size_t minCam0Idx=0;
         size_t minCam1Idx=0;
+        Ray minRay0;
+        Ray minRay1;
         if ((!cam0bucket.empty()) && (!cam1bucket.empty()))
         {
             float minDist=std::numeric_limits<float>::max();
@@ -143,9 +145,22 @@ void ReconstructorCPU::reconstruct()
                             minMidP = midP;
                             minCam0Idx = cam0P;
                             minCam1Idx = cam1P;
+                            
                         }
                     }
                 }
+            // Output min ray 
+            minRay0 = cameras_[0]->getRay(minCam0Idx);
+            minRay1 = cameras_[1]->getRay(minCam1Idx);
+            std::cout<<"==========================\n";
+            std::cout<<"MidPoint: "<<minMidP.x<<"\t"<<minMidP.y<<"\t"<<minMidP.z<<std::endl;
+            std::cout<<"Camera0 pixel: "<<minCam0Idx/y<<"\t"<<minCam0Idx%y<<std::endl;
+            std::cout<<"Min ray dir: "<<minRay0.dir.x<<"\t"<<minRay0.dir.y<<"\t"<<minRay0.dir.z<<std::endl;
+            std::cout<<"Min ray origin: "<<minRay0.origin.x<<"\t"<<minRay0.origin.y<<"\t"<<minRay0.origin.z<<std::endl;
+            std::cout<<"Camera1 pixel: "<<minCam1Idx/y<<"\t"<<minCam1Idx%y<<std::endl;
+            std::cout<<"Min ray dir: "<<minRay1.dir.x<<"\t"<<minRay1.dir.y<<"\t"<<minRay1.dir.z<<std::endl;
+            std::cout<<"Min ray origin: "<<minRay1.origin.x<<"\t"<<minRay1.origin.y<<"\t"<<minRay1.origin.z<<std::endl;
+
             midPointAvg = midPointAvg/ptCount;
             //if (minDist < 0.3) //Setting threshold
             {

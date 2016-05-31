@@ -19,6 +19,16 @@ class Calibrator
             cv::waitKey(30);
         }
     }
+    static void showImgAvecText_Block( const cv::Mat &img, const std::string &text, const std::string &windowName)
+    {
+        cv::Mat textImg;
+        cv::cvtColor(img, textImg, CV_GRAY2RGB);
+        cv::putText(textImg, text, cvPoint(20,70), 
+                cv::FONT_HERSHEY_SIMPLEX, 3.0, cvScalar(0,0,255), 2, CV_AA);
+        //cv::putText(image, cv::Point(10,10), str.str(), CV_FONT_HERSHEY_PLAIN, CV_RGB(0,0,250));
+        cv::imshow(windowName, textImg);
+        textImg.release();
+    }
     /**
      * @brief   Manually pick for extrenal corners of a image of checkerboard
      *
@@ -39,6 +49,7 @@ class Calibrator
      * @return 
      */
     static bool findCornersInCamImg(const cv::Mat &img,cv::vector<cv::Point2f> &camCorners,cv::vector<cv::Point3f> &objCorners, cv::Size squareSize);
+    static float markWhite(const cv::Mat &img);
 public:
     static void Calibrate(FileReader *cam, const std::string& calibImgsDir, const std::string &calibFile);
 };

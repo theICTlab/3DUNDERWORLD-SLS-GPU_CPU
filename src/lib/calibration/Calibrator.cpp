@@ -1,5 +1,6 @@
 #include <calibration/Calibrator.hpp>
 #include <thread>
+#include <sstream>
 
 namespace SLS
 {
@@ -58,7 +59,7 @@ namespace SLS
 
             //system("clear");
 
-            std::cout<<"Please click on the 4 extrime corners of the board, starting from the top left corner\n";
+            //std::cout<<"Please click on the 4 extrime corners of the board, starting from the top left corner\n";
 
             cv::Point2f rectSize(20,20);
 
@@ -79,7 +80,11 @@ namespace SLS
                     curNumOfCorners++;
 
                 }
-                cv::imshow("Mark Calibration Board", img_copy);
+                //cv::imshow("Mark Calibration Board", img_copy);
+                std::ostringstream ss;
+                ss<<"Please click on the 4 extrime corners of the board starting from the top left corner "
+                    <<curNumOfCorners<<"/4";
+                showImgAvecText_Block(img_copy, ss.str(), "Mark Calibration Board");
                 //Showing in the loop
                 cv::waitKey(5);
             }
@@ -90,14 +95,15 @@ namespace SLS
             cv::line(img_copy, corners[3],corners[0],cvScalar(0,0,255),10);
 
             //system("clear");
-            std::cout<<"Press 'n' to continue or 'r' to select a new area!\n";
+            //std::cout<<"Press 'n' to continue or 'r' to select a new area!\n";
 
             int key = 0;
 
             //wait for enter or esc key press
             while( key!='n' && key!='r' )
             {
-                cv::imshow("Mark Calibration Board", img_copy );
+                //cv::imshow("Mark Calibration Board", img_copy );
+                showImgAvecText_Block( img_copy, "Press 'n' to continue or 'r' to select a new area!", "Mark Calibration Board");
                 key = cv::waitKey(0);
             }
 
@@ -132,7 +138,7 @@ namespace SLS
         background.copyTo(img,mask);
 
     }
-    float markWhite(const cv::Mat &img)
+    float Calibrator::markWhite(const cv::Mat &img)
     {
 
         float white;
@@ -164,7 +170,7 @@ namespace SLS
                     pointsCount++;
                     point.val[2]=0;
                 }
-                cv::imshow("Mark White", img_copy);
+                showImgAvecText_Block(img_copy, "Click mouse on a white area", "Mark White");
                 cv::waitKey(5);
             }
 
@@ -173,7 +179,7 @@ namespace SLS
 
             while(key != 'n' && key != 'r')
             {
-                cv::imshow("Mark White", img_copy );
+                showImgAvecText_Block( img_copy, "Press 'n' to continue or 'r' to select a new area!", "Mark White");
                 key=cv::waitKey();
             }
 
@@ -252,16 +258,6 @@ namespace SLS
             found=cv::findChessboardCorners(img_grey, cvSize(numOfCornersX,numOfCornersY), camCorners, CV_CALIB_CB_ADAPTIVE_THRESH );
 
             std::cout<<"found = "<<camCorners.size()<<"\n";
-            if (!found)
-            {
-                std::cout<<"DEBUGGGGGGGGGGGGGGGGGGGGG\n";
-                std::cout<<numOfCornersX<<"\t"<<numOfCornersY<<std::endl;
-                std::cout<<camCorners.size()<<std::endl;
-                imshow("DEBUG", img_grey);
-                cv::waitKey(0);
-            }
-                
-
 
             int key = cv::waitKey(5);
 
