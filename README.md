@@ -24,11 +24,11 @@ if CUDA is dected on your machine, a binary `SLS_GPU` will be compiled, which is
 
 `SLS_GRAYCODE` is an application to project graycode.
 
-All of the binaries are designed to run with `alexandar` data.
+All of the binaries are designed to run with [`alexandar`](https://github.com/v3c70r/SLS/tree/dev/data/alexander) data.
 
 ## How to use the library
 
-Please refer the code in `src/app/` to use your own data set.
+Please refer to the code in [`src/app/`](https://github.com/v3c70r/SLS/tree/dev/src/app) to use your own data set.
 
 ## Known issues
 
