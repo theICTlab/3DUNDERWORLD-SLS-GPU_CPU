@@ -16,3 +16,10 @@ add_subdirectory(./src/lib/calibration)
 add_subdirectory(./src/lib/core)
 add_subdirectory(./src/app)
 
+set_target_properties ( SLS
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+

@@ -12,11 +12,11 @@ int main()
     SLS::FileReader *rightCam=new SLS::FileReader("rightCamera");
     SLS::FileReader *leftCam= new SLS::FileReader("leftCamera");
 
-    rightCam->loadImages("../../../data/alexander/rightCam/dataset1/");
-    leftCam->loadImages("../../../data/alexander/leftCam/dataset1/");
+    rightCam->loadImages("../../data/alexander/rightCam/dataset1/");
+    leftCam->loadImages("../../data/alexander/leftCam/dataset1/");
 
-    rightCam->loadConfig("../../../data/alexander/rightCam/calib/output/calib.xml");
-    leftCam->loadConfig("../../../data/alexander/leftCam/calib/output/calib.xml");
+    rightCam->loadConfig("../../data/alexander/rightCam/calib/output/calib.xml");
+    leftCam->loadConfig("../../data/alexander/leftCam/calib/output/calib.xml");
 
     
     SLS::ReconstructorCPU reconstruct(1024,768);

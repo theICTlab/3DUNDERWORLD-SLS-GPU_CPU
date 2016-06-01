@@ -1,5 +1,6 @@
 #include <calibration/Calibrator.hpp>
 #include <thread>
+#include <sstream>
 
 namespace SLS
 {
@@ -41,7 +42,7 @@ namespace SLS
         cv::vector<cv::Point2f> corners;
 
         cv::namedWindow("Mark Calibration Board",CV_WINDOW_NORMAL);
-        cv::resizeWindow("Mark Calibration Board",800,600);
+        cv::resizeWindow("Mark Calibration Board",WINDOW_WIDTH,WINDOW_HEIGHT);
         //Set a mouse callback
         cv::setMouseCallback( "Mark Calibration Board",calib_board_corners_mouse_callback, (void*) &corners);
 
@@ -49,16 +50,13 @@ namespace SLS
         while(!ok)
         {
             corners.clear();
-            cv::resizeWindow("Mark Calibration Board",800,600);
+            cv::resizeWindow("Mark Calibration Board",WINDOW_WIDTH,WINDOW_HEIGHT);
 
-            int curNumOfCorners=0;
+            size_t curNumOfCorners=0;
 
             cv::Mat img_copy ;
             img.copyTo(img_copy);
 
-            //system("clear");
-
-            std::cout<<"Please click on the 4 extrime corners of the board, starting from the top left corner\n";
 
             cv::Point2f rectSize(20,20);
 
@@ -79,7 +77,11 @@ namespace SLS
                     curNumOfCorners++;
 
                 }
-                cv::imshow("Mark Calibration Board", img_copy);
+                //cv::imshow("Mark Calibration Board", img_copy);
+                std::ostringstream ss;
+                ss<<"Please click on the 4 extreme corners of the board starting from the top left corner "
+                    <<curNumOfCorners<<"/4";
+                showImgAvecText_Block(img_copy, ss.str(), "Mark Calibration Board");
                 //Showing in the loop
                 cv::waitKey(5);
             }
@@ -89,15 +91,14 @@ namespace SLS
             cv::line(img_copy, corners[3],corners[2],cvScalar(0,0,255),10);
             cv::line(img_copy, corners[3],corners[0],cvScalar(0,0,255),10);
 
-            //system("clear");
-            std::cout<<"Press 'n' to continue or 'r' to select a new area!\n";
 
             int key = 0;
 
             //wait for enter or esc key press
             while( key!='n' && key!='r' )
             {
-                cv::imshow("Mark Calibration Board", img_copy );
+                //cv::imshow("Mark Calibration Board", img_copy );
+                showImgAvecText_Block( img_copy, "Press 'n' to continue or 'r' to select a new area!", "Mark Calibration Board");
                 key = cv::waitKey(0);
             }
 
@@ -132,12 +133,12 @@ namespace SLS
         background.copyTo(img,mask);
 
     }
-    float markWhite(const cv::Mat &img)
+    float Calibrator::markWhite(const cv::Mat &img)
     {
 
-        float white;
+        float white=0.0;
         cv::namedWindow("Mark White",CV_WINDOW_NORMAL);
-        cv::resizeWindow("Mark White",800,600);
+        cv::resizeWindow("Mark White",WINDOW_WIDTH,WINDOW_HEIGHT);
 
         cv::Scalar point;
 
@@ -149,7 +150,7 @@ namespace SLS
         while(!ok)
         {
             cv::Mat img_copy=img.clone();
-            cv::resizeWindow("Mark White",800,600);
+            cv::resizeWindow("Mark White",WINDOW_WIDTH,WINDOW_HEIGHT);
 
             int pointsCount=0;
             point.val[2]=0;
@@ -164,7 +165,7 @@ namespace SLS
                     pointsCount++;
                     point.val[2]=0;
                 }
-                cv::imshow("Mark White", img_copy);
+                showImgAvecText_Block(img_copy, "Click mouse on a white area", "Mark White");
                 cv::waitKey(5);
             }
 
@@ -173,7 +174,7 @@ namespace SLS
 
             while(key != 'n' && key != 'r')
             {
-                cv::imshow("Mark White", img_copy );
+                showImgAvecText_Block( img_copy, "Press 'n' to continue or 'r' to select a new point!", "Mark White");
                 key=cv::waitKey();
             }
 
@@ -217,24 +218,29 @@ namespace SLS
             //show img to user
             // Create an async task to show image
             cv::namedWindow("Calibration",CV_WINDOW_NORMAL);
-            cv::resizeWindow("Calibration",800,600);
-            closeAsynImg = false;
+            cv::resizeWindow("Calibration",WINDOW_WIDTH,WINDOW_HEIGHT);
+            //closeAsynImg = false;
+            numOfCornersX = 5;
+            numOfCornersY = 5;
+            cv::createTrackbar("x", "Calibration", &numOfCornersX, 10);
+            cv::createTrackbar("y", "Calibration", &numOfCornersY, 10);
+            showImgAvecText_Block(img_grey, "Select number of squares on x and y axis on the trackbar and press any key", "Calibration");
+            cv::waitKey(0);
             // Kick the thread
-            std::thread imgAsync( showImgAsync, img_grey, "Calibration");
+            //std::thread imgAsync( showImgAsync, img_grey, "Calibration");
+            //system("clear");
+            ////ask the number of squares in img
+            //std::cout<<"Give number of squares on x axis: ";
+            //std::cin>>numOfCornersX;
+            //std::cout<<"Give number of squares on y axis: ";
+            //std::cin>>numOfCornersY;
 
-            system("clear");
-            //ask the number of squares in img
-            std::cout<<"Give number of squares on x axis: ";
-            std::cin>>numOfCornersX;
-            std::cout<<"Give number of squares on y axis: ";
-            std::cin>>numOfCornersY;
-
-            // Close the thread
-            closeAsynImg = true;
-            // Notify it
-            cv.notify_one();
-            // Wait for it to finish
-            imgAsync.join();
+            //// Close the thread
+            //closeAsynImg = true;
+            //// Notify it
+            //cv.notify_one();
+            //// Wait for it to finish
+            //imgAsync.join();
 
             if(numOfCornersX<=0 || numOfCornersY<=0)
                 break;
@@ -252,27 +258,21 @@ namespace SLS
             found=cv::findChessboardCorners(img_grey, cvSize(numOfCornersX,numOfCornersY), camCorners, CV_CALIB_CB_ADAPTIVE_THRESH );
 
             std::cout<<"found = "<<camCorners.size()<<"\n";
-            if (!found)
-            {
-                std::cout<<"DEBUGGGGGGGGGGGGGGGGGGGGG\n";
-                std::cout<<numOfCornersX<<"\t"<<numOfCornersY<<std::endl;
-                std::cout<<camCorners.size()<<std::endl;
-                imshow("DEBUG", img_grey);
-                cv::waitKey(0);
-            }
-                
-
 
             int key = cv::waitKey(5);
 
             if(key=='n')
                 break;
 
-            std::cout<<"\nPress 'Enter' to continue or 'ESC' to repeat the procedure.\n";
 
             while(found)
             {
+                cv::destroyWindow("Calibration");
+                cv::namedWindow("Calibration",CV_WINDOW_NORMAL);
+                cv::resizeWindow("Calibration",WINDOW_WIDTH,WINDOW_HEIGHT);
                 cv::drawChessboardCorners(img_copy, cvSize(numOfCornersX,numOfCornersY), camCorners, found);
+
+                showImgAvecText_Block(img_copy, "Press 'n' to continue or 'r' to redo!", "Calibration");
                 cv::imshow("Calibration", img_copy );
 
                 key = cv::waitKey(0);
@@ -284,7 +284,7 @@ namespace SLS
             }
             if (!found)
             {
-                std::cout<<"No squres found, do it again ...\n";
+                std::cout<<"No squares found, do it again ...\n";
                 cv::destroyWindow("Calibration");
                 img_grey.release();
             }
@@ -295,7 +295,6 @@ namespace SLS
             //find sub pix of the corners
             cv::cornerSubPix(img_grey, camCorners, cvSize(20,20), cvSize(-1,-1), cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
 
-            system("clear");
 
             if(squareSize.height == 0)
             {
@@ -401,7 +400,7 @@ namespace SLS
         int size = imgBoardCornersCam.size();
         fs << "NumberOfImgs" << size;
 
-        for(int i=0; i<imgBoardCornersCam.size(); i++)
+        for(size_t i=0; i<imgBoardCornersCam.size(); i++)
         {
 
             std::stringstream name;

@@ -2,7 +2,9 @@
 using namespace SLS;
 int main()
 {
-    FileReader fr("CalibCamera");
-    Calibrator::Calibrate(&fr,"/home/tsing/project/SLS/data/alexander/rightCam/calib", "test.xml");
+    FileReader rightCam("CalibCameraRight");
+    FileReader leftCam("CalibCameraLeft");
+    Calibrator::Calibrate(&rightCam,"../../data/alexander/rightCam/calib", "right.xml");
+    Calibrator::Calibrate(&leftCam,"../../data/alexander/leftCam/calib", "left.xml");
     return 0;
 }
