@@ -5,7 +5,7 @@ A Structured Light Scanner
 
 ## How to compile demo binaries
 
-CMake is used as building system for this project. To buid the binaries, create a folder as bulding work directory.
+CMake is used to build this project. To buid the binaries, create a folder as bulding work directory.
 
 ```bash
 mkdir build
