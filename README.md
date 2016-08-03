@@ -23,10 +23,8 @@ Part of the 3DUNDERWORLD project: http://www.3dunderworld.org
   year={2014}
 }
 
-# SLS
 [![Build Status](https://travis-ci.org/v3c70r/SLS.svg?branch=dev)](https://travis-ci.org/v3c70r/SLS)
 
-A Structured Light Scanner
 
 ## How to compile demo binaries
 
