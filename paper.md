@@ -19,8 +19,38 @@
 # Summary
 In this paper we present the development of a 3D scanning system which is based on the principle of structured-light, without having particular requirements for specialized equipment. We discuss the intrinsic details and inherent difficulties of structured-light scanning techniques and present our solutions. Finally, we introduce our open-source scanning software system "3DUNDERWORLD-SLS" which implements the proposed techniques both in CPU and GPU. We have performed extensive testing with a wide range of models and report the results. Furthermore, we present a comprehensive evaluation of the system and a comparison with a high-end commercial 3D scanner.
 
-#Further details
-In [@paper.pdf]
+[![Build Status](https://travis-ci.org/v3c70r/SLS.svg?branch=dev)](https://travis-ci.org/v3c70r/SLS)
 
-#References
-In [@paper.bib]
+
+## How to compile demo binaries
+
+CMake is used to build this project. To buid the binaries, create a folder as bulding work directory.
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
+
+Binaries are compiled and located in the `bin` folder. 
+
+`SLS` is the reconstructor running on GPU
+
+if CUDA is dected on your machine, a binary `SLS_GPU` will be compiled, which is a reconstructor running on GPU
+
+`SLS_CALIB` is a manul calibration application.
+
+`SLS_GRAYCODE` is an application to project graycode.
+
+All of the binaries are designed to run with [`alexandar`](https://github.com/v3c70r/SLS/tree/dev/data/alexander) data.
+
+## How to use the library
+
+Please refer to the code in [`src/app/`](https://github.com/v3c70r/SLS/tree/dev/src/app) to use your own data set.
+
+## Known issues
+
+Since there's no good API for cameras, the camera acquisition is not implemented. However, interfaces are provided.
+We welcome you to implement your camera class and make a pull request to this project.
+
