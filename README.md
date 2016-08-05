@@ -23,7 +23,8 @@ Part of the 3DUNDERWORLD project: http://www.3dunderworld.org
   year={2014}
 }
 
-[![Build Status](https://travis-ci.org/v3c70r/SLS.svg?branch=dev)](https://travis-ci.org/v3c70r/SLS)
+
+[![status](http://joss.theoj.org/papers/4329bcbc7bba33961a5e749dcacb995b/status.svg)](http://joss.theoj.org/papers/4329bcbc7bba33961a5e749dcacb995b)
 
 
 ## How to compile demo binaries
