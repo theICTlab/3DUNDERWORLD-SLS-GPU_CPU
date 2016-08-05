@@ -233,8 +233,8 @@ Gray codes can be calculated by first computing the Binary representation of a n
 
 \begin{figure*}[!ht]
 	\centering
-	\subfloat[\label{fig:bin2gray}]{\includegraphics[scale=0.75]{./images/binary_to_Gray.png}}
-	\subfloat[\label{fig:gray2bin}]{	\includegraphics[scale=0.75]{./images/gray_to_bin.png}}
+	\subfloat[\label{fig:bin2gray}]{\includegraphics[scale=0.75]{./binary_to_Gray.png}}
+	\subfloat[\label{fig:gray2bin}]{	\includegraphics[scale=0.75]{./gray_to_bin.png}}
 	\caption{(a) Encoding of decimal number 93. The Binary Code representing the decimal number 93 is converted into Gray Code. (b) Conversion of Gray Code to Binary Code.}
 \end{figure*}
 
@@ -243,9 +243,9 @@ copy the most significant bit as is and for the remaining bits (taking one bit a
 
 \begin{figure}[!ht]
 	\centering
-	\subfloat[\label{fig:bin}]{\includegraphics[scale=0.4]{./images/binary.png}}
+	\subfloat[\label{fig:bin}]{\includegraphics[scale=0.4]{./binary.png}}
 	\\
-	\subfloat[\label{fig:gray}]{\includegraphics[scale=0.4]{./images/gray.png}}
+	\subfloat[\label{fig:gray}]{\includegraphics[scale=0.4]{./gray.png}}
 	\caption{(a) Binary encoding of the columns for an area of 8x8 pixels. (b) Gray encoding corresponding to the same columns of the area in (a).}
 \end{figure}
 
@@ -269,7 +269,7 @@ When considering a camera, the image is formed when light rays being reflected i
 
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[scale=0.8]{./images/rays_and_camera.png}
+	\includegraphics[scale=0.8]{./rays_and_camera.png}
 	\caption{\label{fig:camRays} Image formation. Light rays being reflected in the scene, pass through the camera lens, then through the aperture and interact with the photo-sensitive light sensor.}
 \end{figure}
 
@@ -317,7 +317,7 @@ Although, theoretically the camera matrix $C$ can be computed from a single imag
 
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[scale=0.6]{./images/extrCalib.png}
+	\includegraphics[scale=0.6]{./extrCalib.png}
 	\caption{\label{fig:calibration} Multiple Camera Calibration. For each orientation and position of the calibration board, images are captured from all cameras. This allows the use of a common reference point i.e. world origin.}
 \end{figure}
 
@@ -340,11 +340,11 @@ An acquisition set consists of the images captured by each camera for each patte
 
 \begin{figure}[!ht]
 	\centering
-	\subfloat[\label{fig:view1}]{\includegraphics[scale=0.10]{./images/half_artemis01.jpg}}
+	\subfloat[\label{fig:view1}]{\includegraphics[scale=0.10]{./half_artemis01.jpg}}
 	\hfil
-	\subfloat[\label{fig:view2}]{\includegraphics[scale=0.10]{./images/half_artemis02.JPG}}
+	\subfloat[\label{fig:view2}]{\includegraphics[scale=0.10]{./half_artemis02.JPG}}
 	\hfil
-	\subfloat[\label{fig:mesh}] {\includegraphics[scale=0.12]{./images/half_artemis00.png}}
+	\subfloat[\label{fig:mesh}] {\includegraphics[scale=0.12]{./half_artemis00.png}}
 	\caption{\label{fig:singleScan}{Result of a single scan. (a) and (b) show the two camera views and (c) the reconstructed mesh. In same cases more scans are needed in order to obtain the desired area.}}
 \end{figure}
 
@@ -358,9 +358,9 @@ Following the acquisition of the data, the next step is the decoding of the capt
 The goal of this process is to determine which pixels in a camera's image fall under shadow regions. This involves comparing each pixel's intensity values between the two first projections: the black and white images. Pixels whose intensity values in the two captured images corresponding to the black image projection and white image projection is large, are considered as a valid pixels. If the difference is small then the pixel is marked as "in-shadow". Figure \ref{fig:shadow_mask} shows an example of a shadow mask.
 \begin{figure}[!ht]
 	\centering
-	\subfloat[]{\includegraphics[scale=0.15]{./images/cam1.jpg}}
+	\subfloat[]{\includegraphics[scale=0.15]{./cam1.jpg}}
 	\hfil 
-	\subfloat[]{\includegraphics[scale=0.15]{./images/cam1Mask.png}}
+	\subfloat[]{\includegraphics[scale=0.15]{./cam1Mask.png}}
 	\caption{\label{fig:shadow_mask} Shadow mask example. (a) Image captured by the camera. (b) Shadow mask - all black pixels are removed from subsequent processing.}
 \end{figure}
 
@@ -371,7 +371,7 @@ The cameras capture images of the encoded projected patterns. The next step is t
 
 \begin{figure}[!ht]
  \centering
- \includegraphics[scale=0.9]{./images/slsDiagram.png}
+ \includegraphics[scale=0.9]{./slsDiagram.png}
  \caption{\label{fig:decoding} A 3D point is viewed by two different cameras. The decoding aims at deriving a mapping between the pixels of the two cameras, corresponding to the same 3D point.}
 \end{figure}
 
@@ -422,7 +422,7 @@ In order to overcome this limitation, the segment perpendicular to the two rays 
 
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[scale=1]{./images/not_inters_rays.png}
+	\includegraphics[scale=1]{./not_inters_rays.png}
 	\caption{\label{fig:raysNotInters} Ray intersection. In cases where two rays do not intersect 'exactly', the intersection point is considered to be the midpoint of the shortest segment connecting the two rays.}
 \end{figure}
 
@@ -489,7 +489,7 @@ Thus far, we have described how to generate a cloud of 3D points in Euclidean sp
 
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[scale=0.6]{./images/neighbourPixels.png}
+	\includegraphics[scale=0.6]{./neighbourPixels.png}
 	\caption{\label{fig:neighboringPixels} Neighbouring pixels. 1st level neighbours of a pixel $p$ are the previous, next, above and below pixels. 2nd level are the diagonal pixels.}
 \end{figure}
 
@@ -497,7 +497,7 @@ As already mentioned, each point in the cloud corresponds to a projector's pixel
 
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[scale=0.8]{./images/triang_and_quad_mesh.png}
+	\includegraphics[scale=0.8]{./triang_and_quad_mesh.png}
 	\caption{\label{fig:mesh49} Conversion of point-cloud to mesh. 1st level connections result to a quadrilateral faces. 1st and 2nd level result to triangular faces }
 \end{figure}
 
@@ -516,7 +516,7 @@ In the open-source scanning system 3DUNDERWORLD-SLS v3.x, we employ two Canon SL
 
 \begin{figure}[!ht]
 	\centering	
-	\includegraphics[scale=0.24]{./images/setup.jpg}
+	\includegraphics[scale=0.24]{./setup.jpg}
 	\caption{\label{fig:setup} Example of two cameras setup, with the cameras left and right of the projector.}
 \end{figure}
 
@@ -544,8 +544,8 @@ Figure \ref{fig:amphora} shows a render of a genuine replica of an amphora (righ
 	\textbf{Model} & \textbf{Real} & \textbf{Recon.} & \textbf{Size} & \textbf{Pts} & \textbf{Tri.} \\
 	\hline
 	Aphrodite & 
-	\includegraphics[scale=0.05]{./images/Afro_real.png} & 
-	\includegraphics[scale=0.05]{./images/Afro_CG.png} & 
+	\includegraphics[scale=0.05]{./Afro_real.png} & 
+	\includegraphics[scale=0.05]{./Afro_CG.png} & 
 	\begin{tabular}{c}
 		$88cm \times$ \\ $20cm \times$ \\ $20cm$	
 	\end{tabular} & 
@@ -553,8 +553,8 @@ Figure \ref{fig:amphora} shows a render of a genuine replica of an amphora (righ
 	$1205406$ \\
 	\hline
 	Aztec & 
-	\includegraphics[scale=0.05]{./images/aztec_real.png} & 
-	\includegraphics[scale=0.05]{./images/aztec_CG.png} & 
+	\includegraphics[scale=0.05]{./aztec_real.png} & 
+	\includegraphics[scale=0.05]{./aztec_CG.png} & 
 	\begin{tabular}{c}
 		$22.5cm \times$ \\ $10.5cm \times$ \\ $6cm$	
 	\end{tabular} & 
@@ -562,8 +562,8 @@ Figure \ref{fig:amphora} shows a render of a genuine replica of an amphora (righ
 	$1054972$ \\
 	\hline
 	Caryatid & 
-	\includegraphics[scale=0.05]{./images/kariatida_real.png} & 
-	\includegraphics[scale=0.05]{./images/kariatida_CG.png} & 
+	\includegraphics[scale=0.05]{./kariatida_real.png} & 
+	\includegraphics[scale=0.05]{./kariatida_CG.png} & 
 	\begin{tabular}{c}
 		$24.5cm \times$ \\ $5.5cm \times$ \\ $5.5cm$	
 	\end{tabular} & 
@@ -571,8 +571,8 @@ Figure \ref{fig:amphora} shows a render of a genuine replica of an amphora (righ
 	$1319544$ \\
 	\hline
 	Aphrodite & 
-	\includegraphics[scale=0.05]{./images/alex_real.png} & 
-	\includegraphics[scale=0.05]{./images/alex_CG.png} & 
+	\includegraphics[scale=0.05]{./alex_real.png} & 
+	\includegraphics[scale=0.05]{./alex_CG.png} & 
 	\begin{tabular}{c}
 		$25.5cm \times$ \\ $19cm \times$ \\ $14.5cm$	
 	\end{tabular} & 
@@ -587,9 +587,9 @@ Figure \ref{fig:amphora} shows a render of a genuine replica of an amphora (righ
 
 \begin{figure}[!ht]
 	\centering
-	\subfloat[]{\includegraphics[scale=0.25]{./images/amfora_real.png}}
+	\subfloat[]{\includegraphics[scale=0.25]{./amfora_real.png}}
 	\hfil
-	\subfloat[]{\includegraphics[scale=0.25]{./images/amfora_CG.png}}
+	\subfloat[]{\includegraphics[scale=0.25]{./amfora_CG.png}}
 	\caption{\label{fig:amphora} Reconstructed model of a genuine replica of an amphora. (a) Photo of the object. (b) A render of the reconstructed model.}
 \end{figure}
 
@@ -619,17 +619,17 @@ We scan several different planar surfaces shown in Table \ref{tab:metric1} and p
    \hline
    & & & $E_{avg}$ & $RMSE$ & $\aleph$ \\
    \hline
-   Flat Plane $\Pi_{1}$ & \includegraphics[scale=0.05]{./images/plane1_cam1.JPG} & \includegraphics[scale=0.05]{./images/plane1_cam2.JPG} & 0.0046794643 & 0.0083896662 & 490625\\
+   Flat Plane $\Pi_{1}$ & \includegraphics[scale=0.05]{./plane1_cam1.JPG} & \includegraphics[scale=0.05]{./plane1_cam2.JPG} & 0.0046794643 & 0.0083896662 & 490625\\
   \hline
-   Flat Plane $\Pi_{2}$ & \includegraphics[scale=0.05]{./images/plane2_cam1.JPG} & \includegraphics[scale=0.05]{./images/plane2_cam2.JPG} & 0.0109797063 & 0.0186112309 & 359659\\
+   Flat Plane $\Pi_{2}$ & \includegraphics[scale=0.05]{./plane2_cam1.JPG} & \includegraphics[scale=0.05]{./plane2_cam2.JPG} & 0.0109797063 & 0.0186112309 & 359659\\
    \hline
-   Flat Plane $\Pi_{3}$ & \includegraphics[scale=0.05]{./images/plane3_cam1.JPG} & \includegraphics[scale=0.05]{./images/plane3_cam2.JPG} & 0.002567169 & 0.004390225 & 540160\\
+   Flat Plane $\Pi_{3}$ & \includegraphics[scale=0.05]{./plane3_cam1.JPG} & \includegraphics[scale=0.05]{./plane3_cam2.JPG} & 0.002567169 & 0.004390225 & 540160\\
    \hline
-   Box Plane $\Pi_{Box}^{1}$ & \includegraphics[scale=0.05]{./images/box_cam1.JPG} & \includegraphics[scale=0.05]{./images/box_cam2.JPG} & 0.0012361568 & 0.0015234051 & 59210\\
+   Box Plane $\Pi_{Box}^{1}$ & \includegraphics[scale=0.05]{./box_cam1.JPG} & \includegraphics[scale=0.05]{./box_cam2.JPG} & 0.0012361568 & 0.0015234051 & 59210\\
    \hline
-   Box Plane $\Pi_{Box}^{2}$ & \includegraphics[scale=0.05]{./images/box_cam1.JPG} & \includegraphics[scale=0.05]{./images/box_cam2.JPG} & 0.0064742412	& 0.0090599699 & 24980\\
+   Box Plane $\Pi_{Box}^{2}$ & \includegraphics[scale=0.05]{./box_cam1.JPG} & \includegraphics[scale=0.05]{./box_cam2.JPG} & 0.0064742412	& 0.0090599699 & 24980\\
    \hline
-   Box Plane $\Pi_{Box}^{3}$ & \includegraphics[scale=0.05]{./images/box_cam1.JPG} & \includegraphics[scale=0.05]{./images/box_cam2.JPG} & 0.0264965185	& 0.0352513109 & 24464\\
+   Box Plane $\Pi_{Box}^{3}$ & \includegraphics[scale=0.05]{./box_cam1.JPG} & \includegraphics[scale=0.05]{./box_cam2.JPG} & 0.0264965185	& 0.0352513109 & 24464\\
    \hline  
 \end{tabular}
 }
@@ -673,7 +673,7 @@ We scan a planar object which contains a imprinted ruler on its surface. We meas
 \centering
 \begin{tabular}{| c | c |}
    \hline
-   \multirow{20}{*}{\includegraphics[scale=0.3]{./images/render_ruler.png}} &    $E_{acc}$ = 0.0251\\
+   \multirow{20}{*}{\includegraphics[scale=0.3]{./render_ruler.png}} &    $E_{acc}$ = 0.0251\\
 &$E_{acc}$ = 0.0827\\
 &$E_{acc}$ = 0.0259\\
 &$E_{acc}$ = 0.0166\\
@@ -705,7 +705,7 @@ The sampling rate is computed by selecting an area(patch) of known dimensions $(
 
 \begin{figure}[!ht]
 	\centering	
-	\includegraphics[scale=0.35]{./images/area_selection.png}
+	\includegraphics[scale=0.35]{./area_selection.png}
 	\caption{\label{fig:area_selection} Example of a density measurement on the reconstructed object(rendered). Multiple areas are selected on a marked reconstructed object and the number of points and number of faces(triangles) are counted in order to compute the point and face density per squared centimetre. }
 \end{figure}
 
@@ -751,9 +751,9 @@ The sampling rate is computed by selecting an area(patch) of known dimensions $(
   
 \begin{figure}[!ht]
 	\centering
-	\subfloat[]{\includegraphics[scale=0.45]{./images/point_density.png}}
+	\subfloat[]{\includegraphics[scale=0.45]{./point_density.png}}
 	\hfill
-	\subfloat[]{\includegraphics[scale=0.45]{./images/face_density.png}}
+	\subfloat[]{\includegraphics[scale=0.45]{./face_density.png}}
 	\caption{\label{fig:density} The point and face density for difference patch sizes. \textbf{Mean point density per $cm^2$: 1458.3}. \textbf{Mean face density per $cm^2$: 2835.6}}
 \end{figure}
 
@@ -771,9 +771,9 @@ Furthermore, we have introduced the general-purpose, open-source 3DUNDERWORLD-SL
 \begin{landscape}
 \begin{figure}[!ht]
 	\centering
-	\subfloat[\label{fig:laser_scan}]{\includegraphics[scale=0.25, angle=-90]{./images/laser_scan_smooth_render00.png}}
+	\subfloat[\label{fig:laser_scan}]{\includegraphics[scale=0.25, angle=-90]{./laser_scan_smooth_render00.png}}
 	\hfill
-	\subfloat[\label{fig:sls_scan}]{\includegraphics[scale=0.25, angle=-90]{./images/sls_scan_smooth_render00.png}}
+	\subfloat[\label{fig:sls_scan}]{\includegraphics[scale=0.25, angle=-90]{./sls_scan_smooth_render00.png}}
 	\caption{\label{fig:amphora} The same part of an object reconstructed with (a) ZScanner 700CX configured to the highest resolution and scanned from multiple directions and (b) the proposed system using a \textbf{single scan}. Both meshes were hole-filled using the same settings and are presented with the same Gouraud shading.}
 \end{figure}
 \end{landscape}
@@ -891,7 +891,7 @@ Parallel implementation of buckets is a challenging task. As we insert camera pi
 \begin{center}
 \begin{figure}
     \centering
-    \includegraphics{images/race01.png}
+    \includegraphics{race01.png}
     \caption{Inserting elements to the same bucket may trigger race condition.}
     \label{fig:race01}
 \end{figure}
@@ -900,7 +900,7 @@ Parallel implementation of buckets is a challenging task. As we insert camera pi
 \begin{center}
 \begin{figure}
     \centering
-    \includegraphics{images/race02.png}
+    \includegraphics{race02.png}
     \caption{Each bucket will maintain an atomicly increasing index indicates where to insert next element within the bucket.}
     \label{fig:race02}
 \end{figure}
