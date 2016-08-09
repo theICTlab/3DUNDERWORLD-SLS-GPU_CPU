@@ -58,3 +58,5 @@ Please refer to the code in [`src/app/`](https://github.com/v3c70r/SLS/tree/dev/
 
 Since there's no good API for cameras, the camera acquisition is not implemented. However, interfaces are provided.
 We welcome you to implement your camera class and make a pull request to this project.
+
+Also please note that since the example data files are currently included in the repository, the size of repository is 300MB. It may take while to clone. 
