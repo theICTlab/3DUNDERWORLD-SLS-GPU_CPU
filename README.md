@@ -1,17 +1,25 @@
 # 3DUNDERWORLD-Structured-Light-Scanner
 =====================================
 
-[v4] Lead software developer: Qing Gu
-     Researchers: Qing Gu, Charalambos Poullis
-     Immersive and Creative Technologies Lab (http://www.theICTlab.org), Concordia University
+### [v4] 
+Lead software developer: Qing Gu
+     
+Researchers: Qing Gu, Charalambos Poullis
+     
+Immersive and Creative Technologies Lab (http://www.theICTlab.org), Concordia University
 
-[v1-v3.2] Lead software developer: Kyriakos Herakleous
-          Researchers: Kyriakos Herakleous, Charalambos Poullis
-          Immersive and Creative Technologies Lab (http://www.theICTlab.org), Concordia University
+### [v1-v3.2] 
 
-Part of the 3DUNDERWORLD project: http://www.3dunderworld.org
+Lead software developer: Kyriakos Herakleous
 
-*IMPORTANT: To use this software, YOU MUST CITE the following in any resulting publication:*
+Researchers: Kyriakos Herakleous, Charalambos Poullis
+
+Immersive and Creative Technologies Lab (http://www.theICTlab.org), Concordia University
+
+
+#### Part of the 3DUNDERWORLD project: http://www.3dunderworld.org
+
+##### IMPORTANT: To use this software, YOU MUST CITE the following in any resulting publication:*
 
 @article{GuHerakleousPoullis3dunderworld,
   title={A Structured-Light Scanning Software for Rapid Geometry Acquisition},
