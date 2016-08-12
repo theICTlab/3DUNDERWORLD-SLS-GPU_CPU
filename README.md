@@ -28,11 +28,18 @@ Immersive and Creative Technologies Lab (http://www.theICTlab.org), Concordia Un
   year={2016}
 }
 
-@article{herakleous20143dunderworld,
-  title={3DUNDERWORLD-SLS: An Open-Source Structured-Light Scanning System for Rapid Geometry Acquisition},
-  author={Herakleous, Kyriakos and Poullis, Charalambos},
-  journal={arXiv preprint arXiv:1406.6595},
-  year={2014}
+@article{DBLP:journals/corr/HerakleousP14,
+  author    = {Kyriakos Herakleous and
+               Charalambos Poullis},
+  title     = {3DUNDERWORLD-SLS: An Open-Source Structured-Light Scanning System
+               for Rapid Geometry Acquisition},
+  journal   = {CoRR},
+  volume    = {abs/1406.6595},
+  year      = {2014},
+  url       = {http://arxiv.org/abs/1406.6595},
+  timestamp = {Tue, 01 Jul 2014 11:58:08 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/HerakleousP14},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
 }
 
 
