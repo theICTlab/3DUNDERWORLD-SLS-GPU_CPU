@@ -11,9 +11,9 @@ int main(int argc, char** argv)
     cxxopts::Options options("SLS_CPU", "CPU implementation of SLS");
     options.add_options()
         ("l,leftcam", "Left camera image folder", cxxopts::value<std::string>()->default_value("../../data/alexander/leftCam/dataset1/"))
-        ("lc", "Left camera configuration file", cxxopts::value<std::string>()->default_value("../../data/alexander/leftCam/calib/output/calib.xml"))
+        ("L,leftconfig", "Left camera configuration file", cxxopts::value<std::string>()->default_value("../../data/alexander/leftCam/calib/output/calib.xml"))
         ("r,rightcam", "Right camera image folder", cxxopts::value<std::string>()->default_value("../../data/alexander/rightCam/dataset1/"))
-        ("rc", "Right camera configuration file", cxxopts::value<std::string>()->default_value("../../data/alexander/rightCam/calib/output/calib.xml"))
+        ("R,rightconfig", "Right camera configuration file", cxxopts::value<std::string>()->default_value("../../data/alexander/rightCam/calib/output/calib.xml"))
         ("o,output", "Output file", cxxopts::value<std::string>()->default_value("test.ply"))
         ("h,help","Print this help")
         ;
@@ -28,8 +28,8 @@ int main(int argc, char** argv)
     LOG::restartLog();
     std::string leftCameraFolder = options["l"].as<std::string>();
     std::string rightCameraFolder = options["r"].as<std::string>();
-    std::string leftConfigFile = options["lc"].as<std::string>();
-    std::string rightConfigFile = options["rc"].as<std::string>();
+    std::string leftConfigFile = options["L"].as<std::string>();
+    std::string rightConfigFile = options["R"].as<std::string>();
     std::string output = options["output"].as<std::string>();
 
     SLS::FileReader *rightCam=new SLS::FileReader("rightCamera");
