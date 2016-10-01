@@ -27,8 +27,8 @@ int main(int argc, char** argv)
     cmdline::parser p;
     p.add<std::string>("leftcam", 'l',"Left camera image folder", false, "../../data/alexander/leftCam/dataset1/");
     p.add<std::string>("rightcam", 'r',"Right camera image folder", false, "../../data/alexander/rightCam/dataset1/");
-    p.add<std::string>("leftconfig", 'c',"Left camera configuration file", false, "../../data/alexander/leftCam/calib/output/calib.xml");
-    p.add<std::string>("rightconfig", 'n',"Right camera configuration file", false, "../../data/alexander/rightCam/calib/output/calib.xml");
+    p.add<std::string>("leftconfig", 'L',"Left camera configuration file", false, "../../data/alexander/leftCam/calib/output/calib.xml");
+    p.add<std::string>("rightconfig", 'R',"Right camera configuration file", false, "../../data/alexander/rightCam/calib/output/calib.xml");
     p.add<std::string>("output", 'o',"Right camera configuration file", false, "output.ply");
     p.parse_check(argc, argv);
 
