@@ -1,29 +1,10 @@
 #include <ReconstructorCUDA/Dynamic_bits.cuh>
 #include <ReconstructorCUDA/fileReaderCUDA.cuh>
 #include <ReconstructorCUDA/ReconstructorCUDA.cuh>
-//#include "cxxopts.hpp"
 #include "cmdline.h"
 
 int main(int argc, char** argv)
 {
-    // Does not compile with NVCC 
-    //
-    //cxxopts::Options options("SLS_CPU", "CPU implementation of SLS");
-    //options.add_options()
-    //    ("l,leftcam", "Left camera image folder", cxxopts::value<std::string>()->default_value("../../data/alexander/leftCam/dataset1/"))
-    //    ("lc", "Left camera configuration file", cxxopts::value<std::string>()->default_value("../../data/alexander/leftCam/calib/output/calib.xml"))
-    //    ("r,rightcam", "Right camera image folder", cxxopts::value<std::string>()->default_value("../../data/alexander/rightCam/dataset1/"))
-    //    ("rc", "Right camera configuration file", cxxopts::value<std::string>()->default_value("../../data/alexander/rightCam/calib/output/calib.xml"))
-    //    ("o,output", "Output file", cxxopts::value<std::string>()->default_value("test.ply"))
-    //    ("h,help","Print this help")
-    //    ;
-    //options.parse(argc, argv);
-
-    //if (options.count("help"))
-    //{
-    //    std::cout<<options.help()<<std::endl;
-    //    return 0;
-    //}
     cmdline::parser p;
     p.add<std::string>("leftcam", 'l',"Left camera image folder", false, "../../data/alexander/leftCam/dataset1/");
     p.add<std::string>("rightcam", 'r',"Right camera image folder", false, "../../data/alexander/rightCam/dataset1/");
