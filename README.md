@@ -22,7 +22,10 @@ cd build
 cmake ..
 make
 ```
-If CUDA is detected in your system, both CPU and GPU constructors are created in the `bin` folder. Otherwise, only CPU constructor will be generated. To run the binaries, you can pass the data folder and camera configuration files as parameters, or using the default value if you compiled with the commands above.
+If CUDA is detected in your system, the cmake flag `ENABLE_CUDA` is set to `on` by default, both CPU and GPU constructors are created in the `bin` folder. Otherwise, only CPU constructor will be generated. To run the binaries, you can pass the data folder and camera configuration files as parameters, or using the default value if you compiled with the commands above.
+
+You can use `cmake .. -DENABLE_CUDA=off` to disable CUDA if you don't want compile the GPU binary.
+
 ```
   SLS/SLS_GPU [OPTION...]
 
