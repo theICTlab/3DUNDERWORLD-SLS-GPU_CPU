@@ -3,7 +3,6 @@
 #include <iomanip>
 #include <fstream>
 
-//using uchar=unsigned char;
 namespace SLS
 {
 void FileReader::loadImages(const std::string& folder, bool isGL)
@@ -92,26 +91,8 @@ void FileReader::loadConfig(const std::string& configFile)
             rotationMat[i][j]=params_[ROT_MAT].at<double>(j,i);
     rotationMat = glm::inverse(rotationMat);
     camTransMat_ = rotationMat*translationMat;
-
-    //No need to do this
-    //Generating raytable
-    //LOG::startTimer("Generating ray lookup table with size of %d*%d...",
-    //        resX_, resY_);
-    //for (size_t i=0; i<resX_; i++)
-    //    for (size_t j=0; j<resY_; j++){
-    //        Ray ray;
-    //        ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
-
-    //        ray.dir.x = ((float)i-params_[CAMERA_MAT].at<double>(0,2))/params_[CAMERA_MAT].at<double>(0,0);
-    //        ray.dir.y = ((float)j-params_[CAMERA_MAT].at<double>(1,2))/params_[CAMERA_MAT].at<double>(1,1);
-    //        ray.dir.z=1.0;
-    //        ray.dir.w=0.0;
-    //        ray.dir = camTransMat_*ray.dir;
-    //        ray.dir=glm::normalize(ray.dir);
-    //        rayTable[j+i*resY_] = ray;
-    //    }
-    //LOG::endTimer('s');
 }
+
 const cv::Mat& FileReader::getNextFrame() 
 {
     //Return the current frame and move on
@@ -141,9 +122,6 @@ void FileReader::undistort()
 
 void FileReader::computeShadowsAndThresholds()
 {
-    /*
-     * Black threashold = 5;
-     */
     cv::Mat& brightImg=images_[0];
     cv::Mat& darkImg=images_[1];
     shadowMask_.resize(resX_*resY_); 
@@ -161,10 +139,12 @@ void FileReader::computeShadowsAndThresholds()
             thresholds_[j+i*resY_]=diff/2;
 #endif
         }
+    // Output mask
     std::string pgmFName=name_+".pgm";
     LOG::writeLog("Writing mask to %s\n", pgmFName.c_str());
     shadowMask_.writeToPGM(pgmFName.c_str(), resX_, resY_, true);
 }
+
 Ray FileReader::getRay(const size_t &x, const size_t &y)
 {
         glm::vec2 undistorted = undistortPixel(glm::vec2(x, y));

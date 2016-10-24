@@ -19,12 +19,13 @@
 #include <vector>
 #include "./Camera.h"
 #include "./Projector.h"
+#include <core/exporter.hpp>
 namespace SLS
 {
 /**
  * @brief Reconstructor
  * Reconstructor takes images from cameras to
- * reconstruct objects into point cloud
+ * reconstruct objects into the point cloud
  */
 class Reconstructor
 {
@@ -40,15 +41,16 @@ public:
     // Interfaces
     virtual void reconstruct()=0;
     virtual void addCamera(Camera* cam)=0;
+
+    // Export point cloud
     friend void exportPLYGrid(std::string fileName, const Reconstructor& reconstructor);
     friend void exportPLY( std::string fileName ,const Reconstructor& reconstructor);
     friend void exportOBJ( std::string fileName ,const Reconstructor& reconstructor);
     friend void exportOBJVec4( std::string fileName ,const Reconstructor& reconstructor);
+
+    // refactoring
+    friend void exportPointCloud(std::string fileName, std::string type, const Reconstructor& reconstructor);
 };
-    void exportPLYGrid(std::string fileName, const Reconstructor& reconstructor);
-    void exportPLY( std::string fileName ,const Reconstructor& reconstructor);
-    void exportOBJ( std::string fileName ,const Reconstructor& reconstructor);
-    void exportOBJVec4( std::string fileName ,const Reconstructor& reconstructor);
 
 } // namespace SLS
 

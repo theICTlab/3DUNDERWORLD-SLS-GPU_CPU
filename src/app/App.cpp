@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     reconstruct.addCamera(leftCam);
     reconstruct.reconstruct();
 
-    SLS::exportPLYGrid(output,  reconstruct);
+    SLS::exportPointCloud(output, "OBJ", reconstruct);
 
     LOG::writeLog("DONE!\n");
     

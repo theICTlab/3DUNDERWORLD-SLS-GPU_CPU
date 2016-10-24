@@ -22,6 +22,12 @@ endif()
 cmake_minimum_required(VERSION 2.8)
 set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 project( SLS )
+find_package( glm REQUIRED )
+
+include_directories(${glm_DIR})
+message (STATUS ${glm_DIR})
+
+
 find_package( OpenCV REQUIRED )
 include_directories(./src/lib)
 #Detecting CUDA
@@ -37,7 +43,6 @@ endif (NOT DEFINED ${ENABLE_CUDA})
 
 if (${CUDA_FOUND} AND ${ENABLE_CUDA})
     set( USE_CUDA on)
-    message(STATUS ${CUDA_NVCC_FLAGS})
     set(CUDA_PROPAGATE_HOST_FLAGS OFF)
     list(APPEND CUDA_NVCC_FLAGS "-O2 -std=c++11 -D__STRICT_ANSI__ -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES")
 else (${CUDA_FOUND} AND ${ENABLE_CUDA})
