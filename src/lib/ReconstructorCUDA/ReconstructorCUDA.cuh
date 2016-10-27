@@ -99,13 +99,11 @@ namespace Kernel{
 
 __global__ void getPointCloud2Cam(
         GPUBucketsObj buckets0,
-        Dynamic_Bitset_Array_GPU mask0,
         float *camMat0,
         float *distMat0,
         float *camTransMat0,
 
         GPUBucketsObj buckets1,
-        Dynamic_Bitset_Array_GPU mask1,
         float *camMat1,
         float *distMat1,
         float *camTransMat1,

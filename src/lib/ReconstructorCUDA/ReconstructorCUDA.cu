@@ -35,11 +35,13 @@ void ReconstructorCUDA::reconstruct()
     /**/
 
 
+    // For each camera
     for(size_t camIdx = 0; camIdx < cameras_.size(); camIdx++)
     {
+        // Cast camera to CUDA camera
         FileReaderCUDA* cam = (FileReaderCUDA*)cameras_[camIdx];
         LOG::writeLog("Generating reconstruction bucket for \"%s\" ... \n", cam->getName().c_str());
-        cam->computeShadowsAndThresholds();    // can it be done in GPU? Yes
+        cam->computeShadowsAndThresholds();    // TODO: Put this part to GPU too.
         size_t x=0,y=0,xTimesY=0;
         cam->getResolution(x,y);
         xTimesY=x*y;
@@ -48,10 +50,16 @@ void ReconstructorCUDA::reconstruct()
         cam->getNextFrame();
         // Load all images into GPU memory
         uchar *images_d=nullptr;
+
+        // Allocate image memory on GPU with (number of pixel) * (number of pattern image + number of reversed pattern image)
         gpuErrchk(cudaMalloc((void**)&images_d, sizeof(uchar)*xTimesY*projector_->getRequiredNumFrames()*2));
+
+        // Initialize binary sequence for each pixel. Here we have xTimesY pixels and 
+        // each pixel has `projector_->getRequiredNumFrames()` bits.
         Dynamic_Bitset_Array bitsetArray(xTimesY, projector_->getRequiredNumFrames());
 
-        //Preparing data
+        // Preparing data
+        // Copy images to GPU
         for (size_t i=0; i<projector_->getRequiredNumFrames(); i++)
         {
             auto frm = cam->getNextFrame();
@@ -63,6 +71,7 @@ void ReconstructorCUDA::reconstruct()
                     sizeof(uchar)*xTimesY, cudaMemcpyHostToDevice));
         }
 
+        // Generate bit array for all pixels from image sequence.
         Kernel::genPatternArray<<<200,200>>> (
                 images_d, 
                 projector_->getRequiredNumFrames(),
@@ -71,10 +80,11 @@ void ReconstructorCUDA::reconstruct()
                 cam->getMask()->getGPUOBJ(),
                 bitsetArray.getGPUOBJ()
                 );
-        //Check for errors
+        // Check for errors
         gpuErrchk(cudaPeekAtLastError());
         gpuErrchk(cudaFree(images_d)); // Release the heavy image array
 
+        // Insert pixels into bucket
         Kernel::buildBuckets<<<200, 200>>> (
              cam->getMask()->getGPUOBJ(),
              bitsetArray.getGPUOBJ(),
@@ -90,11 +100,11 @@ void ReconstructorCUDA::reconstruct()
     // TODO: Export point cloud in (x, y, z, r, g, b) format
     auto camera0 = (FileReaderCUDA*)(cameras_[0]);
     auto camera1 = (FileReaderCUDA*)(cameras_[1]);
-    float* cloud = nullptr;
+    float* pointCloud_d = nullptr;  // Point cloud on device with x,y,z,r,g,b.
     size_t resX, resY;
     camera0->getResolution(resX, resY);
 
-    gpuErrchk ( cudaMalloc((void**)&cloud, buckets[0].getNumBKTs()*sizeof(float)*6));
+    gpuErrchk ( cudaMalloc((void**)&pointCloud_d, buckets[0].getNumBKTs()*sizeof(float)*6));
 
     // Reconstructing point cloud
     LOG::writeLog("Reconstructing point cloud ...\n");
@@ -111,11 +121,11 @@ void ReconstructorCUDA::reconstruct()
 
             resX,resY,
 
-            cloud
+            pointCloud_d
             );
     gpuErrchk(cudaPeekAtLastError());
     pointCloud_.resize(buckets[0].getNumBKTs()*6);
-    gpuErrchk(cudaMemcpy(  &pointCloud_[0],cloud, buckets[0].getNumBKTs()*sizeof(float)*4, cudaMemcpyDeviceToHost));
+    gpuErrchk(cudaMemcpy(  pointCloud_.data(), pointCloud_d, buckets[0].getNumBKTs()*sizeof(float)*6, cudaMemcpyDeviceToHost));
 
     // The point cloud returned from GPU is vec4 of positions.
     // TODO: Reshape the pointCloud to x,y,z,r,g,b format
@@ -126,7 +136,8 @@ void ReconstructorCUDA::reconstruct()
     cudaEventElapsedTime(&milliseconds, start, stop);
     LOG::writeLog("GPU Time : %fms\n", milliseconds);
     /*****/
-    gpuErrchk( cudaFree(cloud));
+
+    gpuErrchk( cudaFree(pointCloud_d));
     LOG::writeLog("Done\n");
 }
 
@@ -200,7 +211,6 @@ __global__ void getPointCloud2Cam(
         float *camMat0,
         float *distMat0,
         float *camTransMat0,
-        vec3*
 
         GPUBucketsObj buckets1,
         float *camMat1,
@@ -225,7 +235,7 @@ __global__ void getPointCloud2Cam(
             // If there's no corresponding pixel
             // Set the point cloud to empty
             for(size_t i=0; i<6; i++)
-                pointCloud[6 * idx + i) = 0.0;
+                pointCloud[6 * idx + i] = 0.0;
         }
         else
         {
@@ -286,7 +296,7 @@ __global__ void getPointCloud2Cam(
             avgPoint[1] /= (float)ptCount;
             avgPoint[2] /= (float)ptCount;
             avgPoint[3] = 1.0;
-            memcpy ( &pointCloud[4*idx], avgPoint, sizeof(float)*3);
+            memcpy ( &pointCloud[6*idx], avgPoint, sizeof(float)*3);
         }
         idx += stride;
     }

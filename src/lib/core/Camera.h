@@ -39,20 +39,27 @@ namespace SLS
 class Camera
 {
 protected:
+
     // Name of camera
     std::string name_;
+
     // Camera Resolution
     size_t resX_, resY_;
+
     // Mask of valid pixels
     Dynamic_Bitset shadowMask_; //Color mask
+
     // An all lit image contains color information of reconstruction object
     cv::Mat color_;
+
     // Thresholds are used to filter out invalid pixel.
     uchar whiteThreshold_;
+
     // Contrast threshold
     // If the contrast of a pixel between lit and unlit is smaller than the 
     // dark threshold, the pixel is invalid.
     uchar blackThreshold_;
+
     // adaptive Thresholds of each pixel. 
     // The threshold is used filter out invalid pixels
     std::vector<unsigned char> thresholds_; //Threshold for each pixel with in [0,255], 
@@ -87,6 +94,7 @@ public:
     {
         getColor(idx/resY_, idx%resY_, r,g,b);
     }
+
     // Interfaces
     /**
      * @brief Get a ray in world space by given pixel
@@ -106,10 +114,13 @@ public:
 
     // Load camera intrinsic/extrinsic parameters and distortion from file
     virtual void loadConfig(const std::string &configFile) = 0;
+
     // Get next frame from camera
     virtual const cv::Mat& getNextFrame() = 0;
+
     // Undistort image using the distortion parameter.
     virtual void undistort()=0;
+
     // Compute masks and thresholds ( if dynamic threshold enabled 
     virtual void computeShadowsAndThresholds()=0;
 };

@@ -31,7 +31,8 @@ int main(int argc, char** argv)
     reconstruct.addCamera(rightCam);
     reconstruct.addCamera(leftCam);
     reconstruct.reconstruct();
-    SLS::exportOBJVec4(output,  reconstruct);
+    //SLS::exportOBJVec4(output,  reconstruct);
+    SLS::exportPointCloud(output, "PLY", reconstruct);
     LOG::writeLog("DONE\n");
     return 0;
 }
