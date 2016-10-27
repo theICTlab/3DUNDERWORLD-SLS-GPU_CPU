@@ -85,36 +85,40 @@ void ReconstructorCUDA::reconstruct()
     }
 
 
-    // A lot of hacks down there, need to be refactored
+    // some hacks down there, need to be refactored
+    // TODO: Support more than 2 cameras
+    // TODO: Export point cloud in (x, y, z, r, g, b) format
     auto camera0 = (FileReaderCUDA*)(cameras_[0]);
     auto camera1 = (FileReaderCUDA*)(cameras_[1]);
     float* cloud = nullptr;
     size_t resX, resY;
     camera0->getResolution(resX, resY);
 
-    gpuErrchk ( cudaMalloc((void**)&cloud, buckets[0].getNumBKTs()*sizeof(float)*4));
+    gpuErrchk ( cudaMalloc((void**)&cloud, buckets[0].getNumBKTs()*sizeof(float)*6));
 
     // Reconstructing point cloud
     LOG::writeLog("Reconstructing point cloud ...\n");
     Kernel::getPointCloud2Cam<<<200,200>>>(
             buckets[0].getGPUOBJ(),
-            camera0->getMask()->getGPUOBJ(),
             camera0->getDeviceCamMat(),
             camera0->getDeviceDistMat(),
             camera0->getDeviceCamTransMat(),
 
             buckets[1].getGPUOBJ(),
-            camera1->getMask()->getGPUOBJ(),
             camera1->getDeviceCamMat(),
             camera1->getDeviceDistMat(),
             camera1->getDeviceCamTransMat(),
+
             resX,resY,
+
             cloud
             );
-    gpuErrchk( cudaPeekAtLastError());
-    pointCloud_.resize(buckets[0].getNumBKTs()*4);
-    gpuErrchk( 
-            cudaMemcpy(  &pointCloud_[0],cloud, buckets[0].getNumBKTs()*sizeof(float)*4, cudaMemcpyDeviceToHost));
+    gpuErrchk(cudaPeekAtLastError());
+    pointCloud_.resize(buckets[0].getNumBKTs()*6);
+    gpuErrchk(cudaMemcpy(  &pointCloud_[0],cloud, buckets[0].getNumBKTs()*sizeof(float)*4, cudaMemcpyDeviceToHost));
+
+    // The point cloud returned from GPU is vec4 of positions.
+    // TODO: Reshape the pointCloud to x,y,z,r,g,b format
     /**** Profile *****/
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
@@ -184,15 +188,21 @@ __global__ void buildBuckets(
     }
 }
 
+
+// 
+// Reconstruct point cloud from two cameras
+// The inputs are the bucket, bit pattern and camera matrices.
+// The output is written to float* pointCloud
+//
+
 __global__ void getPointCloud2Cam(
         GPUBucketsObj buckets0,
-        Dynamic_Bitset_Array_GPU mask0,
         float *camMat0,
         float *distMat0,
         float *camTransMat0,
+        vec3*
 
         GPUBucketsObj buckets1,
-        Dynamic_Bitset_Array_GPU mask1,
         float *camMat1,
         float *distMat1,
         float *camTransMat1,
@@ -204,15 +214,18 @@ __global__ void getPointCloud2Cam(
         float* pointCloud
         )
 {
-    //Each thread takes care of one projector pixel
+    // Each thread takes care of one projector pixel
+    // i.e. a bucket
     uint idx = blockIdx.x*blockDim.x + threadIdx.x;
     uint stride = blockDim.x * gridDim.x;
     while (idx < buckets0.NUM_BKTS_)   // For each pixel
     {
         if ( buckets0.count_[idx] == 0 || buckets1.count_[idx] == 0) 
         {
-            memset( &pointCloud[4*idx], 0, sizeof(float)*4);
-            pointCloud[4*idx+3] = float(0.0);
+            // If there's no corresponding pixel
+            // Set the point cloud to empty
+            for(size_t i=0; i<6; i++)
+                pointCloud[6 * idx + i) = 0.0;
         }
         else
         {
@@ -269,14 +282,11 @@ __global__ void getPointCloud2Cam(
                         memcpy (minMidPoint, midPoint, sizeof(float)*4);
                     }
                 }
-            //if (minDist < 0.3)
             avgPoint[0] /= (float)ptCount;
             avgPoint[1] /= (float)ptCount;
             avgPoint[2] /= (float)ptCount;
             avgPoint[3] = 1.0;
-            memcpy ( &pointCloud[4*idx], avgPoint, sizeof(float)*4);
-            //else
-                //memset( &pointCloud[4*idx], 0, sizeof(float)*4);
+            memcpy ( &pointCloud[4*idx], avgPoint, sizeof(float)*3);
         }
         idx += stride;
     }

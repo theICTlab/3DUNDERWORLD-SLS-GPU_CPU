@@ -68,7 +68,7 @@ public:
     }
     uint getNumBKTs() const{ return NUM_BKTS_;}
 
-    // Debug func
+    // Debug function
     uint getMaxCount(uint idx) const
     {
         std::vector<uint> count_h;
@@ -282,7 +282,7 @@ inline __device__ float getMidPoint(
     float t = -(v1_dot_v2/denom) * v12_dot_v1 + (v1_dot_v1/denom) * v12_dot_v2;
     dist = glm::length(p1+s*v1-p2-t*v2);
     auto midP = vec4((p1+s*v1+p2+t*v2)/2.0f, 1.0);
-    //cpy back
+    // copy back
     memcpy( midPoint, &midP[0], sizeof(float)*4);
     return dist;
 }

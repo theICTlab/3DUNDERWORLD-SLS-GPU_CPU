@@ -147,19 +147,18 @@ void ReconstructorCPU::reconstruct()
                     }
                 }
             midPointAvg = midPointAvg/ptCount;
-            //if (minDist < 0.3) //Setting threshold
             {
                 pointCloud_.push_back(midPointAvg.x);
                 pointCloud_.push_back(midPointAvg.y);
                 pointCloud_.push_back(midPointAvg.z);
-                pointCloud_.push_back(1);
+                //pointCloud_.push_back(1);
                 unsigned char r0, g0, b0;
                 unsigned char r1, g1, b1;
                 cameras_[0]->getColor(minCam0Idx, r0, g0, b0);
                 cameras_[1]->getColor(minCam1Idx, r1, g1, b1);
-                //   pointCloud_.push_back((float)(r0+r1)/255.0f);
-                //   pointCloud_.push_back((float)(g0+g1)/255.0f);
-                //   pointCloud_.push_back((float)(b0+b1)/255.0f);
+                pointCloud_.push_back((r0+r1)/2);
+                pointCloud_.push_back((g0+g1)/2);
+                pointCloud_.push_back((b0+b1)/2);
             }
         }
     }

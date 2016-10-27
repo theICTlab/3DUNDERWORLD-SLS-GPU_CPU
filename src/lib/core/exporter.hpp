@@ -12,4 +12,5 @@ void exportOBJVec4( std::string fileName ,const Reconstructor& reconstructor);
 
 void exportPointCloud(std::string fileName, std::string type, const Reconstructor& reconstructor);
 void exportPointCloud2OBJ(std::string fileName, const std::vector<float> &pointCloud);
+void exportPointCloud2PLY(std::string fileName, const std::vector<float> &pointCloud);
 } // namespace SLS
