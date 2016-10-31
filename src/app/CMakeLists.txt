@@ -13,11 +13,11 @@ IF(${USE_CUDA})
         )
 ENDIF(${USE_CUDA})
 
-add_executable(SLS_CALIB App_Calib.cpp)
-target_link_libraries(SLS_CALIB core sls_calib)
+add_executable(calibrateCamera calibrateCamera.cpp)
+target_link_libraries(calibrateCamera core sls_calib)
 
-add_executable(SLS_GRAYCODE App_Graycode.cpp)
-target_link_libraries(SLS_GRAYCODE core sls_graycode)
+add_executable(generateGraycode generateGraycode.cpp)
+target_link_libraries(generateGraycode core sls_graycode)
 
 set_target_properties ( SLS
     PROPERTIES
@@ -25,13 +25,13 @@ set_target_properties ( SLS
     #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
-set_target_properties ( SLS_CALIB
+set_target_properties ( calibrateCamera
     PROPERTIES
     #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
-set_target_properties ( SLS_GRAYCODE
+set_target_properties ( generateGraycode
     PROPERTIES
     #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"

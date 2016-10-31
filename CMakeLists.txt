@@ -22,16 +22,20 @@ endif()
 cmake_minimum_required(VERSION 2.8)
 set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 project( SLS )
-find_package( glm REQUIRED )
 
+# Include this project
+include_directories(./src/lib)
+
+find_package( glm REQUIRED )
 include_directories(${glm_DIR})
-message (STATUS ${glm_DIR})
 
 
 find_package( OpenCV REQUIRED )
-include_directories(./src/lib)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
 #Detecting CUDA
 find_package(CUDA)
+include_directories(${CUDA_INCLUDE_DIRS})
 # Set default ENABLE_CUDA value
 if (NOT DEFINED ${ENABLE_CUDA})
     if (${CUDA_FOUND})
