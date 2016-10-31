@@ -83,6 +83,10 @@ public:
     void clearMask(const size_t &idx){ shadowMask_.clearBit(idx);}
     uchar getWhiteThreshold() const {return whiteThreshold_;}
     uchar getblackThreshold() const {return blackThreshold_;}
+    virtual const cv::Mat& getColorFrame() const
+    {
+        return color_;
+    }
     void getColor(size_t x, size_t y, unsigned char &r, unsigned char &g, unsigned char &b) const
     {
         auto color = color_.at<cv::Vec3b>(y, x);

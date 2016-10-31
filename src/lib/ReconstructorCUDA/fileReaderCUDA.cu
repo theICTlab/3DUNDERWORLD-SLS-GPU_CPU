@@ -27,6 +27,7 @@ __global__ void computeMask_kernel(
         idx += stride;
     }
 }
+
 void FileReaderCUDA::computeShadowsAndThresholds()
 {
     cv::Mat& brightImg=images_[0];

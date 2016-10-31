@@ -10,7 +10,6 @@ class ReconstructorCUDA: public Reconstructor
 {
 private:
 public:
-
      ReconstructorCUDA(const size_t projX, const size_t projY);
     ~ReconstructorCUDA() override;
     void addCamera(Camera *cam) override;
@@ -19,6 +18,8 @@ public:
 
 struct GPUBucketsObj
 {
+    // Indices in the bucket object. 
+    // The indices are raw-based indices of image pixels
     uint *data_;
     //size_t *offsets_;
     uint *count_; // num of element in buckets
@@ -102,11 +103,14 @@ __global__ void getPointCloud2Cam(
         float *camMat0,
         float *distMat0,
         float *camTransMat0,
+        uchar* color0,
+
 
         GPUBucketsObj buckets1,
         float *camMat1,
         float *distMat1,
         float *camTransMat1,
+        uchar* color1,
 
         uint camResX,
         uint camResY,

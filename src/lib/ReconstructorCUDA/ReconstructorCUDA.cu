@@ -34,6 +34,9 @@ void ReconstructorCUDA::reconstruct()
     cudaEventRecord(start);
     /**/
 
+    // Color frames
+    std::vector<uchar*> colors_d_;
+    colors_d_.resize(cameras_.size());
 
     // For each camera
     for(size_t camIdx = 0; camIdx < cameras_.size(); camIdx++)
@@ -45,7 +48,14 @@ void ReconstructorCUDA::reconstruct()
         size_t x=0,y=0,xTimesY=0;
         cam->getResolution(x,y);
         xTimesY=x*y;
-        //Skip first two frames
+
+        // Load color images to GPU memory
+        gpuErrchk( cudaMalloc((void**)&(colors_d_[camIdx]), 
+                    sizeof(uchar)* xTimesY*3)); // num_pixel * (r,g,b)
+        gpuErrchk( cudaMemcpy( colors_d_[camIdx], cam->getColorFrame().data,
+                    sizeof(uchar)*xTimesY, cudaMemcpyHostToDevice));
+
+        // Skip first two frames
         cam->getNextFrame();
         cam->getNextFrame();
         // Load all images into GPU memory
@@ -96,8 +106,7 @@ void ReconstructorCUDA::reconstruct()
 
 
     // some hacks down there, need to be refactored
-    // TODO: Support more than 2 cameras
-    // TODO: Export point cloud in (x, y, z, r, g, b) format
+    // TODO: Export point cloud in (x, y, z, r, g, b) 
     auto camera0 = (FileReaderCUDA*)(cameras_[0]);
     auto camera1 = (FileReaderCUDA*)(cameras_[1]);
     float* pointCloud_d = nullptr;  // Point cloud on device with x,y,z,r,g,b.
@@ -113,22 +122,21 @@ void ReconstructorCUDA::reconstruct()
             camera0->getDeviceCamMat(),
             camera0->getDeviceDistMat(),
             camera0->getDeviceCamTransMat(),
+            colors_d_[0],
 
             buckets[1].getGPUOBJ(),
             camera1->getDeviceCamMat(),
             camera1->getDeviceDistMat(),
             camera1->getDeviceCamTransMat(),
+            colors_d_[1],
 
             resX,resY,
-
             pointCloud_d
             );
     gpuErrchk(cudaPeekAtLastError());
     pointCloud_.resize(buckets[0].getNumBKTs()*6);
     gpuErrchk(cudaMemcpy(  pointCloud_.data(), pointCloud_d, buckets[0].getNumBKTs()*sizeof(float)*6, cudaMemcpyDeviceToHost));
 
-    // The point cloud returned from GPU is vec4 of positions.
-    // TODO: Reshape the pointCloud to x,y,z,r,g,b format
     /**** Profile *****/
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
@@ -138,6 +146,11 @@ void ReconstructorCUDA::reconstruct()
     /*****/
 
     gpuErrchk( cudaFree(pointCloud_d));
+    
+    // Free color image device pointers
+    for (const auto &ptr : colors_d_)
+        gpuErrchk( cudaFree(ptr));
+
     LOG::writeLog("Done\n");
 }
 
@@ -180,6 +193,7 @@ __global__ void genPatternArray(
 }
 
 
+// Insert image pixel indices into buckets
 __global__ void buildBuckets(
         Dynamic_Bitset_Array_GPU mask,
         Dynamic_Bitset_Array_GPU patterns,
@@ -211,12 +225,13 @@ __global__ void getPointCloud2Cam(
         float *camMat0,
         float *distMat0,
         float *camTransMat0,
+        uchar* color0,
 
         GPUBucketsObj buckets1,
         float *camMat1,
         float *distMat1,
         float *camTransMat1,
-
+        uchar* color1,
 
         uint camResX,
         uint camResY,
@@ -241,6 +256,8 @@ __global__ void getPointCloud2Cam(
         {
             //Undistorted pixels
             float minDist = 99999.0;
+            uint minIdx0 = 0;
+            uint minIdx1 = 0;
             float minMidPoint[4];
 
             float avgPoint[4];
@@ -288,6 +305,8 @@ __global__ void getPointCloud2Cam(
                     ptCount++;
                     if (dist < minDist)
                     {
+                        minIdx0 = buckets0.data_[idx*buckets0.MAX_CNT_PER_BKT_+i];
+                        minIdx1 = buckets1.data_[idx*buckets1.MAX_CNT_PER_BKT_+j];
                         minDist = dist;
                         memcpy (minMidPoint, midPoint, sizeof(float)*4);
                     }
@@ -296,7 +315,12 @@ __global__ void getPointCloud2Cam(
             avgPoint[1] /= (float)ptCount;
             avgPoint[2] /= (float)ptCount;
             avgPoint[3] = 1.0;
+            float color[3] = {0.0, 0.0, 0.0};
+            color[0] = float(color0[minIdx0*3] + color1[minIdx1*3])/2;
+            color[1] = float(color0[minIdx0*3+1] + color1[minIdx1*3+1])/2;
+            color[2] = float(color0[minIdx0*3+2] + color1[minIdx1*3+2])/2;
             memcpy ( &pointCloud[6*idx], avgPoint, sizeof(float)*3);
+            memcpy ( &pointCloud[6*idx+3], color, sizeof(float)*3);
         }
         idx += stride;
     }
