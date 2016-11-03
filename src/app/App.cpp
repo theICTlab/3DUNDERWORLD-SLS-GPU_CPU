@@ -1,4 +1,4 @@
-#include <core/fileReader.h>
+#include <core/FileReader.h>
 #include <core/Reconstructor.h>
 #include <core/log.hpp>
 #include <glm/gtx/string_cast.hpp>

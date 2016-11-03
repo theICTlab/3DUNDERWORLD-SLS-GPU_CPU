@@ -1,4 +1,4 @@
-#include "fileReader.h"
+#include "FileReader.h"
 #include <glm/gtx/string_cast.hpp>
 #include <iomanip>
 #include <fstream>

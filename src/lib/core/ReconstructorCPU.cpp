@@ -1,6 +1,6 @@
 #include <iomanip>
 #include "ReconstructorCPU.h"
-#include "fileReader.h"
+#include "FileReader.h"
 #include <limits>
 
 namespace SLS{

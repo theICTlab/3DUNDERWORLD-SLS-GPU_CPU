@@ -1,5 +1,5 @@
 #include <ReconstructorCUDA/Dynamic_bits.cuh>
-#include <ReconstructorCUDA/fileReaderCUDA.cuh>
+#include <ReconstructorCUDA/FileReaderCUDA.cuh>
 #include <ReconstructorCUDA/ReconstructorCUDA.cuh>
 #include "cmdline.h"
 

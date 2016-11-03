@@ -1,5 +1,5 @@
 #pragma once
-#include <core/fileReader.h>
+#include <core/FileReader.h>
 #include "Dynamic_bits.cuh"
 #include <string>
 namespace SLS
@@ -7,7 +7,7 @@ namespace SLS
 class FileReaderCUDA: public FileReader
 {
 protected:
-    Dynamic_Bitset_Array *maskGPU_; // Sorry can't init before reading the image
+    Dynamic_Bitset_Array *maskGPU_; // Sorry can't init before reading the images
 
     // Init configurations in device
     std::array<float*, PARAM_COUNT> params_d_;

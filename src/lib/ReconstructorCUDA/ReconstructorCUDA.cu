@@ -1,6 +1,6 @@
 #include <device_launch_parameters.h>
 #include "ReconstructorCUDA.cuh"
-#include "fileReaderCUDA.cuh"
+#include "FileReaderCUDA.cuh"
 namespace SLS
 {
 
@@ -316,9 +316,10 @@ __global__ void getPointCloud2Cam(
             avgPoint[2] /= (float)ptCount;
             avgPoint[3] = 1.0;
             float color[3] = {0.0, 0.0, 0.0};
-            color[0] = float(color0[minIdx0*3] + color1[minIdx1*3])/2;
+            // OpenCV BGR to RGB
+            color[2] = float(color0[minIdx0*3] + color1[minIdx1*3])/2;
             color[1] = float(color0[minIdx0*3+1] + color1[minIdx1*3+1])/2;
-            color[2] = float(color0[minIdx0*3+2] + color1[minIdx1*3+2])/2;
+            color[0] = float(color0[minIdx0*3+2] + color1[minIdx1*3+2])/2;
             memcpy ( &pointCloud[6*idx], avgPoint, sizeof(float)*3);
             memcpy ( &pointCloud[6*idx+3], color, sizeof(float)*3);
         }

@@ -1,5 +1,5 @@
 #pragma once
-#include <core/fileReader.h>
+#include <core/FileReader.h>
 #include <string>
 #include <condition_variable>
 

@@ -90,6 +90,7 @@ public:
     void getColor(size_t x, size_t y, unsigned char &r, unsigned char &g, unsigned char &b) const
     {
         auto color = color_.at<cv::Vec3b>(y, x);
+        // OpenCV BGR
         b = color.val[0];
         g = color.val[1];
         r = color.val[2];

@@ -1,5 +1,5 @@
 
-#include "fileReaderCUDA.cuh"
+#include "FileReaderCUDA.cuh"
 #include <device_launch_parameters.h>
 
 namespace SLS

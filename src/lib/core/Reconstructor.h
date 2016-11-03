@@ -19,7 +19,7 @@
 #include <vector>
 #include "./Camera.h"
 #include "./Projector.h"
-#include <core/exporter.hpp>
+#include <core/Exporter.hpp>
 namespace SLS
 {
 /**
