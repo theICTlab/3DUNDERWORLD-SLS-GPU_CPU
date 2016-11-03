@@ -1,5 +1,5 @@
 #include "DynamicBits.cuh"
-#include <core/Dynamic_Bitset.h>
+#include <core/DynamicBitset.h>
 #include <cassert>
 #include <fstream>
 namespace SLS

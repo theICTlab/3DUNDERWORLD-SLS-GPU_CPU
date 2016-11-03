@@ -48,7 +48,7 @@ public:
 
 
     //Extra functions
-    void loadImages(const std::string& folder, bool isGL=false);
+    void loadImages(const std::string& folder, std::string suffix="jpg", bool isGL=false);
     void previousFrame() {frameIdx_=frameIdx_==0?frameIdx_:frameIdx_-1;}
     const cv::Mat& getCurrentFrame() const {return images_[frameIdx_];}
     size_t getNumFrames() const { return images_.size(); }

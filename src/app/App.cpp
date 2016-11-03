@@ -14,7 +14,14 @@ int main(int argc, char** argv)
     p.add<std::string>("leftconfig", 'L',"Left camera configuration file", false, "../../data/alexander/leftCam/calib/output/calib.xml");
     p.add<std::string>("rightconfig", 'R',"Right camera configuration file", false, "../../data/alexander/rightCam/calib/output/calib.xml");
     p.add<std::string>("output", 'o',"Right camera configuration file", false, "output.ply");
+    p.add<std::string>("format", 'f',"suffix of image files, e.g. .jpg", false, ".jpg");
+    p.add<size_t>("width", 'w',"Projector width", false, 1024);
+    p.add<size_t>("height", 'h',"Projector height", false, 768);
     p.parse_check(argc, argv);
+
+    // TODO: Add parameters
+    // 1. file suffix 
+    // 2. projector resolution
 
     LOG::restartLog();
     std::string leftCameraFolder = p.get<std::string>("leftcam");
@@ -22,6 +29,7 @@ int main(int argc, char** argv)
     std::string leftConfigFile = p.get<std::string>("leftconfig");
     std::string rightConfigFile = p.get<std::string>("rightconfig");
     std::string output = p.get<std::string>("output");
+    std::string suffix = p.get<std::string>("format");
 
     SLS::FileReader *rightCam=new SLS::FileReader("rightCamera");
     SLS::FileReader *leftCam= new SLS::FileReader("leftCamera");
@@ -36,6 +44,7 @@ int main(int argc, char** argv)
     SLS::ReconstructorCPU reconstruct(1024,768);
     reconstruct.addCamera(rightCam);
     reconstruct.addCamera(leftCam);
+
     reconstruct.reconstruct();
 
     SLS::exportPointCloud(output, "PLY", reconstruct);

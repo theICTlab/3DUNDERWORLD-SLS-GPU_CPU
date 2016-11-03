@@ -36,9 +36,11 @@ public:
     void getSize(size_t &w, size_t &h){w = width_; h = height_;}
     size_t getWidth() const {return width_;}
     size_t getHeight() const {return height_;}
+    size_t getNumPixels() const {return width_ * height_;}
     size_t getRequiredNumFrames() const
     {
-        return (size_t )std::ceil(std::log2((float)width_*(float)height_));
+        return (size_t)std::ceil(std::log2(width_))+std::ceil(std::log2(height_));
+        //return (size_t )std::ceil(std::log2((float)width_*(float)height_));   // hmmm TODO: Figure out why it doesn't work
     }
 };
 }
