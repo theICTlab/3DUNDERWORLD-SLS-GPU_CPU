@@ -1,4 +1,4 @@
-#include "Dynamic_Bitset.h"
+#include "DynamicBitset.h"
 namespace SLS{
 bool Dynamic_Bitset::writeToPGM( std::string fileName, const size_t &w, const size_t &h, bool transpose)
 {

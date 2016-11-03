@@ -1,4 +1,4 @@
-#include "Dynamic_bits.cuh"
+#include "DynamicBits.cuh"
 #include <core/Dynamic_Bitset.h>
 #include <cassert>
 #include <fstream>

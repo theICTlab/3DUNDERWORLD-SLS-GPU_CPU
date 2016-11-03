@@ -21,7 +21,7 @@
 #include <array>
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include "Dynamic_Bitset.h"
+#include "DynamicBitset.h"
 #include <glm/glm.hpp>
 #include "Ray.h"
 

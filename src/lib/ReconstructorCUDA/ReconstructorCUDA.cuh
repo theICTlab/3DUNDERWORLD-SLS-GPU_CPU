@@ -1,7 +1,7 @@
 #pragma once
 #include <core/Reconstructor.h>
-#include <core/log.hpp>
-#include "Dynamic_bits.cuh"
+#include <core/Log.hpp>
+#include "DynamicBits.cuh"
 #include <vector>
 
 namespace SLS

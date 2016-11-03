@@ -1,6 +1,6 @@
 #pragma once
 #include <core/FileReader.h>
-#include "Dynamic_bits.cuh"
+#include "DynamicBits.cuh"
 #include <string>
 namespace SLS
 {

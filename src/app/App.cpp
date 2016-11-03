@@ -1,6 +1,6 @@
 #include <core/FileReader.h>
 #include <core/Reconstructor.h>
-#include <core/log.hpp>
+#include <core/Log.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <core/ReconstructorCPU.h>
 #include "cmdline.h"

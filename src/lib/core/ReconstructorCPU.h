@@ -17,7 +17,7 @@
  */
 #pragma once
 #include "Reconstructor.h"
-#include "log.hpp"
+#include "Log.hpp"
 #include <new>
 namespace SLS
 {

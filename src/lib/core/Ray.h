@@ -2,7 +2,7 @@
 #define GLM_FORCE_CUDA
 #include <glm/glm.hpp>
 //#include <glm/gtx/string_cast.hpp>
-#include "log.hpp"
+#include "Log.hpp"
 using namespace glm;
 namespace SLS
 {
