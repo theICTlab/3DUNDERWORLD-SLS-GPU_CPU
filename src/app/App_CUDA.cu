@@ -10,6 +10,9 @@ int main(int argc, char** argv)
     p.add<std::string>("leftconfig", 'L',"Left camera configuration file", false, "../../data/alexander/leftCam/calib/output/calib.xml");
     p.add<std::string>("rightconfig", 'R',"Right camera configuration file", false, "../../data/alexander/rightCam/calib/output/calib.xml");
     p.add<std::string>("output", 'o',"Right camera configuration file", false, "output.ply");
+    p.add<std::string>("format", 'f',"suffix of image files, e.g. .jpg", false, ".jpg");
+    p.add<size_t>("width", 'w',"Projector width", false, 1024);
+    p.add<size_t>("height", 'h',"Projector height", false, 768);
     p.parse_check(argc, argv);
 
     LOG::restartLog();
@@ -22,15 +25,17 @@ int main(int argc, char** argv)
     LOG::restartLog();
     SLS::FileReaderCUDA *rightCam=new SLS::FileReaderCUDA("rightCamera");
     SLS::FileReaderCUDA *leftCam= new SLS::FileReaderCUDA("leftCamera");
+
     rightCam->loadImages(rightCameraFolder);
     leftCam->loadImages(leftCameraFolder);
     rightCam->loadConfig(rightConfigFile);
     leftCam->loadConfig(leftConfigFile);
+
     SLS::ReconstructorCUDA reconstruct(1024,768);
     reconstruct.addCamera(rightCam);
     reconstruct.addCamera(leftCam);
     reconstruct.reconstruct();
-    //SLS::exportOBJVec4(output,  reconstruct);
+
     SLS::exportPointCloud(output, "PLY", reconstruct);
     LOG::writeLog("DONE\n");
     return 0;

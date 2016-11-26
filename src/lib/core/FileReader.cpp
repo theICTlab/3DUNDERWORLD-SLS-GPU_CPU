@@ -19,6 +19,7 @@ void FileReader::loadImages(const std::string& folder, std::string suffix, bool 
         // TODO: fix Quick hack
         jpgss<<std::setfill('0')<<std::setw(4)<<images_.size()<<"."<<suffix;
         std::string fName = ss.str()+jpgss.str();
+        LOG::writeLog("Loading file %s: ", fName.c_str());
         cv::Mat img=cv::imread(fName, CV_LOAD_IMAGE_COLOR);
         if (!img.data)
             break;

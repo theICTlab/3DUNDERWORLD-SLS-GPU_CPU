@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     p.add<std::string>("leftconfig", 'L',"Left camera configuration file", false, "../../data/alexander/leftCam/calib/output/calib.xml");
     p.add<std::string>("rightconfig", 'R',"Right camera configuration file", false, "../../data/alexander/rightCam/calib/output/calib.xml");
     p.add<std::string>("output", 'o',"Right camera configuration file", false, "output.ply");
-    p.add<std::string>("format", 'f',"suffix of image files, e.g. .jpg", false, ".jpg");
+    p.add<std::string>("format", 'f',"suffix of image files, e.g. jpg", false, "jpg");
     p.add<size_t>("width", 'w',"Projector width", false, 1024);
     p.add<size_t>("height", 'h',"Projector height", false, 768);
     p.parse_check(argc, argv);
@@ -34,14 +34,13 @@ int main(int argc, char** argv)
     SLS::FileReader *rightCam=new SLS::FileReader("rightCamera");
     SLS::FileReader *leftCam= new SLS::FileReader("leftCamera");
 
-    rightCam->loadImages(rightCameraFolder);
-    leftCam->loadImages(leftCameraFolder);
+    rightCam->loadImages(rightCameraFolder, suffix);
+    leftCam->loadImages(leftCameraFolder, suffix);
 
     rightCam->loadConfig(rightConfigFile);
     leftCam->loadConfig(leftConfigFile);
 
-    
-    SLS::ReconstructorCPU reconstruct(1024,768);
+    SLS::ReconstructorCPU reconstruct(p.get<size_t>("width"), p.get<size_t>("height"));
     reconstruct.addCamera(rightCam);
     reconstruct.addCamera(leftCam);
 
