@@ -35,7 +35,6 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 #Detecting CUDA
 find_package(CUDA)
-include_directories(${CUDA_INCLUDE_DIRS})
 # Set default ENABLE_CUDA value
 if (NOT DEFINED ${ENABLE_CUDA})
     if (${CUDA_FOUND})
@@ -47,6 +46,7 @@ endif (NOT DEFINED ${ENABLE_CUDA})
 
 if (${CUDA_FOUND} AND ${ENABLE_CUDA})
     set( USE_CUDA on)
+    include_directories(${CUDA_INCLUDE_DIRS})
     set(CUDA_PROPAGATE_HOST_FLAGS OFF)
     list(APPEND CUDA_NVCC_FLAGS "-O2 -std=c++11 -D__STRICT_ANSI__ -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES")
 else (${CUDA_FOUND} AND ${ENABLE_CUDA})
@@ -72,6 +72,7 @@ add_subdirectory(./src/lib/GrayCode)
 add_subdirectory(./src/lib/calibration)
 add_subdirectory(./src/lib/core)
 add_subdirectory(./src/app)
+#add_subdirectory(./test)
 
 set_target_properties ( SLS
     PROPERTIES

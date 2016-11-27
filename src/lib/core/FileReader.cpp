@@ -19,7 +19,7 @@ void FileReader::loadImages(const std::string& folder, std::string suffix, bool 
         // TODO: fix Quick hack
         jpgss<<std::setfill('0')<<std::setw(4)<<images_.size()<<"."<<suffix;
         std::string fName = ss.str()+jpgss.str();
-        LOG::writeLog("Loading file %s: ", fName.c_str());
+        LOG::writeLog("Loading file: %s \n", fName.c_str());
         cv::Mat img=cv::imread(fName, CV_LOAD_IMAGE_COLOR);
         if (!img.data)
             break;
@@ -127,9 +127,9 @@ void FileReader::computeShadowsAndThresholds()
     cv::Mat& brightImg=images_[0];
     cv::Mat& darkImg=images_[1];
     shadowMask_.resize(resX_*resY_); 
-    cv::waitKey(0);
     //Column based
     for (size_t i=0; i< resX_; i++)
+    {
         for (size_t j=0; j<resY_; j++)
         {
             auto diff = brightImg.at<uchar>(j,i) - darkImg.at<uchar>(j,i);
@@ -141,6 +141,7 @@ void FileReader::computeShadowsAndThresholds()
             thresholds_[j+i*resY_]=diff/2;
 #endif
         }
+    }
     // Output mask
     std::string pgmFName=name_+".pgm";
     LOG::writeLog("Writing mask to %s\n", pgmFName.c_str());

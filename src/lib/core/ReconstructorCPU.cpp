@@ -7,8 +7,6 @@ namespace SLS{
 
 ReconstructorCPU::~ReconstructorCPU()
 {
-    for (auto &cam: cameras_)
-        delete cam;
     delete projector_;
 }
 void ReconstructorCPU::initBuckets()
@@ -20,10 +18,12 @@ void ReconstructorCPU::initBuckets()
         b.resize(x*y);
     generateBuckets();
 }
+
 void ReconstructorCPU::addCamera(Camera *cam)
 {
     cameras_.push_back(cam);
 }
+
 void ReconstructorCPU::generateBuckets()
 {
     //Generating reconstruction bucket for each camera

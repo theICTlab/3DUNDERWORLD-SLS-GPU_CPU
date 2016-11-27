@@ -1,6 +1,7 @@
 #include "Exporter.hpp"
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 
 namespace SLS
 {
@@ -50,25 +51,16 @@ void exportPLYGrid(std::string fileName, const Reconstructor& reconstructor)
 
 // Refactoring export functions
 
+
 void exportPointCloud(std::string fileName, std::string type, const Reconstructor& reconstructor)
 {
-    std::hash<std::string> hashFunc;
-    switch (hashFunc(type)){
-        case (const size_t)15537605204898678351U: // "OBJ"
-        case (const size_t)7208462448059259249U:  // "obj"
-            exportPointCloud2OBJ(fileName, reconstructor.pointCloud_);
-            break;
-        case (const size_t)9263517021921177413U:    //"PLY"
-        case (const size_t)15116060116567580642U:   //"ply"
-            exportPointCloud2PLY(fileName, reconstructor.pointCloud_);
-            break;
+    std::unordered_map<std::string, std::function<void(std::string, const std::vector<float>&)>> dispatcher;
+    dispatcher["ply"] = exportPointCloud2PLY;
+    dispatcher["obj"] = exportPointCloud2OBJ;
 
-        default:
-            std::cerr<<type<<" is not supported\n";
-            break;
-
-    }
+    dispatcher[type](fileName, reconstructor.pointCloud_);
 }
+
 void exportPointCloud2OBJ(std::string fileName, const std::vector<float> &pointCloud)
 {
     LOG::startTimer("Exporting OBJ to %s ... ", fileName.c_str());
