@@ -4,7 +4,7 @@ build
 *.pgm
 *.log
 temp
-data
+./data
 !data/alexander
 YCM-Generator
 *.swp

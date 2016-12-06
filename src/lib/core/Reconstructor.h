@@ -37,6 +37,7 @@ protected:
 public:
     Reconstructor():projector_{nullptr}{};
     virtual ~Reconstructor(){}
+    const std::vector<float> getPointCloud() const {return pointCloud_;}
 
     // Interfaces
     virtual void reconstruct()=0;
