@@ -1,13 +1,29 @@
-#include <gtest/gtest.h>
 #include <fstream>
 #include <core/FileReader.h>
 #include <core/ReconstructorCPU.h>
 #include "splitstring.h"
+#include <gtest/gtest.h>
+
+const float MAX_DIFF = 0.5;
 
 inline bool comparePlyLine(std::string line1, std::string line2)
 {
-    return false;
+    if (!std::isdigit(line1[0]) && !std::isdigit(line1[1]))    // if is header
+        return line1 == line2;
+
+    splitstring split1(line1);
+    splitstring split2(line2);
+    vector<std::string> splited1 = split1.split(' ');
+    vector<std::string> splited2 = split2.split(' ');
+    if (splited1.size() > 0 && splited2.size() > 0)
+    {
+        for (size_t i=0 ; i<splited1.size(); i++)
+            if ( std::fabs( std::stof(splited1[i]) - std::stof(splited2[i]) ) > MAX_DIFF)
+                return false;
+    }
+    return true;
 }
+
 inline bool compareObjLine(std::string line1, std::string line2)
 {
     splitstring split1(line1);
@@ -17,29 +33,41 @@ inline bool compareObjLine(std::string line1, std::string line2)
     if (splited1.size() > 0 && splited2.size() > 0)
     {
         for (size_t i=1 ; i<splited1.size(); i++)
-            if ( std::fabs( std::stof(splited1[i]) - std::stof(splited2[i]) ) > 0.001)
+            if ( std::fabs( std::stof(splited1[i]) - std::stof(splited2[i]) ) > MAX_DIFF)
                 return false;
     }
     return true;
 }
-bool compareFiles(std::string file1, std::string file2)
+
+bool compareObjFiles(std::string file1, std::string file2)
 {
     std::fstream is1, is2;
     std::string buf1, buf2;
     is1.open(file1); is2.open(file2);
     while (std::getline( is1, buf1))
     {
-        if (! std::getline(is2, buf2)) return false; // sorter
+        if (! std::getline(is2, buf2)) return false; // shorter
         if (! compareObjLine(buf1, buf2)) return false;
     }
     if (std::getline(is2, buf2)) return false;  // longer
     return true;
 }
 
-bool compareOBJs(std::string file1, std::string file2)
+bool comparePlyFiles(std::string file1, std::string file2)
 {
+    std::fstream is1, is2;
+    std::string buf1, buf2;
+    is1.open(file1); is2.open(file2);
+    while (std::getline( is1, buf1))
+    {
+        if (! std::getline(is2, buf2)) return false; // shorter
+        if (! comparePlyLine(buf1, buf2)) return false;
+    }
+    if (std::getline(is2, buf2)) return false;  // longer
+    return true;
 }
-TEST( SLS_CPU, Arc)
+
+TEST( RunCPUTest, Arc)
 {
     const std::string L_IMGS = "../../data/arc/leftCam/dataset1/";
     const std::string L_CFG = "../../data/arc/leftCam/calib/output/calib.xml";
@@ -66,13 +94,41 @@ TEST( SLS_CPU, Arc)
 
     SLS::exportPointCloud( O_PLY, "ply", rec);
     SLS::exportPointCloud( O_OBJ, "obj", rec);
-    //EXPECT_TRUE(compareFiles(TEST_PLY, O_PLY));
-    EXPECT_TRUE(compareFiles(TEST_OBJ, O_OBJ));
-
+    EXPECT_TRUE(compareObjFiles(TEST_OBJ, O_OBJ));
+    EXPECT_TRUE(comparePlyFiles(TEST_PLY, TEST_PLY));
+    EXPECT_TRUE(true);
 }
 
-int main(int argc, char** argv)
+TEST( RunCPUTest, Alexander)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    const std::string L_IMGS = "../../data/alexander/leftCam/dataset1/";
+    const std::string L_CFG = "../../data/alexander/leftCam/calib/output/calib.xml";
+    const std::string R_IMGS = "../../data/alexander/rightCam/dataset1/";
+    const std::string R_CFG = "../../data/alexander/rightCam/calib/output/calib.xml";
+    const std::string SUFFIX = "jpg";
+    const size_t W=1024, H=768;
+    const std::string TEST_PLY = "../../test/data/alexander.ply";
+    const std::string TEST_OBJ = "../../test/data/alexander.obj";
+    const std::string O_PLY="alexander.ply", O_OBJ="alexander.obj";
+
+    auto RC = SLS::FileReader("RightCamera");
+    RC.loadImages(R_IMGS, SUFFIX);
+    RC.loadConfig(R_CFG);
+
+    auto LC = SLS::FileReader("LeftCamera");
+    LC.loadImages(L_IMGS, SUFFIX);
+    LC.loadConfig(L_CFG);
+
+    SLS::ReconstructorCPU rec(W, H);
+    rec.addCamera(&LC);
+    rec.addCamera(&RC);
+    rec.reconstruct();
+
+    SLS::exportPointCloud( O_PLY, "ply", rec);
+    SLS::exportPointCloud( O_OBJ, "obj", rec);
+    EXPECT_TRUE(compareObjFiles(TEST_OBJ, O_OBJ));
+    EXPECT_TRUE(comparePlyFiles(TEST_PLY, TEST_PLY));
+    EXPECT_TRUE(true);
 }
+
+
