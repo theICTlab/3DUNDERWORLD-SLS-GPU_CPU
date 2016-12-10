@@ -7,7 +7,7 @@ install:
     - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
     - wget https://github.com/g-truc/glm/archive/0.9.8.3.tar.gz
     - tar -xzvf 0.9.8.3.tar.gz
-    - cd glm-0.9.8.3 && make && make install
+    - cd glm-0.9.8.3 && cmake . && make && make install
 addons:
     apt:
         sources:
