@@ -4,7 +4,6 @@
 
 namespace SLS
 {
-    std::condition_variable Calibrator::cv;
     bool Calibrator::closeAsynImg=false;
     // Callbacks !!
     void calib_board_corners_mouse_callback( int event, int x, int y, int flags, void* param )

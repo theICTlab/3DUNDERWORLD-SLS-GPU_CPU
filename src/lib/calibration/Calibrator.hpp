@@ -10,7 +10,6 @@ namespace SLS
 class Calibrator
 {
 
-    static std::condition_variable cv;
     static bool closeAsynImg;
 
     static void showImgAsync(const cv::Mat &img, const std::string &windowName)
