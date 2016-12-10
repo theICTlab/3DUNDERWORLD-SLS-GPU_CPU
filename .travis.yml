@@ -8,6 +8,7 @@ install:
     - wget https://github.com/g-truc/glm/archive/0.9.8.3.tar.gz
     - tar -xzvf 0.9.8.3.tar.gz
     - cd glm-0.9.8.3 && cmake . && make && sudo make install
+    - cd .. # Need to cd back
 addons:
     apt:
         sources:
