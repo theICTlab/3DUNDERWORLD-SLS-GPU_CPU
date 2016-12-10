@@ -25,6 +25,6 @@ addons:
 before_script:
     - mkdir build
     - cd build
-    - cmake ..
+    - cmake .. -DGTEST=ON -DENABLE_CUDA=OFF
 script: make && make test
 
