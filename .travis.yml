@@ -5,6 +5,9 @@ compiler:
     - clang
 install:
     - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+    - wget https://github.com/g-truc/glm/archive/0.9.8.3.tar.gz
+    - tar -xzvf 0.9.8.3.tar.gz
+    - cd glm-0.9.8.3 && make && make install
 addons:
     apt:
         sources:
@@ -17,7 +20,6 @@ addons:
             - g++-4.8
             - clang
             - libopencv-dev
-            - libglm-dev
 before_script:
     - mkdir build
     - cd build
