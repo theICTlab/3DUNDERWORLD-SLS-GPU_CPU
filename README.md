@@ -1,5 +1,6 @@
 # 3DUNDERWORLD-Structured-Light-Scanner
 [![status](http://joss.theoj.org/papers/4329bcbc7bba33961a5e749dcacb995b/status.svg)](http://joss.theoj.org/papers/4329bcbc7bba33961a5e749dcacb995b)
+![build](https://travis-ci.org/theICTlab/3DUNDERWORLD-SLS-GPU_CPU.svg?branch=dev)
 
 Structured light scanner is a tool to reconstruct point cloud from series of images lit by patterned light. As showing in the following image, patterns are projected to the object in the grid manner. Each cell in the grid has a unique sequence. The corresponding points can be extracted by decoding the sequences from both images.
 ![img](https://raw.githubusercontent.com/theICTlab/3DUNDERWORLD-SLS-GPU_CPU/dev/screenshots/flow.png)
