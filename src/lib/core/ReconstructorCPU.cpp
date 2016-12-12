@@ -94,12 +94,13 @@ void ReconstructorCPU::generateBuckets()
                 }
             }
         }
+
+        // Keep track of maximum number of pixels in a grid
         unsigned  maxCount = 0;
         for (const auto &bucket: buckets_[camIdx]){
             if (bucket.size() > maxCount)
                 maxCount = bucket.size();
         }
-        std::cout<<"Max count = "<<maxCount<<std::endl;
     }
 
 }

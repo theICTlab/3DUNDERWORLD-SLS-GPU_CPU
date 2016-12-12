@@ -155,7 +155,6 @@ Ray FileReader::getRay(const size_t &x, const size_t &y)
         if (undistorted.x > resX_ || undistorted.y > resY_)
         {
             ray.dir = vec4(0.0);
-            LOG::writeLogErr("Invalid ray");
             return ray;
         }
         ray.origin = camTransMat_*glm::vec4(0.0,0.0,0.0,1.0);
@@ -175,7 +174,6 @@ Ray FileReader::getRay(const size_t &pixelIdx)
         if (undistorted.x > resX_ || undistorted.y > resY_)
         {
             ray.dir = vec4(0.0);
-            LOG::writeLogErr("Invalid ray");
             return ray;
         }
 

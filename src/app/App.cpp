@@ -20,10 +20,6 @@ int main(int argc, char** argv)
     p.add<size_t>("height", 'h',"Projector height", false, 768);
     p.parse_check(argc, argv);
 
-    // TODO: Add parameters
-    // 1. file suffix 
-    // 2. projector resolution
-
     LOG::restartLog();
     std::string leftCameraFolder = p.get<std::string>("leftcam");
     std::string rightCameraFolder = p.get<std::string>("rightcam");
@@ -32,18 +28,19 @@ int main(int argc, char** argv)
     std::string output = p.get<std::string>("output");
     std::string suffix = p.get<std::string>("format");
 
-    auto rightCam = std::unique_ptr<SLS::FileReader>(new SLS::FileReader("rightCamera"));
-    auto leftCam = std::unique_ptr<SLS::FileReader>(new SLS::FileReader("leftCamera"));
 
-    rightCam->loadImages(rightCameraFolder, suffix);
-    leftCam->loadImages(leftCameraFolder, suffix);
+    SLS::FileReader rightCam("rightCam");
+    SLS::FileReader leftCam("rightCam");
 
-    rightCam->loadConfig(rightConfigFile);
-    leftCam->loadConfig(leftConfigFile);
+    rightCam.loadImages(rightCameraFolder, suffix);
+    leftCam.loadImages(leftCameraFolder, suffix);
+
+    rightCam.loadConfig(rightConfigFile);
+    leftCam.loadConfig(leftConfigFile);
 
     SLS::ReconstructorCPU reconstruct(p.get<size_t>("width"), p.get<size_t>("height"));
-    reconstruct.addCamera(rightCam.get());
-    reconstruct.addCamera(leftCam.get());
+    reconstruct.addCamera(&rightCam);
+    reconstruct.addCamera(&leftCam);
 
     reconstruct.reconstruct();
 
