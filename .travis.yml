@@ -23,6 +23,7 @@ addons:
             - clang
             - libopencv-dev
 before_script:
+    - git submodule update --recursive --remote
     - mkdir build
     - cd build
     - cmake .. -DGTEST=ON -DENABLE_CUDA=OFF
