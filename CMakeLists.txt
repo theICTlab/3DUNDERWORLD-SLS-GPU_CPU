@@ -26,8 +26,9 @@ project( SLS )
 # Include this project
 include_directories(./src/lib)
 
-find_package( glm REQUIRED )
-include_directories(${glm_DIR})
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+find_package( GLM REQUIRED )
+include_directories(${GLM_INCLUDE_DIR})
 
 
 find_package( OpenCV REQUIRED )
