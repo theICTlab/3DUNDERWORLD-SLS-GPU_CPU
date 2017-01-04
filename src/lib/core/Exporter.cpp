@@ -26,13 +26,13 @@ void exportPLYGrid(std::string fileName, const Reconstructor& reconstructor)
     LOG::endTimer();
     of<<"property list uchar int vertex_indices\n";
     of<<"end_header\n";
-    for (size_t i=0; i<pointCloud.size(); i+=4)
+    for (size_t i=0; i<pointCloud.size(); i+=3)
     {
         of<<pointCloud[i+0]<<" "<<pointCloud[i+1]<<" "<<pointCloud[i+2]<<std::endl;
     }
     std::cout<<"PointCloud size: "<<pointCloud.size()<<std::endl;
     std::vector<bool> ranged_grid(reconstructor.projector_->getHeight()*reconstructor.projector_->getWidth(), false);
-    for (size_t i=0; i<pointCloud.size(); i+=4)
+    for (size_t i=0; i<pointCloud.size(); i+=3)
     {
         unsigned clmBasedIdx = i/4;
         unsigned x = clmBasedIdx / reconstructor.projector_->getHeight();
@@ -58,8 +58,21 @@ void exportPointCloud(std::string fileName, std::string type, const Reconstructo
     std::unordered_map<std::string, std::function<void(std::string, const std::vector<float>&)>> dispatcher;
     dispatcher["ply"] = exportPointCloud2PLY;
     dispatcher["obj"] = exportPointCloud2OBJ;
+    dispatcher["raw"] = dumpRawPointCloud;
 
     dispatcher[type](fileName, reconstructor.pointCloud_);
+}
+
+void dumpRawPointCloud(std::string fileName, const std::vector<float> &pointCloud)
+{
+    LOG::startTimer("Dump raw point cloud to %s ... ", fileName.c_str());
+    std::ofstream of(fileName, std::ofstream::out);
+    for (size_t i=0; i<pointCloud.size(); i+=6)
+        if ( pointCloud[i] != 0)
+            of<<pointCloud[i]<<" "<<pointCloud[i+1]<<" "<<pointCloud[i+2]<<
+                pointCloud[i+3]<<pointCloud[i+4]<<pointCloud[i+5]<<std::endl;
+    of.close();
+    LOG::endTimer();
 }
 
 void exportPointCloud2OBJ(std::string fileName, const std::vector<float> &pointCloud)
@@ -67,7 +80,8 @@ void exportPointCloud2OBJ(std::string fileName, const std::vector<float> &pointC
     LOG::startTimer("Exporting OBJ to %s ... ", fileName.c_str());
     std::ofstream of(fileName, std::ofstream::out);
     for (size_t i=0; i<pointCloud.size(); i+=6)
-        of<<"v "<<pointCloud[i]<<" "<<pointCloud[i+1]<<" "<<pointCloud[i+2]<<std::endl;
+        if ( pointCloud[i] != 0)
+            of<<"v "<<pointCloud[i]<<" "<<pointCloud[i+1]<<" "<<pointCloud[i+2]<<std::endl;
     of.close();
     LOG::endTimer();
 }
@@ -80,20 +94,24 @@ void exportPointCloud2PLY(std::string fileName, const std::vector<float> &pointC
     std::stringstream dataSS;
   
     size_t pointCount = 0;
+    // Writing data
     for (size_t i=0; i<pointCloud.size(); i+=6)
     {
-        std::array<float, 6> p;
-        memcpy ( p.data(), &pointCloud[i], sizeof(float) * 6);
-        float sum = 0.0;
-        for (const auto &elem : p)
-            sum += abs(elem);
-        if (abs(sum - 0.0) < 0.0000001)
-            continue;
-        dataSS<<pointCloud[i+0]<<" "<<pointCloud[i+1]<<" "<<pointCloud[i+2]<<" "   
-            <<(int)pointCloud[i+3]<<" "<<(int)pointCloud[i+4]<<" "<<(int)pointCloud[i+5]<<std::endl;
-        pointCount++;
+        if ( pointCloud[i] != 0)
+        {
+            std::array<float, 6> p;
+            memcpy ( p.data(), &pointCloud[i], sizeof(float) * 6);
+            float sum = 0.0;
+            for (const auto &elem : p)
+                sum += abs(elem);
+            if (abs(sum - 0.0) < 0.0000001)
+                continue;
+            dataSS<<pointCloud[i+0]<<" "<<pointCloud[i+1]<<" "<<pointCloud[i+2]<<" "   
+                <<(int)pointCloud[i+3]<<" "<<(int)pointCloud[i+4]<<" "<<(int)pointCloud[i+5]<<std::endl;
+            pointCount++;
+        }
     }
-  // Writing Headers
+    // Writing Headers
     headerSS <<"ply\n"<<
         "format ascii 1.0\n"<<
         "element vertex "<<pointCount<<std::endl<<

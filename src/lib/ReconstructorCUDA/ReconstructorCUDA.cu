@@ -10,8 +10,6 @@ ReconstructorCUDA :: ReconstructorCUDA(const size_t projX, const size_t projY):
     projector_ = new Projector(projX, projY);
 }
 ReconstructorCUDA::~ReconstructorCUDA(){
-    for (auto &cam: cameras_)
-        delete cam;
     delete projector_;
 }
 void ReconstructorCUDA::addCamera(Camera *cam)
@@ -106,7 +104,7 @@ void ReconstructorCUDA::reconstruct()
 
 
     // some hacks down there, need to be refactored
-    // TODO: Export point cloud in (x, y, z, r, g, b) 
+    // Export point cloud in (x, y, z, r, g, b) 
     auto camera0 = (FileReaderCUDA*)(cameras_[0]);
     auto camera1 = (FileReaderCUDA*)(cameras_[1]);
     float* pointCloud_d = nullptr;  // Point cloud on device with x,y,z,r,g,b.

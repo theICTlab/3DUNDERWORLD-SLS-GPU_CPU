@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     p.add<std::string>("leftconfig", 'L',"Left camera configuration file", false, "../../data/alexander/leftCam/calib/output/calib.xml");
     p.add<std::string>("rightconfig", 'R',"Right camera configuration file", false, "../../data/alexander/rightCam/calib/output/calib.xml");
     p.add<std::string>("output", 'o',"Right camera configuration file", false, "output.ply");
-    p.add<std::string>("format", 'f',"suffix of image files, e.g. .jpg", false, ".jpg");
+    p.add<std::string>("format", 'f',"suffix of image files, e.g. jpg", false, "jpg");
     p.add<size_t>("width", 'w',"Projector width", false, 1024);
     p.add<size_t>("height", 'h',"Projector height", false, 768);
     p.parse_check(argc, argv);
@@ -21,22 +21,24 @@ int main(int argc, char** argv)
     std::string leftConfigFile = p.get<std::string>("leftconfig");
     std::string rightConfigFile = p.get<std::string>("rightconfig");
     std::string output = p.get<std::string>("output");
+    std::string suffix = p.get<std::string>("format");
 
     LOG::restartLog();
-    SLS::FileReaderCUDA *rightCam=new SLS::FileReaderCUDA("rightCamera");
-    SLS::FileReaderCUDA *leftCam= new SLS::FileReaderCUDA("leftCamera");
+    SLS::FileReaderCUDA rightCam("rightCamera");
+    SLS::FileReaderCUDA leftCam("leftCamera");
 
-    rightCam->loadImages(rightCameraFolder);
-    leftCam->loadImages(leftCameraFolder);
-    rightCam->loadConfig(rightConfigFile);
-    leftCam->loadConfig(leftConfigFile);
+    rightCam.loadImages(rightCameraFolder, suffix);
+    leftCam.loadImages(leftCameraFolder, suffix);
 
-    SLS::ReconstructorCUDA reconstruct(1024,768);
-    reconstruct.addCamera(rightCam);
-    reconstruct.addCamera(leftCam);
+    rightCam.loadConfig(rightConfigFile);
+    leftCam.loadConfig(leftConfigFile);
+
+    SLS::ReconstructorCUDA reconstruct(p.get<size_t>("width"), p.get<size_t>("height"));
+    reconstruct.addCamera(&rightCam);
+    reconstruct.addCamera(&leftCam);
     reconstruct.reconstruct();
 
-    SLS::exportPointCloud(output, "PLY", reconstruct);
+    SLS::exportPointCloud(output, "ply", reconstruct);
     LOG::writeLog("DONE\n");
     return 0;
 }
