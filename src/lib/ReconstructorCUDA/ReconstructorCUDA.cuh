@@ -133,6 +133,7 @@ __global__ void buildBuckets(
         Dynamic_Bitset_Array_GPU mask,
         Dynamic_Bitset_Array_GPU patterns,
         size_t XtimesY,
+        vec2 projectorResolution,
 
         GPUBucketsObj bkts
         );

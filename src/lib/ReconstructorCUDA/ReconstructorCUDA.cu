@@ -97,6 +97,7 @@ void ReconstructorCUDA::reconstruct()
              cam->getMask()->getGPUOBJ(),
              bitsetArray.getGPUOBJ(),
              xTimesY,
+             vec2(projector_->getWidth(), projector_->getHeight()),
              buckets[camIdx].getGPUOBJ()
             );
         gpuErrchk(cudaPeekAtLastError());
@@ -196,6 +197,7 @@ __global__ void buildBuckets(
         Dynamic_Bitset_Array_GPU mask,
         Dynamic_Bitset_Array_GPU patterns,
         size_t XtimesY,
+        vec2 projectorResolution,
 
         GPUBucketsObj bkts
         )
@@ -205,8 +207,8 @@ __global__ void buildBuckets(
     while (idx < XtimesY)   // For each pixel
     {
         glm::uvec2 bkt2v = patterns.to_uint_gray(idx);
-        if (bkt2v.x < 1024 && bkt2v.y < 768 && mask.getBit(0, idx))
-            bkts.add2Bucket(idx, bkt2v.x+bkt2v.y*1024);
+        if (bkt2v.x < projectorResolution.x && bkt2v.y < projectorResolution.y && mask.getBit(0, idx))
+            bkts.add2Bucket(idx, bkt2v.x+bkt2v.y*projectorResolution.x);
         idx += stride;
     }
 }

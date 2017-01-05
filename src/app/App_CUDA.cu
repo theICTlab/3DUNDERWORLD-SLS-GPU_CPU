@@ -38,7 +38,8 @@ int main(int argc, char** argv)
     reconstruct.addCamera(&leftCam);
     reconstruct.reconstruct();
 
-    SLS::exportPointCloud(output, "ply", reconstruct);
+    auto extension = output.substr(output.find_last_of(".")+1);
+    SLS::exportPointCloud(output, extension, reconstruct);
     LOG::writeLog("DONE\n");
     return 0;
 }
