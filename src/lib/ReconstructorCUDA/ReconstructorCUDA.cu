@@ -49,9 +49,9 @@ void ReconstructorCUDA::reconstruct()
 
         // Load color images to GPU memory
         gpuErrchk( cudaMalloc((void**)&(colors_d_[camIdx]), 
-                    sizeof(uchar)* xTimesY*3)); // num_pixel * (r,g,b)
+                    sizeof(uchar)* xTimesY * 3)); // num_pixel * (r,g,b)
         gpuErrchk( cudaMemcpy( colors_d_[camIdx], cam->getColorFrame().data,
-                    sizeof(uchar)*xTimesY, cudaMemcpyHostToDevice));
+                    sizeof(uchar) * xTimesY * 3, cudaMemcpyHostToDevice));
 
         // Skip first two frames
         cam->getNextFrame();

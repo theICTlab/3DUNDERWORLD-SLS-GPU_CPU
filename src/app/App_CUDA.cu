@@ -5,14 +5,14 @@
 int main(int argc, char** argv)
 {
     cmdline::parser p;
-    p.add<std::string>("leftcam", 'l',"Left camera image folder", false, "../../data/alexander/leftCam/dataset1/");
-    p.add<std::string>("rightcam", 'r',"Right camera image folder", false, "../../data/alexander/rightCam/dataset1/");
-    p.add<std::string>("leftconfig", 'L',"Left camera configuration file", false, "../../data/alexander/leftCam/calib/output/calib.xml");
-    p.add<std::string>("rightconfig", 'R',"Right camera configuration file", false, "../../data/alexander/rightCam/calib/output/calib.xml");
-    p.add<std::string>("output", 'o',"Right camera configuration file", false, "output.ply");
-    p.add<std::string>("format", 'f',"suffix of image files, e.g. jpg", false, "jpg");
-    p.add<size_t>("width", 'w',"Projector width", false, 1024);
-    p.add<size_t>("height", 'h',"Projector height", false, 768);
+    p.add<std::string>("leftcam", 'l',"Left camera image folder", true);
+    p.add<std::string>("rightcam", 'r',"Right camera image folder", true);
+    p.add<std::string>("leftconfig", 'L',"Left camera configuration file", true);
+    p.add<std::string>("rightconfig", 'R',"Right camera configuration file", true);
+    p.add<std::string>("output", 'o',"Right camera configuration file", true);
+    p.add<std::string>("format", 'f',"Suffix of image files, e.g. jpg", true);
+    p.add<size_t>("width", 'w',"Projector width", true);
+    p.add<size_t>("height", 'h',"Projector height", true);
     p.parse_check(argc, argv);
 
     LOG::restartLog();
