@@ -119,7 +119,7 @@ void exportPointCloud2PLY(std::string fileName, const std::vector<float> &pointC
         "property float y\n"<<
         "property float z\n"<<
         "property uchar red\n"<<
-        "property uchar geen\n"<<
+        "property uchar green\n"<<
         "property uchar blue\n"<<
         //"property list uchar int vertex_indices\n"<<
         "end_header\n";
