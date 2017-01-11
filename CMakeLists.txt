@@ -72,6 +72,14 @@ endif(${USE_CUDA})
 
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -O3")
+
+# Enable code coverage
+if (COVERAGE)
+    set (CMAKE_CXX_FLAGS "-std=c++11 -g -O0 -fprofile-arcs -ftest-coverage")
+    set (CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+endif(COVERAGE)
+
+
 add_subdirectory(./src/lib/GrayCode)
 add_subdirectory(./src/lib/calibration)
 add_subdirectory(./src/lib/core)
@@ -81,6 +89,7 @@ if (GTEST)
     enable_testing()
     add_subdirectory(./test)
 endif (GTEST)
+
 
 set_target_properties ( SLS
     PROPERTIES
