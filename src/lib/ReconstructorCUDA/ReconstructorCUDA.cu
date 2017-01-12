@@ -16,7 +16,7 @@ void ReconstructorCUDA::addCamera(Camera *cam)
 {
     cameras_.push_back(cam);
 }
-void ReconstructorCUDA::reconstruct()
+PointCloud ReconstructorCUDA::reconstruct()
 {
     // For each camera, hack
     GPUBuckets buckets[2] =
@@ -133,8 +133,9 @@ void ReconstructorCUDA::reconstruct()
             pointCloud_d
             );
     gpuErrchk(cudaPeekAtLastError());
-    pointCloud_.resize(buckets[0].getNumBKTs()*6);
-    gpuErrchk(cudaMemcpy(  pointCloud_.data(), pointCloud_d, buckets[0].getNumBKTs()*sizeof(float)*6, cudaMemcpyDeviceToHost));
+
+    PointCloud res(buckets[0].getNumBKTs());
+    gpuErrchk(cudaMemcpy(  res.getBuffer().data(), pointCloud_d, buckets[0].getNumBKTs()*sizeof(float)*6, cudaMemcpyDeviceToHost));
 
     /**** Profile *****/
     cudaEventRecord(stop);
@@ -151,6 +152,7 @@ void ReconstructorCUDA::reconstruct()
         gpuErrchk( cudaFree(ptr));
 
     LOG::writeLog("Done\n");
+    return res;
 }
 
 namespace Kernel{

@@ -90,10 +90,10 @@ TEST( RunCPUTest, Arch)
     SLS::ReconstructorCPU rec(W, H);
     rec.addCamera(&LC);
     rec.addCamera(&RC);
-    rec.reconstruct();
+    auto pc = rec.reconstruct();
 
-    SLS::exportPointCloud( O_PLY, "ply", rec);
-    SLS::exportPointCloud( O_OBJ, "obj", rec);
+    pc.exportPointCloud( O_PLY, "ply");
+    pc.exportPointCloud( O_OBJ, "obj");
     EXPECT_TRUE(compareObjFiles(TEST_OBJ, O_OBJ));
     EXPECT_TRUE(comparePlyFiles(TEST_PLY, TEST_PLY));
 }
@@ -121,10 +121,10 @@ TEST( RunCPUTest, Alexander)
     SLS::ReconstructorCPU rec(W, H);
     rec.addCamera(&LC);
     rec.addCamera(&RC);
-    rec.reconstruct();
+    auto pc = rec.reconstruct();
 
-    SLS::exportPointCloud( O_PLY, "ply", rec);
-    SLS::exportPointCloud( O_OBJ, "obj", rec);
+    pc.exportPointCloud( O_PLY, "ply");
+    pc.exportPointCloud( O_OBJ, "obj");
     EXPECT_TRUE(compareObjFiles(TEST_OBJ, O_OBJ));
     EXPECT_TRUE(comparePlyFiles(TEST_PLY, TEST_PLY));
 }

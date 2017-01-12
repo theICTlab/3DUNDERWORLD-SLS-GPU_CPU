@@ -42,10 +42,10 @@ int main(int argc, char** argv)
     reconstruct.addCamera(&rightCam);
     reconstruct.addCamera(&leftCam);
 
-    reconstruct.reconstruct();
+    auto pointCloud = reconstruct.reconstruct();
 
     auto extension = output.substr(output.find_last_of(".")+1);
-    SLS::exportPointCloud(output, extension, reconstruct);
+    //SLS::exportPointCloud(output, extension, reconstruct);
 
     LOG::writeLog("DONE!\n");
     

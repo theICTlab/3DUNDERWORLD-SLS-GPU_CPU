@@ -19,6 +19,7 @@
 #include "Reconstructor.h"
 #include "Log.hpp"
 #include <memory>
+#include <core/PointCloud.hpp>
 namespace SLS
 {
 
@@ -39,7 +40,7 @@ public:
     }
     ~ReconstructorCPU() override;
     //Interfaces
-    void reconstruct() override;
+    PointCloud reconstruct() override;
     void addCamera(Camera *cam) override;
 };
 } // namespace SLS

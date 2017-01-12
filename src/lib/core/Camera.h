@@ -87,17 +87,18 @@ public:
     {
         return color_;
     }
-    void getColor(size_t x, size_t y, unsigned char &r, unsigned char &g, unsigned char &b) const
+    glm::vec3 getColor(size_t x, size_t y) const
     {
         auto color = color_.at<cv::Vec3b>(y, x);
         // OpenCV BGR
-        b = color.val[0];
-        g = color.val[1];
-        r = color.val[2];
+        float b = (float)color.val[0];
+        float g = (float)color.val[1];
+        float r = (float)color.val[2];
+        return vec3(r, g, b);
     }
-    void getColor(size_t idx, unsigned char &r, unsigned char &g, unsigned char &b) const
+    glm::vec3 getColor(size_t idx) const
     {
-        getColor(idx/resY_, idx%resY_, r,g,b);
+        return getColor(idx/resY_, idx%resY_);
     }
 
     // Interfaces

@@ -36,10 +36,9 @@ int main(int argc, char** argv)
     SLS::ReconstructorCUDA reconstruct(p.get<size_t>("width"), p.get<size_t>("height"));
     reconstruct.addCamera(&rightCam);
     reconstruct.addCamera(&leftCam);
-    reconstruct.reconstruct();
-
+    auto pointCloud = reconstruct.reconstruct();
     auto extension = output.substr(output.find_last_of(".")+1);
-    SLS::exportPointCloud(output, extension, reconstruct);
+    pointCloud.exportPointCloud(output, extension);
     LOG::writeLog("DONE\n");
     return 0;
 }

@@ -16,7 +16,7 @@ In this version, the reconstruction process is reimplemented both on CPU and GPU
 ### Compile and run demo binaries
 Demo binaries and data is included.  A CMake script is included to compile the binaries and libraries. 
 ```bash
-git clone https://github.com/theICTlab/3DUNDERWORLD-SLS-GPU_CPU.git
+git clone --recursive https://github.com/theICTlab/3DUNDERWORLD-SLS-GPU_CPU.git
 cd 3DUNDERWORLD-SLS-GPU_CPU
 mkdir build
 cd build
@@ -40,20 +40,18 @@ make test
 ```
 Google test will be downloaded and compiled during the compilation stage. 
 
-Please note that the test requires reference file from source path, so the CMake output folder needs to be placed in the source path. (Shown as the example above). 
-
 ### Run demo binary
 ```
-usage: ./SLS [options] ... 
+usage: ./SLS --leftcam=string --rightcam=string --leftconfig=string --rightconfig=string --output=string --format=string --width=unsigned long --height=unsigned long [options] ... 
 options:
-  -l, --leftcam        Left camera image folder (string [=../../data/alexander/leftCam/dataset1/])
-  -r, --rightcam       Right camera image folder (string [=../../data/alexander/rightCam/dataset1/])
-  -L, --leftconfig     Left camera configuration file (string [=../../data/alexander/leftCam/calib/output/calib.xml])
-  -R, --rightconfig    Right camera configuration file (string [=../../data/alexander/rightCam/calib/output/calib.xml])
-  -o, --output         Right camera configuration file (string [=output.ply])
-  -f, --format         suffix of image files, e.g. jpg (string [=jpg])
-  -w, --width          Projector width (unsigned long [=1024])
-  -h, --height         Projector height (unsigned long [=768])
+  -l, --leftcam        Left camera image folder (string)
+  -r, --rightcam       Right camera image folder (string)
+  -L, --leftconfig     Left camera configuration file (string)
+  -R, --rightconfig    Right camera configuration file (string)
+  -o, --output         Right camera configuration file (string)
+  -f, --format         Suffix of image files, e.g. jpg (string)
+  -w, --width          Projector width (unsigned long)
+  -h, --height         Projector height (unsigned long)
   -?, --help           print this message
 
 ```
@@ -85,28 +83,28 @@ int main()
     // Folders contain reconstruction images
     std::string rightCameraFolder = "../../data/alexander/rightCam/dataset1/"
     std::string leftCameraFolder = "../../data/alexander/leftCam/dataset1/"
+
     // Camera configuration files
     std::string rightConfigFile = "../../data/alexander/rightCam/calib/output/calib.xml"
     std::string leftConfigFile = "../../data/alexander/leftCam/calib/output/calib.xml"
 
-    // Allocate two cameras from heap. Parameters are the names of cameras. 
 #ifdef CPU
-    SLS::FileReader *rightCam=new SLS::FileReader("rightCamera");
-    SLS::FileReader *leftCam= new SLS::FileReader("leftCamera");
+    SLS::FileReader rightCam("rightCamera");
+    SLS::FileReader leftCam("leftCamera");
 #else
-    SLS::FileReaderCUDA *rightCam=new SLS::FileReaderCUDA("rightCamera");
-    SLS::FileReaderCUDA *leftCam= new SLS::FileReaderCUDA("leftCamera");
+    SLS::FileReaderCUDA rightCam("rightCamera");
+    SLS::FileReaderCUDA leftCam("leftCamera");
 #endif
 
     // Load image from data folder
-    rightCam->loadImages(rightCameraFolder);
-    leftCam->loadImages(leftCameraFolder);
+    rightCam.loadImages(rightCameraFolder);
+    leftCam.loadImages(leftCameraFolder);
 
     // Load configuration files
-    rightCam->loadConfig(rightConfigFile);
-    leftCam->loadConfig(leftConfigFile);
+    rightCam.loadConfig(rightConfigFile);
+    leftCam.loadConfig(leftConfigFile);
 
-    // Initialize a reconstructor by passing the grid pattern size. 
+    // Initialize a reconstructor the projector resolution. 
 #ifdef CPU
     SLS::ReconstructorCPU reconstructor(1024,768);
 #else
@@ -116,10 +114,12 @@ int main()
     // Allocated resources will be released in constructor.
     reconstructor.addCamera(rightCam);
     reconstructor.addCamera(leftCam);
-    reconstructor.reconstruct();
+
+    // Reconstructor returns a point cloud
+    auto pointCloud = reconstructor.reconstruct();
 
     // Export point cloud to file.
-    SLS::exportOBJVec4(output,  reconstructor);
+    pointCloud.exportPointCloud("alexander.ply", "ply");
     return 0;
 }
 ```
@@ -130,7 +130,7 @@ Since there's no good API for cameras, the camera acquisition is not implemented
 We welcome you to implement your camera class and make a pull request to this project.
 
 Also please note that since the example data files are currently included in the repository, the size of repository is 300MB. It may take while to clone. 
-
+clone
 ## Version Information
 
 ### [v4] 

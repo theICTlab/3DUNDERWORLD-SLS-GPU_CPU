@@ -105,8 +105,10 @@ void ReconstructorCPU::generateBuckets()
 
 }
 
-void ReconstructorCPU::reconstruct()
+PointCloud ReconstructorCPU::reconstruct()
 {
+
+    PointCloud res;
     size_t x,y;
     cameras_[0]->getResolution(x,y);
     initBuckets();
@@ -149,21 +151,15 @@ void ReconstructorCPU::reconstruct()
                 }
             midPointAvg = midPointAvg/ptCount;
             {
-                pointCloud_.push_back(midPointAvg.x);
-                pointCloud_.push_back(midPointAvg.y);
-                pointCloud_.push_back(midPointAvg.z);
                 //pointCloud_.push_back(1);
-                unsigned char r0, g0, b0;
-                unsigned char r1, g1, b1;
-                cameras_[0]->getColor(minCam0Idx, r0, g0, b0);
-                cameras_[1]->getColor(minCam1Idx, r1, g1, b1);
-                pointCloud_.push_back((r0+r1)/2);
-                pointCloud_.push_back((g0+g1)/2);
-                pointCloud_.push_back((b0+b1)/2);
+                auto color0 = cameras_[0]->getColor(minCam0Idx);
+                auto color1 = cameras_[1]->getColor(minCam1Idx);
+                res.pushPoint( glm::vec3(midPointAvg), (color0 + color1) / 2.0f);
             }
         }
     }
     LOG::endTimer("Finished reconstruction in ");
+    return res;
 }
 
 

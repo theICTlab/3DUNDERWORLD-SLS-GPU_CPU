@@ -3,6 +3,7 @@
 #include <core/Log.hpp>
 #include "DynamicBits.cuh"
 #include <vector>
+#include <core/PointCloud.hpp>
 
 namespace SLS
 {
@@ -13,7 +14,7 @@ public:
      ReconstructorCUDA(const size_t projX, const size_t projY);
     ~ReconstructorCUDA() override;
     void addCamera(Camera *cam) override;
-    void reconstruct() override;
+    PointCloud reconstruct() override;
 };
 
 struct GPUBucketsObj
