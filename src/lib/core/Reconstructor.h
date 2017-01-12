@@ -19,7 +19,6 @@
 #include <vector>
 #include "./Camera.h"
 #include "./Projector.h"
-#include <core/Exporter.hpp>
 #include <core/PointCloud.hpp>
 namespace SLS
 {
