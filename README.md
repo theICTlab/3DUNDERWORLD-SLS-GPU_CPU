@@ -111,9 +111,8 @@ int main()
     SLS::ReconstructorCUDA reconstructor(1024,768);
 #endif
     // Pass cameras to the reconstructor.
-    // Allocated resources will be released in constructor.
-    reconstructor.addCamera(rightCam);
-    reconstructor.addCamera(leftCam);
+    reconstructor.addCamera(&rightCam);
+    reconstructor.addCamera(&leftCam);
 
     // Reconstructor returns a point cloud
     auto pointCloud = reconstructor.reconstruct();
