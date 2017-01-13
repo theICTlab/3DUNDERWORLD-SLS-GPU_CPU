@@ -10,7 +10,6 @@ ExternalProject_Add(gtest
     )
 
 ExternalProject_Get_Property(gtest source_dir binary_dir)
-message(STATUS "SOURCE DIR" ${surce_dir})
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -22,7 +21,7 @@ set(GTEST_LIBRARIES
     ${binary_dir}/googlemock/gtest/libgtest_main.a)
 
 
-add_executable(runCPUTest RunTest.cpp splitstring.cpp)
+add_executable(runCPUTest RunTest.cpp)
 add_dependencies(runCPUTest gtest)
 target_link_libraries(runCPUTest ${GTEST_LIBRARIES} Threads::Threads)
 target_link_libraries(runCPUTest core)
