@@ -13,7 +13,7 @@ IF(${USE_CUDA})
         )
 ENDIF(${USE_CUDA})
 
-add_executable(calibrateCamera calibrateCamera.cpp)
+add_executable(calibrateCamera CalibrateCamera.cpp)
 target_link_libraries(calibrateCamera core sls_calib)
 
 add_executable(generateGraycode generateGraycode.cpp)

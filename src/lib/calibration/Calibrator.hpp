@@ -5,8 +5,10 @@
 
 namespace SLS
 {
-    const int WINDOW_WIDTH=1024;
-    const int WINDOW_HEIGHT=768;
+
+const int WINDOW_WIDTH=1024;
+const int WINDOW_HEIGHT=768;
+
 class Calibrator
 {
 
@@ -20,7 +22,8 @@ class Calibrator
             cv::waitKey(30);
         }
     }
-    static void showImgAvecText_Block( const cv::Mat &img, const std::string &text, const std::string &windowName)
+    
+    static void showImgWithText_Block( const cv::Mat &img, const std::string &text, const std::string &windowName)
     {
         cv::Mat textImg;
         cv::cvtColor(img, textImg, CV_GRAY2RGB);

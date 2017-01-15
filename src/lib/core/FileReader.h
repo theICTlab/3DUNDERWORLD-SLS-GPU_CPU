@@ -48,11 +48,30 @@ public:
 
 
     //Extra functions
-    void loadImages(const std::string& folder, std::string suffix="jpg", bool isGL=false);
+    /*! Load a sequence of images from `folder` in the order of number
+     * e.g. for a sequence of images in the folder IMG_001.jpg, IMG_002.jpg ...,
+     * the prefix is "IMG_", number of digits is 3 , start index is 1 and suffix is "jpg".
+     * \param folder Folder contains images
+     * \param prefix Prefix of image before number
+     * \param numDigits number of digits in the number sequence, default is 4
+     * \param startIdx Start index of image sequence, default is 0
+     * \param suffix File extension of images
+     */
+    void loadImages(const std::string& folder, std::string prefix="", size_t numDigits = 4, size_t startIdx = 0, std::string suffix="jpg");
+
+    //! Get previous frame
     void previousFrame() {frameIdx_=frameIdx_==0?frameIdx_:frameIdx_-1;}
+
+    //! Get current frame
     const cv::Mat& getCurrentFrame() const {return images_[frameIdx_];}
+
+    //! Get total number of images 
     size_t getNumFrames() const { return images_.size(); }
+
+    //! Get current frame index
     size_t getCurrentIdx() const {return frameIdx_;}
+
+    //! Get parameters
     const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_;}
 
     /**

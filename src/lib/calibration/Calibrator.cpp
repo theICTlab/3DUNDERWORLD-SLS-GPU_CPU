@@ -80,7 +80,7 @@ namespace SLS
                 std::ostringstream ss;
                 ss<<"Please click on the 4 extreme corners of the board starting from the top left corner "
                     <<curNumOfCorners<<"/4";
-                showImgAvecText_Block(img_copy, ss.str(), "Mark Calibration Board");
+                showImgWithText_Block(img_copy, ss.str(), "Mark Calibration Board");
                 //Showing in the loop
                 cv::waitKey(5);
             }
@@ -97,7 +97,7 @@ namespace SLS
             while( key!='n' && key!='r' )
             {
                 //cv::imshow("Mark Calibration Board", img_copy );
-                showImgAvecText_Block( img_copy, "Press 'n' to continue or 'r' to select a new area!", "Mark Calibration Board");
+                showImgWithText_Block( img_copy, "Press 'n' to continue or 'r' to select a new area!", "Mark Calibration Board");
                 key = cv::waitKey(0);
             }
 
@@ -164,7 +164,7 @@ namespace SLS
                     pointsCount++;
                     point.val[2]=0;
                 }
-                showImgAvecText_Block(img_copy, "Click mouse on a white area", "Mark White");
+                showImgWithText_Block(img_copy, "Click mouse on a white area", "Mark White");
                 cv::waitKey(5);
             }
 
@@ -173,7 +173,7 @@ namespace SLS
 
             while(key != 'n' && key != 'r')
             {
-                showImgAvecText_Block( img_copy, "Press 'n' to continue or 'r' to select a new point!", "Mark White");
+                showImgWithText_Block( img_copy, "Press 'n' to continue or 'r' to select a new point!", "Mark White");
                 key=cv::waitKey();
             }
 
@@ -223,8 +223,9 @@ namespace SLS
             numOfCornersY = 5;
             cv::createTrackbar("x", "Calibration", &numOfCornersX, 10);
             cv::createTrackbar("y", "Calibration", &numOfCornersY, 10);
-            showImgAvecText_Block(img_grey, "Select number of squares on x and y axis on the trackbar and press any key", "Calibration");
+            showImgWithText_Block(img_grey, "Select number of squares on x and y axis on the trackbar and press any key", "Calibration");
             cv::waitKey(0);
+
             // Kick the thread
             //std::thread imgAsync( showImgAsync, img_grey, "Calibration");
             //system("clear");
@@ -271,7 +272,7 @@ namespace SLS
                 cv::resizeWindow("Calibration",WINDOW_WIDTH,WINDOW_HEIGHT);
                 cv::drawChessboardCorners(img_copy, cvSize(numOfCornersX,numOfCornersY), camCorners, found);
 
-                showImgAvecText_Block(img_copy, "Press 'n' to continue or 'r' to redo!", "Calibration");
+                showImgWithText_Block(img_copy, "Press 'n' to continue or 'r' to redo!", "Calibration");
                 cv::imshow("Calibration", img_copy );
 
                 key = cv::waitKey(0);
@@ -336,7 +337,7 @@ namespace SLS
         cv::Size camImageSize;
 
         //Load calibration images
-        cam->loadImages(calibImgsDir);
+        cam->loadImages(calibImgsDir, "", 1, 1, "JPG");
         size_t width, height;
         cam->getResolution(width, height); 
         camImageSize.height = height;

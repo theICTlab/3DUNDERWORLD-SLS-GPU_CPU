@@ -32,8 +32,8 @@ int main(int argc, char** argv)
     SLS::FileReader rightCam("rightCam");
     SLS::FileReader leftCam("rightCam");
 
-    rightCam.loadImages(rightCameraFolder, suffix);
-    leftCam.loadImages(leftCameraFolder, suffix);
+    rightCam.loadImages(rightCameraFolder, "", 4, 0,suffix);
+    leftCam.loadImages(leftCameraFolder, "", 4, 0, suffix);
 
     rightCam.loadConfig(rightConfigFile);
     leftCam.loadConfig(leftConfigFile);

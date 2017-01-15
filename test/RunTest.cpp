@@ -79,11 +79,11 @@ TEST( RunCPUTest, Arch)
     const std::string O_PLY="arch.ply", O_OBJ="arch.obj";
 
     auto RC = SLS::FileReader("RightCamera");
-    RC.loadImages(R_IMGS, SUFFIX);
+    RC.loadImages(R_IMGS, "", 4, 0, SUFFIX);
     RC.loadConfig(R_CFG);
 
     auto LC = SLS::FileReader("LeftCamera");
-    LC.loadImages(L_IMGS, SUFFIX);
+    LC.loadImages(L_IMGS, "", 4, 0, SUFFIX);
     LC.loadConfig(L_CFG);
 
     SLS::ReconstructorCPU rec(W, H);
@@ -110,11 +110,11 @@ TEST( RunCPUTest, Alexander)
     const std::string O_PLY="alexander.ply", O_OBJ="alexander.obj";
 
     auto RC = SLS::FileReader("RightCamera");
-    RC.loadImages(R_IMGS, SUFFIX);
+    RC.loadImages(R_IMGS, "", 4, 0, SUFFIX);
     RC.loadConfig(R_CFG);
 
     auto LC = SLS::FileReader("LeftCamera");
-    LC.loadImages(L_IMGS, SUFFIX);
+    LC.loadImages(L_IMGS, "", 4, 0, SUFFIX);
     LC.loadConfig(L_CFG);
 
     SLS::ReconstructorCPU rec(W, H);

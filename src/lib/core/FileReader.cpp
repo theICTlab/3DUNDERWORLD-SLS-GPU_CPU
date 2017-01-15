@@ -5,7 +5,7 @@
 
 namespace SLS
 {
-void FileReader::loadImages(const std::string& folder, std::string suffix, bool isGL)
+void FileReader::loadImages(const std::string& folder, std::string prefix, size_t numDigits, size_t startIdx,std::string suffix)
 {
     LOG::startTimer("Loading image from %s ... ", folder.c_str());
     std::stringstream ss;
@@ -17,7 +17,7 @@ void FileReader::loadImages(const std::string& folder, std::string suffix, bool 
     {
         std::stringstream jpgss;
         // TODO: fix Quick hack
-        jpgss<<std::setfill('0')<<std::setw(4)<<images_.size()<<"."<<suffix;
+        jpgss<<prefix<<std::setfill('0')<<std::setw(numDigits)<<images_.size()+startIdx<<"."<<suffix;
         std::string fName = ss.str()+jpgss.str();
         LOG::writeLog("Loading file: %s \n", fName.c_str());
         cv::Mat img=cv::imread(fName, CV_LOAD_IMAGE_COLOR);
