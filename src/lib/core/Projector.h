@@ -40,7 +40,6 @@ public:
     size_t getRequiredNumFrames() const
     {
         return (size_t)std::ceil(std::log2(width_))+std::ceil(std::log2(height_));
-        //return (size_t )std::ceil(std::log2((float)width_*(float)height_));   // hmmm TODO: Figure out why it doesn't work
     }
 };
 }

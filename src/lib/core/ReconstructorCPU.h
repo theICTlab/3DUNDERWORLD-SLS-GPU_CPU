@@ -23,9 +23,7 @@
 namespace SLS
 {
 
-/**
- * @brief CPU reconstructor
- */
+// CPU reconstructor
 class ReconstructorCPU: public Reconstructor
 {
 private:

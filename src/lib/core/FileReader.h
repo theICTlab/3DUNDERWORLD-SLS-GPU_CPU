@@ -47,7 +47,6 @@ public:
         Camera(cName),frameIdx_(0),camTransMat_(glm::mat4(1.0)){}
 
 
-    //Extra functions
     /*! Load a sequence of images from `folder` in the order of number
      * e.g. for a sequence of images in the folder IMG_001.jpg, IMG_002.jpg ...,
      * the prefix is "IMG_", number of digits is 3 , start index is 1 and suffix is "jpg".
@@ -74,22 +73,10 @@ public:
     //! Get parameters
     const std::array<cv::Mat, PARAM_COUNT>& getParams()const{return params_;}
 
-    /**
-     * @brief visualize raytable with point cloud, each ray is a unit vector
-     *
-     * @param fileName output obj file
-     */
-    void rayTableToPointCloud(std::string fileName) const;
-
-    //Implementing interfaces
-    ~FileReader() override{
-       for (auto image: images_)
-           image.release();
-        for (auto param: params_)
-            param.release();
-    }
+    //! Get a ray by x, y
     Ray getRay(const size_t &x, const size_t &y) override;
-    //Ray getRay(const size_t &idx) override{return rayTable[idx];}
+
+    //! Get a ray by column major pixel index
     Ray getRay(const size_t &pixelIdx) override;
 
     void loadConfig(const std::string& configFile) override;

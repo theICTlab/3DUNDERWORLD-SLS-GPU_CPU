@@ -27,7 +27,7 @@ void FileReader::loadImages(const std::string& folder, std::string prefix, size_
         {
             if( images_.size() == 0)
                 //Copy the first image to color
-                img.copyTo(color_);
+                img.copyTo(litImage_);
 
             cv::Mat gray;
             cv::cvtColor(img, gray, CV_BGR2GRAY);
@@ -41,7 +41,6 @@ void FileReader::loadImages(const std::string& folder, std::string prefix, size_
     {
         resX_ = images_[0].cols;
         resY_ = images_[0].rows;
-        //rayTable.resize(resX_*resY_);
         thresholds_.resize(resY_*resX_, whiteThreshold_);
         LOG::writeLog("%d images loaded ...", images_.size());
     }
@@ -188,23 +187,6 @@ Ray FileReader::getRay(const size_t &pixelIdx)
         return ray;
 }
 
-
-
-void FileReader::rayTableToPointCloud(std::string fileName) const
-{
-
-    std::ofstream of(fileName);
-    for (size_t i=0; i<rayTable.size(); i++)
-    {
-        const auto& ray = rayTable[i];
-        if (shadowMask_.getBit(i))
-        {
-            auto endP = ray.origin+ray.dir*5000.0f;
-            of<<"v "<<endP.x<<" "<<endP.y<<" "<<endP.z<<std::endl;
-        }
-    }
-    of.close();
-}
 
 glm::vec2 FileReader::undistortPixel(const glm::vec2 &distortedPixel) const
 {

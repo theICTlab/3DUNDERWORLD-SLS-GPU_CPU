@@ -1,7 +1,6 @@
 #pragma once
 #define GLM_FORCE_CUDA
 #include <glm/glm.hpp>
-//#include <glm/gtx/string_cast.hpp>
 #include "Log.hpp"
 using namespace glm;
 namespace SLS
@@ -13,36 +12,15 @@ struct Ray
 };
 
 /**
- * @brief Get mid point of two rays.
+ *! Get mid point of the segment perpendicular to both rays, i.e. intersection point.
  *
- * @param r1 Input of ray 1
- * @param r2 Input of ray 2
- * @param dist distance between two rays
+ * /param r1 Input of ray 1
+ * /param r2 Input of ray 2
+ * /param dist distance between two rays
  *
- * @return Mid point
+ * /return Mid point
  */
-inline glm::vec4 midPoint(const Ray &r1, const Ray &r2, float &dist)
-{
-    glm::vec3 a (r1.origin);
-    glm::vec3 b (r1.dir);
-    glm::vec3 c (r2.origin);
-    glm::vec3 d (r2.dir);
-
-
-
-
-    auto s = ( dot(b,d)*( dot(a,d) - dot(b,c)) - dot(a,d)*dot(c,d)) / (dot (b,d)*dot(b,d)-1.0f);
-    auto t = ( dot(b,d)*( dot(c,d) - dot(a,d)) - dot(b,c)*dot(a,b)) / (dot(b,d)*dot(b,d)-1.0f);
-    
-
-    auto p_1 = a+s*b;
-    auto q_1 = c+t*d;
-
-    dist = distance(p_1, q_1);
-    return vec4((p_1+q_1)/2.0f, 1.0f);
-
-}
-inline glm::vec4 midPointBkp( const Ray &r1, const Ray &r2, float &dist)
+inline glm::vec4 midPoint( const Ray &r1, const Ray &r2, float &dist)
 {
     glm::vec3 v1 (r1.dir);
     glm::vec3 v2 (r2.dir);
@@ -68,16 +46,5 @@ inline glm::vec4 midPointBkp( const Ray &r1, const Ray &r2, float &dist)
     dist = glm::length(p1+s*v1-p2-t*v2);
     return vec4((p1+s*v1+p2+t*v2)/2.0f, 1.0);
 
-}
-inline glm::vec4 midPointPaper(const Ray &r1, const Ray &r2, float &dist)
-{
-    glm::vec3 p(r1.origin);
-    glm::vec3 q(r2.origin);
-    glm::vec3 u(r1.dir);
-    glm::vec3 v(r2.dir);
-    auto w = p-q;
-    auto s = (dot(w,u)*dot(v,v)-dot(u,v)*dot(w,v))/(dot(v,u)*dot(v,u) - dot(v,v)*dot(u,u));
-    auto t = (dot(v,u)*dot(w,u)-dot(u,u)*dot(w,v))/(dot(v,u)*dot(v,u)-dot(v,v)*dot(u,u));
-    return vec4( ((p+s*u)+(q+t*v))/2.0f, 1.0);
 }
 }

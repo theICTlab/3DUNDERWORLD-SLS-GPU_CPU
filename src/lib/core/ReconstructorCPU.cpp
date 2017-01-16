@@ -117,7 +117,6 @@ PointCloud ReconstructorCPU::reconstruct()
 
     for ( size_t i=0; i<buckets_[0].size(); i++)     // 1024*768
     {
-        //Progress
         const auto &cam0bucket = buckets_[0][i];
         const auto &cam1bucket = buckets_[1][i];
         size_t minCam0Idx=0;
@@ -135,7 +134,7 @@ PointCloud ReconstructorCPU::reconstruct()
                 {
                     float dist=-1.0f;
                     
-                    auto midP=midPointBkp(cameras_[0]->getRay(cam0P), cameras_[1]->getRay(cam1P), dist);
+                    auto midP=midPoint(cameras_[0]->getRay(cam0P), cameras_[1]->getRay(cam1P), dist);
                     if (dist > 0.0) // if dist is valid
                     {
                         ptCount += 1.0;

@@ -50,7 +50,7 @@ protected:
     Dynamic_Bitset shadowMask_; //Color mask
 
     // An all lit image contains color information of reconstruction object
-    cv::Mat color_;
+    cv::Mat litImage_;
 
     // Thresholds are used to filter out invalid pixel.
     uchar whiteThreshold_;
@@ -85,11 +85,11 @@ public:
     uchar getblackThreshold() const {return blackThreshold_;}
     virtual const cv::Mat& getColorFrame() const
     {
-        return color_;
+        return litImage_;
     }
     glm::vec3 getColor(size_t x, size_t y) const
     {
-        auto color = color_.at<cv::Vec3b>(y, x);
+        auto color = litImage_.at<cv::Vec3b>(y, x);
         // OpenCV BGR
         float b = (float)color.val[0];
         float g = (float)color.val[1];

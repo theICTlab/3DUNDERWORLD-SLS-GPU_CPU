@@ -17,6 +17,7 @@ namespace SLS
 //! A point cloud class
 void exportPointCloud2OBJ(std::string fileName, const std::vector<float> &pointCloud);
 void exportPointCloud2PLY(std::string fileName, const std::vector<float> &pointCloud);
+
 class PointCloud
 {
 private:
