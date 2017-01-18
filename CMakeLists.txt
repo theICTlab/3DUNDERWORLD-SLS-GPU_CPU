@@ -22,6 +22,10 @@ endif()
 cmake_minimum_required(VERSION 3.1)
 set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 project( SLS )
+set (VERSION_MAJOR 4)
+set (VERSION_MINOR 0)
+set (VERSION_PATCH 1)
+
 
 # Include this project
 include_directories(./src/lib)
@@ -83,6 +87,7 @@ option (COVERAGE "Build with coverage test, require GTEST=on" OFF)
 if (COVERAGE AND GTEST)
     set (CMAKE_CXX_FLAGS "-std=c++11 -g -O0 -fprofile-arcs -ftest-coverage")
     set (CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+    set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
 endif()
 
 # Enable documentation

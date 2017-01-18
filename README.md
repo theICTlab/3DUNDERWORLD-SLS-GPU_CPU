@@ -40,6 +40,12 @@ make test
 ```
 Google test will be downloaded and compiled during the compilation stage. 
 
+### Build documentation
+Document with Doxygen is availabe to be built. Use `-DBUILD_DOC=on` cmake flag to enable documentation. Run `make doc`, the documentation will be generated in the `doc` directory of building path. 
+
+### Code coverage
+Code coverage report is provided by using [lcov](http://ltp.sourceforge.net/coverage/lcov.php). In order to get the code coverage report, enable both test and coverage flag: `-DGTEST=on -DCOVERAGE=on` and run `make coverage`. The coverage report will be generated in the `coverage` directory of building path. 
+
 ### Run demo binary
 ```
 usage: ./SLS --leftcam=string --rightcam=string --leftconfig=string --rightconfig=string --output=string --format=string --width=unsigned long --height=unsigned long [options] ... 
@@ -62,66 +68,8 @@ Most of the outputs are written to the log file named `SLS.log`. To track the ou
 
 ### Use the library
 
-This project also provides libraries that can be easily integrated into other projects. Here's a quick start code for using the libraries.
+This project also provides libraries that can be easily integrated into other projects. Here's a quick start code for using the libraries. An example of [CPU](https://github.com/theICTlab/3DUNDERWORLD-SLS-GPU_CPU/blob/dev/src/app/App.cpp) and [GPU](https://github.com/theICTlab/3DUNDERWORLD-SLS-GPU_CPU/blob/dev/src/app/App_CUDA.cu) applications are included in the repository. 
 
-```C++
-#ifdef CPU
-
-/* Using CPU reconstruction */
-#include <core/fileReader.h>
-#include <core/Reconstructor.h>
-#else
-
-/* Using CUDA reconstruction */
-#include <ReconstructorCUDA/fileReaderCUDA.cuh>
-#include <ReconstructorCUDA/ReconstructorCUDA.cuh>
-#endif
-
-
-int main()
-{
-    // Folders contain reconstruction images
-    std::string rightCameraFolder = "../../data/alexander/rightCam/dataset1/"
-    std::string leftCameraFolder = "../../data/alexander/leftCam/dataset1/"
-
-    // Camera configuration files
-    std::string rightConfigFile = "../../data/alexander/rightCam/calib/output/calib.xml"
-    std::string leftConfigFile = "../../data/alexander/leftCam/calib/output/calib.xml"
-
-#ifdef CPU
-    SLS::FileReader rightCam("rightCamera");
-    SLS::FileReader leftCam("leftCamera");
-#else
-    SLS::FileReaderCUDA rightCam("rightCamera");
-    SLS::FileReaderCUDA leftCam("leftCamera");
-#endif
-
-    // Load image from data folder
-    rightCam.loadImages(rightCameraFolder);
-    leftCam.loadImages(leftCameraFolder);
-
-    // Load configuration files
-    rightCam.loadConfig(rightConfigFile);
-    leftCam.loadConfig(leftConfigFile);
-
-    // Initialize a reconstructor the projector resolution. 
-#ifdef CPU
-    SLS::ReconstructorCPU reconstructor(1024,768);
-#else
-    SLS::ReconstructorCUDA reconstructor(1024,768);
-#endif
-    // Pass cameras to the reconstructor.
-    reconstructor.addCamera(&rightCam);
-    reconstructor.addCamera(&leftCam);
-
-    // Reconstructor returns a point cloud
-    auto pointCloud = reconstructor.reconstruct();
-
-    // Export point cloud to file.
-    pointCloud.exportPointCloud("alexander.ply", "ply");
-    return 0;
-}
-```
 
 ## Known issues
 
@@ -174,4 +122,3 @@ Immersive and Creative Technologies Lab (http://www.theICTlab.org), Concordia Un
   bibsource = {dblp computer science bibliography, http://dblp.org}
 }
 ```
-

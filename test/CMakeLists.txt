@@ -29,7 +29,10 @@ target_link_libraries(runCPUTest core)
 # Use test 
 if (COVERAGE)
     include(CodeCoverage)
-    setup_target_for_coverage(${PROJECT_NAME}_coverage runCPUTest coverage)
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        target_link_libraries(runCPUTest gcov)
+    endif()
+    setup_target_for_coverage(coverage runCPUTest coverage)
 endif(COVERAGE)
 
 add_test( NAME CPU_TEST 
