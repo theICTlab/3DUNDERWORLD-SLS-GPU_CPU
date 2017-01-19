@@ -15,5 +15,6 @@ FILE_PATTERNS          = *.h \
                          *.cuh
 
 RECURSIVE              = YES
+USE_MATHJAX            = YES
 USE_MDFILE_AS_MAINPAGE = @doxy_main_page@
 

@@ -18,10 +18,18 @@ namespace SLS
 void exportPointCloud2OBJ(std::string fileName, const std::vector<float> &pointCloud);
 void exportPointCloud2PLY(std::string fileName, const std::vector<float> &pointCloud);
 
+/*! A point cloud class 
+ *
+ * The point cloud are stored in raw buffer to faciliate GPU memory access.
+ * The class can also export point cloud to different file formats
+ */
 class PointCloud
 {
 private:
-    //! Point cloud buffer, stores point cloud in (X,Y,Z,R,G,B) 
+    /*! Point cloud buffer, stores point cloud in (X,Y,Z,R,G,B) 
+     *  The point cloud is saved as a raw buffer to faciliate 
+     *  furthur processing on GPU.
+     */
     std::vector<float> buffer_;
     const size_t FLOATS_PER_POINT = 6;
 public:
@@ -30,7 +38,10 @@ public:
     {
         buffer_.resize(numPoints * FLOATS_PER_POINT);
     }
-    //! Get reference of buffer
+    /*! Get reference of buffer
+     *
+     * Use `getBuffer().data()` to access the raw pointer
+     */
     std::vector<float>& getBuffer()
     {
         return buffer_;

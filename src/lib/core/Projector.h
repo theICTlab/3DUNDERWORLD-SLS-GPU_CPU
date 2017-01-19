@@ -21,22 +21,37 @@
 #include <cmath>
 namespace SLS {
 
-/**
- * @brief Patterns that projected to the model
- * This class manages projector
+/*! Projector projects patterns to reconstruction objects
  */
 class Projector
 {
 protected:
+    //! Projector width and height
     size_t width_, height_;
 public:
     Projector() = delete;
+    //! Initialize projector with height and width
     Projector(size_t width, size_t height):width_{width},height_{height}{}
     virtual ~Projector(){};
+    /*! Return the size of project
+     * \param w Output width
+     * \param h Output height
+     */
     void getSize(size_t &w, size_t &h){w = width_; h = height_;}
+    //! Get width
     size_t getWidth() const {return width_;}
+    //! Get height
     size_t getHeight() const {return height_;}
+    //! Get number of pixels = getWidth() * getHeight()
     size_t getNumPixels() const {return width_ * height_;}
+    /*! Get required number of frames to distinguish all of the projector pixel.
+     *
+     * The patterns are designed such that each projector pixel has a unique binary sequence. 
+     * One frame can set one bit of the sequences of all projectors. In this application, we
+     * want to distinguish on both x and y dimensions. Thus, the required number
+     * of frames can be infered from the size of projector: 
+     * \f[\left\lceil\log_2{w}\right\rceil+\left\lceil\log_2{h}\right\rceil\f]
+     */
     size_t getRequiredNumFrames() const
     {
         return (size_t)std::ceil(std::log2(width_))+std::ceil(std::log2(height_));

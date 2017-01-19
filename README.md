@@ -29,7 +29,7 @@ You can use `cmake .. -DENABLE_CUDA=off` to disable CUDA if you don't want compi
 
 ### Enable test
 A test using [Google Test Framework](https://github.com/google/googletest.git) is included in the build. To use the test, enable `GTEST` flag at configuration stage.
-```
+```bash
 git clone https://github.com/theICTlab/3DUNDERWORLD-SLS-GPU_CPU.git
 cd 3DUNDERWORLD-SLS-GPU_CPU
 mkdir build
@@ -47,7 +47,7 @@ Document with Doxygen is availabe to be built. Use `-DBUILD_DOC=on` cmake flag t
 Code coverage report is provided by using [lcov](http://ltp.sourceforge.net/coverage/lcov.php). In order to get the code coverage report, enable both test and coverage flag: `-DGTEST=on -DCOVERAGE=on` and run `make coverage`. The coverage report will be generated in the `coverage` directory of building path. 
 
 ### Run demo binary
-```
+```bash
 usage: ./SLS --leftcam=string --rightcam=string --leftconfig=string --rightconfig=string --output=string --format=string --width=unsigned long --height=unsigned long [options] ... 
 options:
   -l, --leftcam        Left camera image folder (string)

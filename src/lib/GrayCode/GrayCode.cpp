@@ -1,9 +1,11 @@
 #include "GrayCode.hpp"
 namespace SLS{
 GrayCode::GrayCode(size_t projW, size_t projH):
-    Projector(projW, projH), currImg(0)
+    width_(projW), height_(projH),currImg(0)
 {
-    setColRowBitsNum();
+    // Calculate number of bits for each dimension
+    numColBits = (size_t)std::ceil(std::log2((float) width_));
+    numRowBits = (size_t)std::ceil(std::log2((float) height_));
     grayCodes_.resize(numColBits*2+numRowBits*2+2);
 }
 void GrayCode::generateGrayCode()
@@ -13,8 +15,6 @@ void GrayCode::generateGrayCode()
         mat = cv::Mat(height_, width_, CV_8UC1, cv::Scalar(0));
     // Set first frame to white
     grayCodes_[0] = cv::Mat(height_, width_, CV_8UC1, cv::Scalar(255));
-
-
     uchar flag = 0;
 	for (size_t j=0; j<width_; j++)	
 	{
