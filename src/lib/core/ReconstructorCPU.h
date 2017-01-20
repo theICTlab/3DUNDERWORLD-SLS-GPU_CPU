@@ -27,18 +27,49 @@ namespace SLS
 class ReconstructorCPU: public Reconstructor
 {
 private:
+    /*! Reconstruction buckets of cameras
+     *
+     * In the reconstruction, camera pixels are assigned to different projector pixels. 
+     * Generally, one projector pixels contains more than one camera pixel. For each camera, we assign 
+     * pixels to projector pixels, and call those projector pixels buckets.
+     * ```
+     * ProjPixels(Buckets)   Camera pixels
+     * +------------------+  +---+---+---+
+     * |       0          +->+   |   |   |
+     * +------------------+  +-------+---+
+     * |       1          +->+   |
+     * +------------------+  +----
+     * 
+     * +------------------+  +---+---+
+     * |       n          +->+   |   |
+     * +------------------+  +---+---+
+     *
+     * ```
+     * The camera pixels in the same bucket of two different cameras are considered correspondent pixels,
+     * depth then can be extracted from those pixels.
+     */
     std::vector<std::vector<std::vector<size_t>>> buckets_;//[camIdx][ProjPixelIdx][camPixelIdx]
     void initBuckets();
     void generateBuckets();
 public:
+
+    /*! Create a reconstructor with given projector size
+    */
     ReconstructorCPU(const size_t projX, const size_t projY): 
         Reconstructor()
     {
             projector_ = new Projector(projX, projY);
     }
     ~ReconstructorCPU() override;
+
     //Interfaces
+    //! Reconstruct point cloud.
     PointCloud reconstruct() override;
+
+    /*! Add a camera to reconstructor\
+     *
+     * Accepts two camera now.
+     */
     void addCamera(Camera *cam) override;
 };
 } // namespace SLS

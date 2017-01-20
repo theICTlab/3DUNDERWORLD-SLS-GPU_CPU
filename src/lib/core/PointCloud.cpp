@@ -32,7 +32,7 @@ namespace SLS
                 memcpy (p.data(), &pointCloud[i], sizeof(float) * 6);
                 float sum = 0.0;
                 for (const auto &elem : p)
-                    sum += abs(elem);
+                    sum += std::abs(elem);
                 if (std::abs(sum - 0.0) < 0.0000001)
                     continue;
                 dataSS<<pointCloud[i+0]<<" "<<pointCloud[i+1]<<" "<<pointCloud[i+2]<<" "   

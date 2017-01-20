@@ -14,8 +14,10 @@
 namespace SLS
 {
 
-//! A point cloud class
+//! Export pointcloud to obj file
 void exportPointCloud2OBJ(std::string fileName, const std::vector<float> &pointCloud);
+
+//! Export pointcloud to ply file with colors
 void exportPointCloud2PLY(std::string fileName, const std::vector<float> &pointCloud);
 
 /*! A point cloud class 
@@ -31,9 +33,13 @@ private:
      *  furthur processing on GPU.
      */
     std::vector<float> buffer_;
-    const size_t FLOATS_PER_POINT = 6;
+
+    //! Number of float elements per point. (x, y, z, r, g, b)
+    static const size_t FLOATS_PER_POINT = 6;
 public:
     PointCloud() {}
+
+    //! Initialize point cloud with number of points
     PointCloud(size_t numPoints)
     {
         buffer_.resize(numPoints * FLOATS_PER_POINT);

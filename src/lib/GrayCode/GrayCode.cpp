@@ -16,9 +16,14 @@ void GrayCode::generateGrayCode()
     // Set first frame to white
     grayCodes_[0] = cv::Mat(height_, width_, CV_8UC1, cv::Scalar(255));
     uchar flag = 0;
+
+    // Generate patterns to encode x pixels.
+    // For each column
 	for (size_t j=0; j<width_; j++)	
 	{
 		int rem=0, num=j, prevRem=j%2;
+
+        // For each bit in the column
 		for (size_t k=0; k<numColBits; k++)	
 		{
 			num=num/2;
@@ -42,15 +47,17 @@ void GrayCode::generateGrayCode()
 		
 	}
     
+    // Generate patterns to encode y pixels
+    // For each row
 	for (size_t i=0;i<height_;i++)	
 	{
 		int rem=0, num=i, prevRem=i%2;
+        // For each bit in the row
 		for (size_t k=0; k<numRowBits; k++)	
 		{
 
 			num=num/2;
 			rem=num%2;
-
 			if ((rem==0 && prevRem==1) || (rem==1 && prevRem==0)) { 
 				flag=1;
 			}
@@ -68,7 +75,6 @@ void GrayCode::generateGrayCode()
 
 			prevRem=rem;
 		} 
-		
 	}
     for (size_t i=0; i<grayCodes_.size(); i++)
     {

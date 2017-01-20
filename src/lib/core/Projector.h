@@ -30,20 +30,26 @@ protected:
     size_t width_, height_;
 public:
     Projector() = delete;
+
     //! Initialize projector with height and width
     Projector(size_t width, size_t height):width_{width},height_{height}{}
+
     virtual ~Projector(){};
     /*! Return the size of project
      * \param w Output width
      * \param h Output height
      */
     void getSize(size_t &w, size_t &h){w = width_; h = height_;}
+
     //! Get width
     size_t getWidth() const {return width_;}
+
     //! Get height
     size_t getHeight() const {return height_;}
+
     //! Get number of pixels = getWidth() * getHeight()
     size_t getNumPixels() const {return width_ * height_;}
+
     /*! Get required number of frames to distinguish all of the projector pixel.
      *
      * The patterns are designed such that each projector pixel has a unique binary sequence. 

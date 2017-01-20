@@ -136,15 +136,13 @@ void FileReader::computeShadowsAndThresholds()
                 shadowMask_.setBit(j+i*resY_);
             else
                 shadowMask_.clearBit(j+i*resY_);
+
+// Experimental: Calculate thresholds based on the contrast of each pixel
 #ifdef AUTO_CONTRAST
             thresholds_[j+i*resY_]=diff/2;
 #endif
         }
     }
-    // Output mask
-    std::string pgmFName=name_+".pgm";
-    LOG::writeLog("Writing mask to %s\n", pgmFName.c_str());
-    shadowMask_.writeToPGM(pgmFName.c_str(), resX_, resY_, true);
 }
 
 Ray FileReader::getRay(const size_t &x, const size_t &y)

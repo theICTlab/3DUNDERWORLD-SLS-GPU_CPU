@@ -39,25 +39,21 @@ void ReconstructorCPU::generateBuckets()
         xTimesY = x * y;
 
         // For each camera pixel
-        //assert(dynamic_cast<FileReader*>(cam)->getNumFrames() == projector_->getRequiredNumFrames()*2+2);
-
         for (size_t i = 0; i < xTimesY; i++) {
             if (!cam->queryMask(i)) // No need to process if in shadow
                 continue;
 
             cam->getNextFrame();
-            cam->getNextFrame();//skip first two frames
+            cam->getNextFrame(); //skip first two frames
 
             Dynamic_Bitset bits(projector_->getRequiredNumFrames());
 
             bool discard = false;
+
             // for each frame
             for (int bitIdx = projector_->getRequiredNumFrames() - 1; bitIdx >= 0; bitIdx--) {
-            //for (int bitIdx = 0; bitIdx <projector_->getRequiredNumFrames(); bitIdx++) {
 
-                //std::cout<<((FileReader*)cam)->getCurrentIdx()<<std::endl;
                 auto frame = cam->getNextFrame();
-                //std::cout<<((FileReader*)cam)->getCurrentIdx()<<std::endl;
                 auto invFrame = cam->getNextFrame();
                 unsigned char pixel = frame.at<uchar>(i % y, i / y);
                 unsigned char invPixel = invFrame.at<uchar>(i % y, i / y);
@@ -68,11 +64,6 @@ void ReconstructorCPU::generateBuckets()
                     // No need to do anything since the array is initialized as all zeros
                     bits.clearBit((size_t) bitIdx);
                     continue;
-                    //std::cout<<"-----\n"<<bits<<std::endl;
-                    //bits.clearBit(bitIdx);
-                    //std::cout<<std::setw(bits.size()-bitIdx)<<"c"<<std::endl;
-                    //std::cout<<bits<<std::endl;
-                   
                 }
                 else if (pixel > invPixel && pixel - invPixel > 
                         ((FileReader*)cam)->getWhiteThreshold(i)) {
@@ -85,8 +76,10 @@ void ReconstructorCPU::generateBuckets()
                     continue;
                 }
             } // end for each frame
-            if (!discard) {
 
+            // if the pixel is valid, add to bucket.
+            if (!discard) 
+            {
                 auto vec2Idx = bits.to_uint_gray();
                 if ( projector_->getWidth() > vec2Idx.x &&
                         vec2Idx.y < projector_->getHeight()) {
@@ -94,13 +87,12 @@ void ReconstructorCPU::generateBuckets()
                 }
             }
         }
-
         // Keep track of maximum number of pixels in a grid
-        unsigned  maxCount = 0;
-        for (const auto &bucket: buckets_[camIdx]){
-            if (bucket.size() > maxCount)
-                maxCount = bucket.size();
-        }
+        //unsigned  maxCount = 0;
+        //for (const auto &bucket: buckets_[camIdx]){
+        //    if (bucket.size() > maxCount)
+        //        maxCount = bucket.size();
+        //}
     }
 
 }
@@ -112,10 +104,8 @@ PointCloud ReconstructorCPU::reconstruct()
     size_t x,y;
     cameras_[0]->getResolution(x,y);
     initBuckets();
-
     LOG::startTimer();
-
-    for ( size_t i=0; i<buckets_[0].size(); i++)     // 1024*768
+    for ( size_t i=0; i<buckets_[0].size(); i++)
     {
         const auto &cam0bucket = buckets_[0][i];
         const auto &cam1bucket = buckets_[1][i];
@@ -150,7 +140,6 @@ PointCloud ReconstructorCPU::reconstruct()
                 }
             midPointAvg = midPointAvg/ptCount;
             {
-                //pointCloud_.push_back(1);
                 auto color0 = cameras_[0]->getColor(minCam0Idx);
                 auto color1 = cameras_[1]->getColor(minCam1Idx);
                 res.pushPoint( glm::vec3(midPointAvg), (color0 + color1) / 2.0f);

@@ -32,11 +32,7 @@ struct GPUBucketsObj
         {
             return;
         }
-        //uint count = atomicAdd( &(count_[bktIdx]), 1);
-        //data_[count+bktIdx*MAX_CNT_PER_BKT_] = val;
         data_[atomicInc( &(count_[bktIdx]), MAX_CNT_PER_BKT_)+bktIdx*MAX_CNT_PER_BKT_] = val;
-        //if (bktIdx * MAX_CNT_PER_BKT_ > (1<<20)-1)
-        //    printf("Too big!\n");
     }
 };
 
@@ -69,30 +65,6 @@ public:
         gpuErrchk (cudaFree(count_));
     }
     uint getNumBKTs() const{ return NUM_BKTS_;}
-
-    // Debug function
-    uint getMaxCount(uint idx) const
-    {
-        std::vector<uint> count_h;
-        count_h.resize(NUM_BKTS_);
-        gpuErrchk( cudaMemcpy( &(count_h[0]), count_, sizeof(uint)*NUM_BKTS_, cudaMemcpyDeviceToHost));
-        uint max = 0;
-        FILE *pFp = std::fopen((std::string("testBucket")+std::to_string((int)idx)+std::string(".ppm")).c_str(), "wb");
-        size_t w = 1024;
-        size_t h = 768;
-        if (pFp){
-            std::fprintf(pFp, "P5\n%zu\n%zu\n%d\n", (size_t )w, (size_t )h, 255);
-            for (size_t i=0; i<count_h.size(); i++)
-            {
-                if (count_h[i] > max) max = count_h[i];
-                if (count_h[i] != 0)
-                    putc((unsigned char) 255, pFp);
-                else
-                    putc((unsigned char) 0, pFp);
-            }
-        }
-        return max;
-    }
 
 };
 

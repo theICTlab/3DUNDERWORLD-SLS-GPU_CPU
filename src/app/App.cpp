@@ -45,6 +45,7 @@ int main(int argc, char** argv)
     auto pointCloud = reconstruct.reconstruct();
 
     auto extension = output.substr(output.find_last_of(".")+1);
+    pointCloud.exportPointCloud( p.get<std::string>("output"), extension);
     //SLS::exportPointCloud(output, extension, reconstruct);
 
     LOG::writeLog("DONE!\n");

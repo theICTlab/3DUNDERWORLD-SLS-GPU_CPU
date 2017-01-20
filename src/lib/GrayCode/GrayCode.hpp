@@ -14,6 +14,14 @@ public:
         for (auto &img: grayCodes_)
             img.release();
     }
+
+    /*! Generate and display gray code
+     *
+     * The patterns are encoded by [gray code](https://en.wikipedia.org/wiki/Gray_code) to 
+     * avoid error.
+     * The binary are encoded separately for columns and rows. i.e. for a projector pixel (x, y)
+     * we have (BitSeqX, BitSeqY).
+     */
     void generateGrayCode();
 private:
     //! Projector width and height

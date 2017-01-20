@@ -18,7 +18,7 @@ void ReconstructorCUDA::addCamera(Camera *cam)
 }
 PointCloud ReconstructorCUDA::reconstruct()
 {
-    // For each camera, hack
+    // For each camera, supports only two cameras now.
     GPUBuckets buckets[2] =
     {
         GPUBuckets( projector_->getNumPixels(),110),
