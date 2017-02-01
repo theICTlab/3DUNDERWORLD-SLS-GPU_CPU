@@ -27,13 +27,32 @@
 
 namespace SLS
 {
-/**
- * @ Base class of camera
- * 1. This class manages acquiring images form file/camera. 
- * 2. Loading configurations
- * 3. Undistort images
- * 4. Calculate mask
- * 5. Compute colors on point cloud
+/*! Base class of camera
+ *
+ * The camera defined here is a specific image input device for reconstruction
+ * which includes the full acquisition pipeline.
+ *
+ * ```
+ * +-------+  +-----------+ +--------+   +--------+
+ * | Get   |  |Undistort  | |Compute |   |Cast    |
+ * | Image +-->Image      +->Mask    +--->Ray     |
+ * +-------+  +-----------+ +--------+   +--------+
+ * ```
+ *
+ * * The image acquisition is implemented as a forward iterator (getNextFrame)
+ * to
+ * be compatible with image cameras, which can only take a new image.
+ *
+ * * Image undistortion happens soon after a image is imported.
+ *
+ * * The mask is used to discard invalid pixels and computed by a contrast
+ * threshold. When the contrast of a pixel in lit and dark images is smaller
+ * than a threshold, the pixel is considered invalid and would be `0` in the
+ * mask.
+ *
+ * * The camera can also cast a ray into the 3D space based on the intrinsic
+ * parameters.
+ *
  */
 
 class Camera
@@ -41,28 +60,25 @@ class Camera
 protected:
 
     // Name of camera
-    std::string name_;
+    std::string name_;  //!< name of the camera
 
     // Camera Resolution
-    size_t resX_, resY_;
+    size_t resX_, resY_; 
 
     // Mask of valid pixels
-    Dynamic_Bitset shadowMask_; //Color mask
+    Dynamic_Bitset shadowMask_; //!< Color mask
 
-    // An all lit image contains color information of reconstruction object
-    cv::Mat litImage_;
+    cv::Mat litImage_;  //!< An all lit image contains color information of reconstruction object
 
-    // Thresholds are used to filter out invalid pixel.
-    uchar whiteThreshold_;
+    uchar whiteThreshold_; //!< Thresholds are used to filter out invalid pixel.
 
-    // Contrast threshold
     // If the contrast of a pixel between lit and unlit is smaller than the 
     // dark threshold, the pixel is invalid.
-    uchar blackThreshold_;
+    uchar blackThreshold_; //!< Contrast threshold
 
     // adaptive Thresholds of each pixel. 
     // The threshold is used filter out invalid pixels
-    std::vector<unsigned char> thresholds_; //Threshold for each pixel with in [0,255], 
+    std::vector<unsigned char> thresholds_; //!< Threshold for each pixel with in [0,255], 
 public:
     Camera() = delete;
     /*
@@ -70,11 +86,16 @@ public:
      * of the camera.
      */
     explicit Camera(const std::string &cName):name_(cName),resX_(0),resY_(0)
-    {whiteThreshold_=5; blackThreshold_=40;}   //Hacking, need to read from file
+    {whiteThreshold_=5; blackThreshold_=40;}   //Hack, need to read from file
+
     const std::string& getName() const {return name_;}
+
     void setName(const std::string &cName) {name_ = cName;}
+
     void getResolution(size_t &x, size_t &y) const{x=resX_; y=resY_;}
+
     const unsigned char& getThreashold(const size_t &idx){return thresholds_[idx];}
+
     // Get a mask by index
     bool queryMask(const size_t &idx){return shadowMask_.getBit(idx);}
     // Set the value of mask to one at given index
