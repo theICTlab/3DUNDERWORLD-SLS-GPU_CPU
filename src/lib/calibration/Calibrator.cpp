@@ -3,7 +3,6 @@
 #include <thread>
 
 namespace SLS {
-bool Calibrator::closeAsynImg = false;
 
 ////////////////////////// Callbacks
 

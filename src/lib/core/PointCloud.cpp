@@ -1,6 +1,7 @@
 #include <core/PointCloud.hpp>
 #include <cstring> // memcpy
 #include <cmath>
+#include <array>
 
 namespace SLS
 {
