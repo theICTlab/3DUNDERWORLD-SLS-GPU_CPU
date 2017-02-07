@@ -23,7 +23,12 @@ void exportPointCloud2PLY(std::string fileName, const std::vector<float> &pointC
 /*! A point cloud class 
  *
  * The point cloud are stored in raw buffer to faciliate GPU memory access.
- * The class can also export point cloud to different file formats
+ * ```
+ * +-----------------+
+ * |X |Y |Z |R |G |B |
+ * +-----------------+
+ * ```
+ * The class can also export point cloud to different file formats.
  */
 class PointCloud
 {

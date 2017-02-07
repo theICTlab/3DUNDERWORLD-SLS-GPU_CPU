@@ -4,6 +4,8 @@ STRIP_FROM_PATH        = @PROJECT_SOURCE_DIR@/src/lib
 INPUT                  = @doxy_main_page@ \
                          @PROJECT_SOURCE_DIR@/src/lib
 
+DISABLE_INDEX          = NO 
+GENERATE_TREEVIEW      = YES 
 EXTRACT_ALL            = YES
 EXTENSION_MAPPING      = cu=c++ \
                          cuh=c++

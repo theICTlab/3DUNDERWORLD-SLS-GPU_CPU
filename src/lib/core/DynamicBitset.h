@@ -33,7 +33,7 @@ namespace SLS
 {
 class Dynamic_Bitset{
 private:
-    std::vector<unsigned char> bits;
+    std::vector<unsigned char> bits; //!< Bytes used to store bits
 protected:
     const size_t BITS_PER_BYTE;
 
@@ -42,41 +42,35 @@ protected:
      * http://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit-in-c-c
      */
 
-    /**
-     * @brief Set bit of a char to 1
+    /*! Set bit of a char to 1
      *
-     * @param ch Char to operate
-     * @param pos Position within the char
+     * \param ch Char to operate
+     * \param pos Position within the char
      */
     void setUChar(unsigned char& ch, const size_t &pos) { ch |= 1<<pos; }
-    /**
-     * @brief Set bit of a char to 0
+    /*! Set bit of a char to 0
      *
-     * @param ch Char to operate
-     * @param pos Position within the char
+     * \param ch Char to operate
+     * \param pos Position within the char
      */
     void clearUChar(unsigned char& ch, const size_t &pos) { ch &= ~(1<<pos);}
 
-    /**
-     * @brief Get bit of within a char
+    /*! Get bit of within a char
      *
-     * @param ch Char to query
-     * @param pos position of bit in char
+     * \param ch Char to query
+     * \param pos position of bit in char
      *
-     * @return Ture if 1; otherwise, 0.
+     * \return Ture if 1; otherwise, 0.
      */
     bool getUChar(const unsigned char& ch, const size_t &pos)const {return (ch>>pos)&1;}
 public:
-
-    /**
-     * @brief Init an empty bitset
+    /*! Init an empty bitset
      */
     Dynamic_Bitset(): BITS_PER_BYTE{8}{}
 
-    /**
-     * @brief Init an empty bitset with given length
+    /*! Init an empty bitset with given length
      *
-     * @param sz number of bits 
+     * \param sz number of bits 
      */
     explicit Dynamic_Bitset(const size_t &sz):BITS_PER_BYTE{8}{resize(sz);}
     Dynamic_Bitset(const size_t &sz, unsigned char* b):BITS_PER_BYTE{8}
@@ -88,27 +82,24 @@ public:
         memcpy( &bits[0], b, sz);
     }
 
-    /**
-     * @brief Get number of bits
+    /*!  Get number of bits
      *
-     * @return number of bits
+     * \return number of bits
      */
     virtual size_t size() const {return bits.size()*BITS_PER_BYTE;}
 
-    /**
-     * @brief Resize bit array length, will set bit array to 0
+    /*! Resize bit array length, will set bit array to 0
      *
-     * @param sz number of bits
+     * \param sz number of bits
      */
     virtual void resize(const size_t &sz) {
         bits.resize((sz+BITS_PER_BYTE-1)/ BITS_PER_BYTE, 0);
         memset(&(bits[0]), 0, sizeof(unsigned char)*bits.size());
     }
 
-    /**
-     * @brief Set a bit to 1
+    /*! Set a bit to 1
      *
-     * @param pos 0-based position of bit
+     * \param pos 0-based position of bit
      */
     void setBit(const size_t &pos){    //Set the bit to one
         if (pos > size())
@@ -116,10 +107,9 @@ public:
         setUChar(bits[pos/BITS_PER_BYTE], pos%BITS_PER_BYTE);
     }
 
-    /**
-     * @brief Set a bit to 0
+    /*! Set a bit to 0
      *
-     * @param pos 0-based position of bit
+     * \param pos 0-based position of bit
      */
     void clearBit(const size_t &pos){  //Set the bit to zero
         if (pos > size())
@@ -127,12 +117,11 @@ public:
         clearUChar(bits[pos/BITS_PER_BYTE], pos%BITS_PER_BYTE);
     }
 
-    /**
-     * @brief Get the value of bit
+    /*! Get the value of bit
      *
-     * @param pos 0-based position of bit
+     * \param pos 0-based position of bit
      *
-     * @return Ture if the bit is 1; otherwise, false.
+     * \return Ture if the bit is 1; otherwise, false.
      */
     bool getBit(const size_t &pos) const {
         if (pos > size())
@@ -140,10 +129,9 @@ public:
         return getUChar(bits[pos/BITS_PER_BYTE], pos%BITS_PER_BYTE);
     }
 
-    /**
-     * @brief Convert bit array to unsigned int
+    /*! Convert bit array to unsigned int
      *
-     * @return representation of bit array in unsigned int
+     * \return representation of bit array in unsigned int
      */
     unsigned int to_uint() const
     {
@@ -154,9 +142,14 @@ public:
             res += ((unsigned int)bits[i])<<(i*BITS_PER_BYTE);
         return res;
     }
+
+    /*! Convert bitarray to gray code
+     */
     glm::uvec2 to_uint_gray () const
     {
         unsigned num = to_uint(); //Gray code
+
+        //TODO: Hack, fix the constant bit size
         //Extract lower 10
         unsigned yDec = num & 0x3FFU;
         //Extract higher 10
@@ -180,7 +173,6 @@ public:
 
 std::ostream& operator<<(std::ostream& os, const Dynamic_Bitset& db)
 {
-    //for (size_t i=db.bits.size()-1; i >=0; i--)
     for (std::vector<unsigned char>::const_reverse_iterator rit = db.bits.rbegin();
             rit != db.bits.rend(); rit++)
         os << (std::bitset<8>)(*rit);

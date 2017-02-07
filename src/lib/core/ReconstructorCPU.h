@@ -40,8 +40,9 @@ private:
     //! Find intersection of two projector pixel
     /*! Each projector pixel contains multiple camera pixels.
      * This function takes two buckets from two cameras. Shoot a ray from each
-     * pixel to find a pair of rays with minimum distance. The midpoints of the
-     * closest rays are considered intersection points.
+     * pixel to find a pair of rays with minimum distance. In this function, the
+     * position of the pixel is calculated by the average position and color of
+     * all pairs of rays in a projector pixel.
      *
      * The retrun value is put in a std::array<glm::vec3, 2>, in which the first
      * vec3 is the position and the second is the color
@@ -52,6 +53,13 @@ private:
     std::array<glm::vec3, 2> intersectionOfBucket_(size_t firstCameraIdx,
                                                    size_t secondCameraIdx,
                                                    size_t bucketIdx);
+
+    /*! Similar to intersectionOfBucket_(), this function finds pair of rays
+     * with minimu distance to reconstruct the depth.
+     *
+     * This function is not used for now since the average method yield more
+     * structural result.
+     */
     std::array<glm::vec3, 2> intersectionOfBucketMinDist_(size_t firstCameraIdx,
                                                    size_t secondCameraIdx,
                                                    size_t bucketIdx);
