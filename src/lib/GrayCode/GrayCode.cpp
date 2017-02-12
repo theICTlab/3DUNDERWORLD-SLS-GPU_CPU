@@ -8,7 +8,7 @@ GrayCode::GrayCode(size_t projW, size_t projH):
     numRowBits = (size_t)std::ceil(std::log2((float) height_));
     grayCodes_.resize(numColBits*2+numRowBits*2+2);
 }
-void GrayCode::generateGrayCode()
+const std::vector<cv::Mat>& GrayCode::generateGrayCode()
 {
     // Init rest of the mat
     for (auto &mat: grayCodes_)
@@ -76,10 +76,6 @@ void GrayCode::generateGrayCode()
 			prevRem=rem;
 		} 
 	}
-    for (size_t i=0; i<grayCodes_.size(); i++)
-    {
-        cv::imshow("test",grayCodes_[i]);
-        cv::waitKey(0);
-    }
+    return grayCodes_;
 }
 } // namespace SLS

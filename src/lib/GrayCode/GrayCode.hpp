@@ -22,7 +22,7 @@ public:
      * The binary are encoded separately for columns and rows. i.e. for a projector pixel (x, y)
      * we have (BitSeqX, BitSeqY).
      */
-    void generateGrayCode();
+    const std::vector<cv::Mat>& generateGrayCode();
 private:
     //! Projector width and height
     size_t width_, height_;
