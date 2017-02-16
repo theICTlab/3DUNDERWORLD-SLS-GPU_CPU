@@ -31,6 +31,9 @@ using std::ostream;
 
 namespace SLS
 {
+/*! This class provides a simple dynamic bitset
+ * The length of the bitset can be dynamicly defined. 
+ */
 class Dynamic_Bitset{
 private:
     std::vector<unsigned char> bits; //!< Bytes used to store bits
