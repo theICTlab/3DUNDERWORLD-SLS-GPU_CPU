@@ -7,11 +7,11 @@ namespace LOG {
 bool writeLog(const char* message, ...)
 {
     va_list argptr;
-    FILE* file = fopen(GL_LOG_FILE, "a");
+    FILE* file = fopen(LOG_FILE, "a");
     if (!file) {
         fprintf(stderr,
-                "ERROR: could not open GL_LOG_FILE %s file for appending\n",
-                GL_LOG_FILE);
+                "ERROR: could not open LOG_FILE %s file for appending\n",
+                LOG_FILE);
         return false;
     }
     va_start(argptr, message);
@@ -23,11 +23,11 @@ bool writeLog(const char* message, ...)
 bool writeLogErr(const char* message, ...)
 {
     va_list argptr;
-    FILE* file = fopen(GL_LOG_FILE, "a");
+    FILE* file = fopen(LOG_FILE, "a");
     if (!file) {
         fprintf(stderr,
-                "ERROR: could not open GL_LOG_FILE %s file for appending\n",
-                GL_LOG_FILE);
+                "ERROR: could not open LOG_FILE %s file for appending\n",
+                LOG_FILE);
         return false;
     }
     va_start(argptr, message);
@@ -41,27 +41,27 @@ bool writeLogErr(const char* message, ...)
 }
 bool restartLog()
 {
-    FILE* file = fopen(GL_LOG_FILE, "w");
+    FILE* file = fopen(LOG_FILE, "w");
     if (!file) {
         fprintf(stderr,
-                "ERROR: could not open GL_LOG_FILE log file %s for writing\n",
-                GL_LOG_FILE);
+                "ERROR: could not open LOG_FILE log file %s for writing\n",
+                LOG_FILE);
         return false;
     }
     time_t now = time(NULL);
     char* date = ctime(&now);
-    fprintf(file, "GL_LOG_FILE log. local time %s\n", date);
+    fprintf(file, "LOG_FILE log. local time %s\n", date);
     fclose(file);
     return true;
 }
 bool startTimer(const char* message, ...)
 {
     va_list argptr;
-    FILE* file = fopen(GL_LOG_FILE, "a");
+    FILE* file = fopen(LOG_FILE, "a");
     if (!file) {
         fprintf(stderr,
-                "ERROR: could not open GL_LOG_FILE %s file for appending\n",
-                GL_LOG_FILE);
+                "ERROR: could not open LOG_FILE %s file for appending\n",
+                LOG_FILE);
         return false;
     }
     va_start(argptr, message);
@@ -80,11 +80,11 @@ bool startTimer()
 bool endTimer(const char* message, ...)
 {
     va_list argptr;
-    FILE* file = fopen(GL_LOG_FILE, "a");
+    FILE* file = fopen(LOG_FILE, "a");
     if (!file) {
         fprintf(stderr,
-                "ERROR: could not open GL_LOG_FILE %s file for appending\n",
-                GL_LOG_FILE);
+                "ERROR: could not open LOG_FILE %s file for appending\n",
+                LOG_FILE);
         return false;
     }
     va_start(argptr, message);

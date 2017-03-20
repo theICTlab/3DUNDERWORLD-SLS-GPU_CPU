@@ -4,4 +4,5 @@ file(GLOB CUDA_SOURCES
     )
 #cuda_compile(SLS_OBJ ${CUDA_SOURCES})
 cuda_add_library( sls_gpu ${CUDA_SOURCES})
+target_link_libraries( sls_gpu core)
 

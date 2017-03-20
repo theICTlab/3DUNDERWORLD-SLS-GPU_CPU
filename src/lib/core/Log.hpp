@@ -2,7 +2,10 @@
 #include <chrono>
 #include <iostream>
 #include <ctime>
-#define GL_LOG_FILE "sls.log"   // !< Define log file
+
+#ifndef LOG_FILE
+#define LOG_FILE "sls.log"  // !< Define log file
+#endif
 
 /*! System wide log to output message to terminal and file
  */
@@ -30,7 +33,6 @@ namespace LOG
      * foo();
      * endTimer('s');
      * ```
-     * 
      */
     //! Start timer with a log
     bool startTimer(const char* message, ...);
