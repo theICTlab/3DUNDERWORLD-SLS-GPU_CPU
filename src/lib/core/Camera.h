@@ -80,7 +80,9 @@ protected:
     // The threshold is used filter out invalid pixels
     std::vector<unsigned char> thresholds_; //!< Threshold for each pixel with in [0,255], 
 public:
+
     Camera() = delete;
+
     /*
      * Construction of a camera, it takes the name and the resolution
      * of the camera.
@@ -98,16 +100,22 @@ public:
 
     // Get a mask by index
     bool queryMask(const size_t &idx){return shadowMask_.getBit(idx);}
+
     // Set the value of mask to one at given index
     void setMask(const size_t &idx){ shadowMask_.setBit(idx);}
+
     // Clear the value of mask to one at given index
     void clearMask(const size_t &idx){ shadowMask_.clearBit(idx);}
+
     uchar getWhiteThreshold() const {return whiteThreshold_;}
+
     uchar getblackThreshold() const {return blackThreshold_;}
+
     virtual const cv::Mat& getColorFrame() const
     {
         return litImage_;
     }
+
     glm::vec3 getColor(size_t x, size_t y) const
     {
         auto color = litImage_.at<cv::Vec3b>(y, x);
@@ -117,6 +125,7 @@ public:
         float r = (float)color.val[2];
         return vec3(r, g, b);
     }
+
     glm::vec3 getColor(size_t idx) const
     {
         return getColor(idx/resY_, idx%resY_);
@@ -124,19 +133,22 @@ public:
 
     // Interfaces
     /**
-     * @brief Get a ray in world space by given pixel
+     *!  Get a ray in world space by given pixel
      *
-     * @param x x coordinate of pixel
-     * @param y y coordinate of pixel
+     * \param x x coordinate of pixel
+     * \param y y coordinate of pixel
      *
-     * @return Ray shot from camera to this pixel
+     * \return Ray shot from camera to this pixel
      */
 
     // Reconstruction relies on find intersection of two rays at the same point
     // from two cameras. The rays can be get from the following functions. 
     virtual Ray getRay(const size_t &x, const size_t &y)=0;
+
     virtual Ray getRay(const size_t &idx)=0;
+
     virtual void setResolution(const size_t &x, const size_t &y) {resX_ = x; resY_ = y;}
+
     virtual ~Camera(){}
 
     // Load camera intrinsic/extrinsic parameters and distortion from file

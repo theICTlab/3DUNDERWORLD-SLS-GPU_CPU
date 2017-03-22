@@ -23,7 +23,7 @@
 namespace SLS
 {
 /**
- * @brief Reconstructor
+ *! Reconstructor
  * Reconstructor takes images from cameras to
  * reconstruct objects into the point cloud
  */
@@ -32,8 +32,6 @@ class Reconstructor
 protected:
     std::vector<Camera*> cameras_;
     Projector* projector_;
-    //std::vector<float> pointCloud_;
-    //PointCloud pointCloud_;
     std::vector<uint> idx_;
 public:
     Reconstructor():projector_{nullptr}{};
