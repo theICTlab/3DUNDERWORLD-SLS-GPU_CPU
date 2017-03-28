@@ -1,11 +1,11 @@
-#include "FileReader.h"
+#include "ImageFileProcessor.h"
 #include <glm/gtx/string_cast.hpp>
 #include <iomanip>
 #include <fstream>
 
 namespace SLS
 {
-void FileReader::loadImages(const std::string& folder, std::string prefix, size_t numDigits, size_t startIdx,std::string suffix)
+void ImageFileProcessor::loadImages(const std::string& folder, std::string prefix, size_t numDigits, size_t startIdx,std::string suffix)
 {
     LOG::startTimer("Loading image from %s ... ", folder.c_str());
     std::stringstream ss;
@@ -47,7 +47,7 @@ void FileReader::loadImages(const std::string& folder, std::string prefix, size_
     LOG::endTimer('s');
 }
 
-void FileReader::loadConfig(
+void ImageFileProcessor::loadConfig(
         const std::string& distMat,
         const std::string& camMat,
         const std::string& transMat,
@@ -60,7 +60,7 @@ void FileReader::loadConfig(
 }
         
 
-void FileReader::loadConfig(const std::string& configFile)
+void ImageFileProcessor::loadConfig(const std::string& configFile)
 {
     // Please refer to this link for paramters.
     // http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
@@ -94,14 +94,14 @@ void FileReader::loadConfig(const std::string& configFile)
     camTransMat_ = rotationMat*translationMat;
 }
 
-const cv::Mat& FileReader::getNextFrame() 
+const cv::Mat& ImageFileProcessor::getNextFrame() 
 {
     //Return the current frame and move on
     frameIdx_ = frameIdx_ % images_.size();
     return images_[frameIdx_++];
 }
 
-void FileReader::undistort()
+void ImageFileProcessor::undistort()
 {
     //Validate matrices
     for (size_t i=0; i<PARAM_COUNT; i++)
@@ -121,7 +121,7 @@ void FileReader::undistort()
 }
 
 
-void FileReader::computeShadowsAndThresholds()
+void ImageFileProcessor::computeShadowsAndThresholds()
 {
     cv::Mat& brightImg=images_[0];
     cv::Mat& darkImg=images_[1];
@@ -145,7 +145,7 @@ void FileReader::computeShadowsAndThresholds()
     }
 }
 
-Ray FileReader::getRay(const size_t &x, const size_t &y)
+Ray ImageFileProcessor::getRay(const size_t &x, const size_t &y)
 {
         glm::vec2 undistorted = undistortPixel(glm::vec2(x, y));
         Ray ray;
@@ -163,7 +163,7 @@ Ray FileReader::getRay(const size_t &x, const size_t &y)
         ray.dir=glm::normalize(ray.dir);
         return ray;
 }
-Ray FileReader::getRay(const size_t &pixelIdx) 
+Ray ImageFileProcessor::getRay(const size_t &pixelIdx) 
 {
         glm::vec2 undistorted = undistortPixel(pixelIdx);
         Ray ray;
@@ -186,7 +186,7 @@ Ray FileReader::getRay(const size_t &pixelIdx)
 }
 
 
-glm::vec2 FileReader::undistortPixel(const glm::vec2 &distortedPixel) const
+glm::vec2 ImageFileProcessor::undistortPixel(const glm::vec2 &distortedPixel) const
 {
     double k[5] = {0.0};
     double fx, fy, ifx, ify, cx, cy;

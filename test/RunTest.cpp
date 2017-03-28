@@ -1,5 +1,5 @@
 #include <fstream>
-#include <core/FileReader.h>
+#include <core/ImageFileProcessor.h>
 #include <core/ReconstructorCPU.h>
 #include <sstream>
 #include <gtest/gtest.h>
@@ -78,17 +78,17 @@ TEST( RunCPUTest, Arch)
     const std::string TEST_OBJ = std::string(TEST_REF_PATH) + "/arch.obj";
     const std::string O_PLY="arch.ply", O_OBJ="arch.obj";
 
-    auto RC = SLS::FileReader("RightCamera");
+    auto RC = SLS::ImageFileProcessor("RightCamera");
     RC.loadImages(R_IMGS, "", 4, 0, SUFFIX);
     RC.loadConfig(R_CFG);
 
-    auto LC = SLS::FileReader("LeftCamera");
+    auto LC = SLS::ImageFileProcessor("LeftCamera");
     LC.loadImages(L_IMGS, "", 4, 0, SUFFIX);
     LC.loadConfig(L_CFG);
 
     SLS::ReconstructorCPU rec(W, H);
-    rec.addCamera(&LC);
-    rec.addCamera(&RC);
+    rec.addImageProcessor(&LC);
+    rec.addImageProcessor(&RC);
     auto pc = rec.reconstruct();
 
     pc.exportPointCloud( O_PLY, "ply");
@@ -109,17 +109,17 @@ TEST( RunCPUTest, Alexander)
     const std::string TEST_OBJ = std::string(TEST_REF_PATH) + "/alexander.obj";
     const std::string O_PLY="alexander.ply", O_OBJ="alexander.obj";
 
-    auto RC = SLS::FileReader("RightCamera");
+    auto RC = SLS::ImageFileProcessor("RightCamera");
     RC.loadImages(R_IMGS, "", 4, 0, SUFFIX);
     RC.loadConfig(R_CFG);
 
-    auto LC = SLS::FileReader("LeftCamera");
+    auto LC = SLS::ImageFileProcessor("LeftCamera");
     LC.loadImages(L_IMGS, "", 4, 0, SUFFIX);
     LC.loadConfig(L_CFG);
 
     SLS::ReconstructorCPU rec(W, H);
-    rec.addCamera(&LC);
-    rec.addCamera(&RC);
+    rec.addImageProcessor(&LC);
+    rec.addImageProcessor(&RC);
     auto pc = rec.reconstruct();
 
     pc.exportPointCloud( O_PLY, "ply");

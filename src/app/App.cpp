@@ -1,4 +1,4 @@
-#include <core/FileReader.h>
+#include <core/ImageFileProcessor.h>
 #include <core/Reconstructor.h>
 #include <core/Log.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -37,8 +37,8 @@ int main(int argc, char** argv)
     std::string suffix = p.get<std::string>("format");
 
     // Initialize two file readers to load images from file
-    SLS::FileReader rightCam("rightCam");
-    SLS::FileReader leftCam("rightCam");
+    SLS::ImageFileProcessor rightCam("rightCam");
+    SLS::ImageFileProcessor leftCam("rightCam");
 
     // Load images
     // void loadImages( const std::string &folder, std::string prefix, size_t numDigits, size_t startIdx, std::string suffix )
@@ -53,8 +53,8 @@ int main(int argc, char** argv)
     SLS::ReconstructorCPU reconstruct(p.get<size_t>("width"), p.get<size_t>("height"));
 
     // Add cameras to reconstructor
-    reconstruct.addCamera(&rightCam);
-    reconstruct.addCamera(&leftCam);
+    reconstruct.addImageProcessor(&rightCam);
+    reconstruct.addImageProcessor(&leftCam);
 
     // Run reconstructio and get the point cloud
     auto pointCloud = reconstruct.reconstruct();

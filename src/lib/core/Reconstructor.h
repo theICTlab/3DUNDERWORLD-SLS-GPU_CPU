@@ -17,7 +17,7 @@
  */
 #pragma once
 #include <vector>
-#include "./Camera.h"
+#include "./ImageProcessor.h"
 #include "./Projector.h"
 #include <core/PointCloud.hpp>
 namespace SLS
@@ -30,7 +30,7 @@ namespace SLS
 class Reconstructor
 {
 protected:
-    std::vector<Camera*> cameras_;
+    std::vector<ImageProcessor*> processors_;
     Projector* projector_;
     std::vector<uint> idx_;
 public:
@@ -41,7 +41,7 @@ public:
     virtual PointCloud reconstruct()=0;
 
     //! Add a camera pointer to reconstructor
-    virtual void addCamera(Camera* cam)=0;
+    virtual void addImageProcessor(ImageProcessor* processor)=0;
 
 };
 

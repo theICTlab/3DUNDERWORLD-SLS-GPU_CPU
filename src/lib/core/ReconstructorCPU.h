@@ -81,6 +81,6 @@ public:
      *
      * Accepts two camera now.
      */
-    void addCamera(Camera *cam) override;
+    void addImageProcessor(ImageProcessor *processor) override;
 };
 }  // namespace SLS

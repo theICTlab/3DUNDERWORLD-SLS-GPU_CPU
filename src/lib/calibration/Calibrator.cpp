@@ -314,7 +314,7 @@ bool Calibrator::findCornersInCamImg(const cv::Mat &img,
     return found;
 }
 
-void Calibrator::Calibrate(FileReader *cam, const std::string &calibImgsDir,
+void Calibrator::Calibrate(ImageFileProcessor *cam, const std::string &calibImgsDir,
                            const std::string &calibFile)
 {
     // Value to generate

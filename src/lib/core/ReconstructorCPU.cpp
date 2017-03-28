@@ -1,7 +1,7 @@
 #include "ReconstructorCPU.h"
 #include <iomanip>
 #include <limits>
-#include "FileReader.h"
+#include "ImageFileProcessor.h"
 
 namespace SLS {
 
@@ -10,17 +10,17 @@ void ReconstructorCPU::initBuckets()
 {
     size_t x, y;
     projector_->getSize(x, y);
-    buckets_.resize(cameras_.size());
+    buckets_.resize(processors_.size());
     for (auto &b : buckets_) b.resize(x * y);
     generateBuckets();
 }
 
-void ReconstructorCPU::addCamera(Camera *cam) { cameras_.push_back(cam); }
+void ReconstructorCPU::addImageProcessor(ImageProcessor *processor) { processors_.push_back(processor); }
 void ReconstructorCPU::generateBuckets()
 {
     // Generating reconstruction bucket for each camera
-    for (size_t camIdx = 0; camIdx < cameras_.size(); camIdx++) {
-        const auto &cam = cameras_[camIdx];
+    for (size_t camIdx = 0; camIdx < processors_.size(); camIdx++) {
+        const auto &cam = processors_[camIdx];
         LOG::writeLog("Generating reconstruction bucket for \"%s\" ... \n",
                       cam->getName().c_str());
 
@@ -56,7 +56,7 @@ void ReconstructorCPU::generateBuckets()
                 // more strict than shadow mask.
                 if (invPixel > pixel &&
                     invPixel - pixel >=
-                        ((FileReader *)cam)->getWhiteThreshold(i)) {
+                        ((ImageFileProcessor *)cam)->getWhiteThreshold(i)) {
                     // No need to do anything since the array is initialized as
                     // all zeros
                     bits.clearBit((size_t)bitIdx);
@@ -64,7 +64,7 @@ void ReconstructorCPU::generateBuckets()
                 }
                 else if (pixel > invPixel &&
                          pixel - invPixel >
-                             ((FileReader *)cam)->getWhiteThreshold(i)) {
+                             ((ImageFileProcessor *)cam)->getWhiteThreshold(i)) {
                     bits.setBit((size_t)bitIdx);
                 }
                 else {
@@ -103,13 +103,13 @@ std::array<glm::vec3, 2> ReconstructorCPU::intersectionOfBucket_(
         for (const auto &cam1P : secondBucket) {
             float dist = -1.0f;
             glm::vec4 midP =
-                midPoint(cameras_[firstCameraIdx]->getRay(cam0P),
-                         cameras_[secondCameraIdx]->getRay(cam1P), dist);
+                midPoint(processors_[firstCameraIdx]->getRay(cam0P),
+                         processors_[secondCameraIdx]->getRay(cam1P), dist);
             if (dist > 0.0) {
                 pointCount++;
                 averagePosition += glm::vec3(midP);
-                averageColor += (cameras_[firstCameraIdx]->getColor(cam0P) +
-                                 cameras_[secondCameraIdx]->getColor(cam1P)) /
+                averageColor += (processors_[firstCameraIdx]->getColor(cam0P) +
+                                 processors_[secondCameraIdx]->getColor(cam1P)) /
                                 2.0f;
             }
         }
@@ -135,13 +135,13 @@ std::array<glm::vec3, 2> ReconstructorCPU::intersectionOfBucketMinDist_(
         for (const auto &cam1P : secondBucket) {
             float dist = -1.0f;
             glm::vec4 midP =
-                midPoint(cameras_[firstCameraIdx]->getRay(cam0P),
-                         cameras_[secondCameraIdx]->getRay(cam1P), dist);
+                midPoint(processors_[firstCameraIdx]->getRay(cam0P),
+                         processors_[secondCameraIdx]->getRay(cam1P), dist);
             if (dist > 0.0 && dist < minDist) {
                 minDist = dist;
                 minPosition = glm::vec3(midP);
-                minColor = (cameras_[firstCameraIdx]->getColor(cam0P) +
-                                 cameras_[secondCameraIdx]->getColor(cam1P)) /
+                minColor = (processors_[firstCameraIdx]->getColor(cam0P) +
+                                 processors_[secondCameraIdx]->getColor(cam1P)) /
                                 2.0f;
             }
         }
@@ -152,7 +152,7 @@ PointCloud ReconstructorCPU::reconstruct()
     PointCloud res;
     size_t x, y;
     // Assumes all of the cameras has the same resolution
-    cameras_[0]->getResolution(x, y);
+    processors_[0]->getResolution(x, y);
     initBuckets();
     LOG::startTimer();
     for (size_t i = 0; i < buckets_[0].size(); i++) {
@@ -181,8 +181,8 @@ PointCloud ReconstructorCPU::reconstruct()
                 for (const auto &cam1P : cam1bucket) {
                     float dist = -1.0f;
 
-                    auto midP = midPoint(cameras_[0]->getRay(cam0P),
-                                         cameras_[1]->getRay(cam1P), dist);
+                    auto midP = midPoint(processors_[0]->getRay(cam0P),
+                                         processors_[1]->getRay(cam1P), dist);
                     if (dist > 0.0)  // if dist is valid
                     {
                         ptCount += 1.0;
@@ -197,8 +197,8 @@ PointCloud ReconstructorCPU::reconstruct()
                 }
             midPointAvg = midPointAvg / ptCount;
             {
-                auto color0 = cameras_[0]->getColor(minCam0Idx);
-                auto color1 = cameras_[1]->getColor(minCam1Idx);
+                auto color0 = processors_[0]->getColor(minCam0Idx);
+                auto color1 = processors_[1]->getColor(minCam1Idx);
                 res.pushPoint(glm::vec3(midPointAvg), (color0 + color1) / 2.0f);
             }
         }

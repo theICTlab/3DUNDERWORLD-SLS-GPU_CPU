@@ -16,10 +16,10 @@
  * 
  */
 #pragma once
-#include "Camera.h"
+#include "ImageProcessor.h"
 namespace SLS
 {
-class FileReader: public Camera
+class ImageFileProcessor: public ImageProcessor
 {
 protected:
      enum CAMERA_MAT{
@@ -42,9 +42,9 @@ protected:
     
 public:
     //Constructors
-    FileReader() = delete;
-    FileReader(const std::string& cName):
-        Camera(cName),frameIdx_(0),camTransMat_(glm::mat4(1.0)){}
+    ImageFileProcessor() = delete;
+    ImageFileProcessor(const std::string& cName):
+        ImageProcessor(cName),frameIdx_(0),camTransMat_(glm::mat4(1.0)){}
 
 
     /*! Load a sequence of images from `folder` in the order of number

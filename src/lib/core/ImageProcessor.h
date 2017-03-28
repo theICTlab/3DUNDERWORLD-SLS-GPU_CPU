@@ -55,7 +55,7 @@ namespace SLS
  *
  */
 
-class Camera
+class ImageProcessor
 {
 protected:
 
@@ -81,13 +81,13 @@ protected:
     std::vector<unsigned char> thresholds_; //!< Threshold for each pixel with in [0,255], 
 public:
 
-    Camera() = delete;
+    ImageProcessor() = delete;
 
     /*
      * Construction of a camera, it takes the name and the resolution
      * of the camera.
      */
-    explicit Camera(const std::string &cName):name_(cName),resX_(0),resY_(0)
+    explicit ImageProcessor(const std::string &cName):name_(cName),resX_(0),resY_(0)
     {whiteThreshold_=5; blackThreshold_=40;}   //Hack, need to read from file
 
     const std::string& getName() const {return name_;}
@@ -149,7 +149,7 @@ public:
 
     virtual void setResolution(const size_t &x, const size_t &y) {resX_ = x; resY_ = y;}
 
-    virtual ~Camera(){}
+    virtual ~ImageProcessor(){}
 
     // Load camera intrinsic/extrinsic parameters and distortion from file
     virtual void loadConfig(const std::string &configFile) = 0;

@@ -8,7 +8,7 @@ int main(int argc, char** argv)
     p.add<std::string>("output", 'o', "Output of calibration file", true);
     p.parse_check(argc, argv);
 
-    FileReader cam("calibCam");
+    ImageFileProcessor cam("calibCam");
 
     // Calibrator takes a camera as input and output camera configuration.
     std::cout<<"Input param: "<<p.get<std::string>("images")<<std::endl;

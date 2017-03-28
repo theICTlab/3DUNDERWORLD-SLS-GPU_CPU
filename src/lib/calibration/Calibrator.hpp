@@ -1,5 +1,5 @@
 #pragma once
-#include <core/FileReader.h>
+#include <core/ImageFileProcessor.h>
 #include <string>
 #include <condition_variable>
 
@@ -63,7 +63,7 @@ public:
      * \param calibImgsDir Directory contains checkerboard
      * \param calibFile Output calibration result
      */
-    static void Calibrate(FileReader *cam, const std::string &calibImgsDir,
+    static void Calibrate(ImageFileProcessor *cam, const std::string &calibImgsDir,
                           const std::string &calibFile);
 };
 }  // namespace SLS
