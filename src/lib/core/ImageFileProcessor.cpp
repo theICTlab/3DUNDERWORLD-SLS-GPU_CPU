@@ -226,4 +226,40 @@ glm::vec2 ImageFileProcessor::undistortPixel(const glm::vec2 &distortedPixel) co
     return glm::vec2((float)(x*fx)+cx,(float)(y*fy)+cy);
 }
 
+Buckets ImageFileProcessor::generateBuckets(size_t projWidth, size_t projHeight, size_t requiredNumFrames){
+    Buckets bkts;
+    bkts.resize(projWidth * projHeight);
+    computeShadowsAndThresholds();
+    size_t xTimesY = resX_ * resY_;
+    for (size_t i = 0; i < xTimesY; i++) {
+        if (!queryMask(i)) continue;
+        getNextFrame(); getNextFrame(); // Skip first two frames
+        Dynamic_Bitset bits(requiredNumFrames);
+        bool discard = false;
+
+        for (int bitIdx = requiredNumFrames - 1; bitIdx >= 0; bitIdx--)
+        {
+            auto frame = getNextFrame();
+            auto invFrame = getNextFrame();
+            unsigned char pixel = frame.at<uchar>(i % resY_, i / resY_);
+            unsigned char invPixel = invFrame.at<uchar>(i % resY_, i / resY_);
+            if (invPixel > pixel && invPixel - pixel >= getThreashold(i))
+                continue;
+            else if (pixel > invPixel && pixel - invPixel > getWhiteThreshold(i)){
+                bits.setBit((size_t)bitIdx);
+            }
+            else{
+                clearMask(i);
+                discard = true;
+            }
+        }
+        if (!discard) {
+            auto vec2Idx = bits.to_uint_gray();
+            if (projWidth > vec2Idx.x &&
+                    projHeight > vec2Idx.y)
+                bkts[vec2Idx.x * projHeight + vec2Idx.y].push_back(i);
+        }
+    }
+    return bkts;
+}
 }
