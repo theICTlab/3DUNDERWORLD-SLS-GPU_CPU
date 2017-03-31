@@ -54,7 +54,8 @@ namespace SLS {
  *
  */
 
-using Buckets = std::vector<std::vector<size_t>>;
+using Bucket = std::vector<Ray>;
+using Buckets = std::vector<Bucket>;
 
 class ImageProcessor {
 protected:
@@ -70,8 +71,7 @@ protected:
     cv::Mat litImage_;  //!< An all lit image contains color information of
                         //!reconstruction object
 
-    uchar
-        whiteThreshold_;  //!< Thresholds are used to filter out invalid pixel.
+    uchar whiteThreshold_;  //!< Thresholds are used to filter out invalid pixel.
 
     // If the contrast of a pixel between lit and unlit is smaller than the
     // dark threshold, the pixel is invalid.

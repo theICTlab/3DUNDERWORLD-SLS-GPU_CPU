@@ -32,10 +32,6 @@ namespace SLS {
  */
 class ReconstructorCPU : public Reconstructor {
 private:
-    std::vector<std::vector<std::vector<size_t>>>
-        buckets_;  //!< Buckets [camIdx][ProjPixelIdx][camPixelIdx]
-    void initBuckets();
-    void generateBuckets();
 
     //! Find intersection of two projector pixel
     /*! Each projector pixel contains multiple camera pixels.
@@ -50,9 +46,8 @@ private:
      * \param bucket1 Another bucket
      * \return midpoint and color
      */
-    std::array<glm::vec3, 2> intersectionOfBucket_(size_t firstCameraIdx,
-                                                   size_t secondCameraIdx,
-                                                   size_t bucketIdx);
+    std::array<glm::vec3, 2> intersectionOfBucket_(const Bucket& firstBucket,
+                                                   const Bucket& secondBucket);
 
     /*! Similar to intersectionOfBucket_(), this function finds pair of rays
      * with minimu distance to reconstruct the depth.
@@ -60,27 +55,13 @@ private:
      * This function is not used for now since the average method yield more
      * structural result.
      */
-    std::array<glm::vec3, 2> intersectionOfBucketMinDist_(size_t firstCameraIdx,
-                                                   size_t secondCameraIdx,
-                                                   size_t bucketIdx);
+    std::array<glm::vec3, 2> intersectionOfBucketMinDist_(
+        const Bucket& firstBucket, const Bucket& secondBucket);
 
 public:
-    /*! Create a reconstructor with given projector size
-    */
-    ReconstructorCPU(const size_t projX, const size_t projY) : Reconstructor()
-    {
-        projector_ = new Projector(projX, projY);
-    }
-    ~ReconstructorCPU() override;
 
     // Interfaces
     //! Reconstruct point cloud.
-    PointCloud reconstruct() override;
-
-    /*! Add a camera to reconstructor\
-     *
-     * Accepts two camera now.
-     */
-    void addImageProcessor(ImageProcessor *processor) override;
+    PointCloud reconstruct(const std::vector<Buckets>& multiBuckets) override;
 };
 }  // namespace SLS

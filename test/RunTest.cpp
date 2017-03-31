@@ -86,10 +86,14 @@ TEST( RunCPUTest, Arch)
     LC.loadImages(L_IMGS, "", 4, 0, SUFFIX);
     LC.loadConfig(L_CFG);
 
-    SLS::ReconstructorCPU rec(W, H);
-    rec.addImageProcessor(&LC);
-    rec.addImageProcessor(&RC);
-    auto pc = rec.reconstruct();
+    SLS::Projector proj(W, H);
+    SLS::ReconstructorCPU rec;
+    auto pc = rec.reconstruct(std::vector<SLS::Buckets>{
+        LC.generateBuckets(proj.getWidth(), proj.getHeight(),
+                           proj.getRequiredNumFrames()),
+        RC.generateBuckets(proj.getWidth(), proj.getHeight(),
+                           proj.getRequiredNumFrames()),
+    });
 
     pc.exportPointCloud( O_PLY, "ply");
     pc.exportPointCloud( O_OBJ, "obj");
@@ -109,6 +113,7 @@ TEST( RunCPUTest, Alexander)
     const std::string TEST_OBJ = std::string(TEST_REF_PATH) + "/alexander.obj";
     const std::string O_PLY="alexander.ply", O_OBJ="alexander.obj";
 
+    SLS::Projector proj(W, H);
     auto RC = SLS::ImageFileProcessor("RightCamera");
     RC.loadImages(R_IMGS, "", 4, 0, SUFFIX);
     RC.loadConfig(R_CFG);
@@ -117,15 +122,16 @@ TEST( RunCPUTest, Alexander)
     LC.loadImages(L_IMGS, "", 4, 0, SUFFIX);
     LC.loadConfig(L_CFG);
 
-    SLS::ReconstructorCPU rec(W, H);
-    rec.addImageProcessor(&LC);
-    rec.addImageProcessor(&RC);
-    auto pc = rec.reconstruct();
+    SLS::ReconstructorCPU rec;
+    auto pc = rec.reconstruct(std::vector<SLS::Buckets>{
+        LC.generateBuckets(proj.getWidth(), proj.getHeight(),
+                           proj.getRequiredNumFrames()),
+        RC.generateBuckets(proj.getWidth(), proj.getHeight(),
+                           proj.getRequiredNumFrames()),
+    });
 
     pc.exportPointCloud( O_PLY, "ply");
     pc.exportPointCloud( O_OBJ, "obj");
     EXPECT_TRUE(compareObjFiles(TEST_OBJ, O_OBJ));
     EXPECT_TRUE(comparePlyFiles(TEST_PLY, TEST_PLY));
 }
-
-

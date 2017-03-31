@@ -33,7 +33,6 @@ protected:
     size_t frameIdx_;
     std::array<cv::Mat, PARAM_COUNT> params_;
     glm::mat4 camTransMat_; //Transformation matrix for camera
-    std::vector<Ray> rayTable;
     glm::vec2 undistortPixel(const glm::vec2 &distortedPixel) const;
     glm::vec2 undistortPixel(const size_t &distortedIdx) const
     {
@@ -89,7 +88,7 @@ public:
     const cv::Mat& getNextFrame() override;
     void undistort() override;
     void computeShadowsAndThresholds() override;
-    void setResolution (const size_t &x, const size_t &y) override {resX_ = x; resY_ = y; rayTable.resize(resX_*resY_);}
+    void setResolution (const size_t &x, const size_t &y) override {resX_ = x; resY_ = y;}
     unsigned char getWhiteThreshold(size_t i) const { return thresholds_[i];}
     Buckets generateBuckets(size_t projWidth, size_t projHeight, size_t requiredNumFrames) override;
 };

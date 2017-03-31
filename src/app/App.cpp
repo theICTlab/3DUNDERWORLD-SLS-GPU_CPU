@@ -37,27 +37,32 @@ int main(int argc, char** argv)
     std::string suffix = p.get<std::string>("format");
 
     // Initialize two file readers to load images from file
-    SLS::ImageFileProcessor rightCam("rightCam");
-    SLS::ImageFileProcessor leftCam("rightCam");
+    SLS::ImageFileProcessor rightCamProcessor("rightCamProcessor");
+    SLS::ImageFileProcessor leftCamProcessor("rightCamProcessor");
 
     // Load images
     // void loadImages( const std::string &folder, std::string prefix, size_t numDigits, size_t startIdx, std::string suffix )
-    rightCam.loadImages(rightCameraFolder, "", 4, 0,suffix);
-    leftCam.loadImages(leftCameraFolder, "", 4, 0, suffix);
+    rightCamProcessor.loadImages(rightCameraFolder, "", 4, 0,suffix);
+    leftCamProcessor.loadImages(leftCameraFolder, "", 4, 0, suffix);
 
     // Load configurations, mainly calibration parameters
-    rightCam.loadConfig(rightConfigFile);
-    leftCam.loadConfig(leftConfigFile);
+    rightCamProcessor.loadConfig(rightConfigFile);
+    leftCamProcessor.loadConfig(leftConfigFile);
 
-    // Initialize a reconstructor with the resolution of the projection to project patterns
-    SLS::ReconstructorCPU reconstruct(p.get<size_t>("width"), p.get<size_t>("height"));
+    SLS::Projector proj(p.get<size_t>("width"),p.get<size_t>("height"));
 
-    // Add cameras to reconstructor
-    reconstruct.addImageProcessor(&rightCam);
-    reconstruct.addImageProcessor(&leftCam);
+    // Generate reconstruction buckets from image processors
+    std::vector<SLS::Buckets> bucketsVec
+    {
+        rightCamProcessor.generateBuckets(proj.getWidth(), proj.getHeight(), proj.getRequiredNumFrames()),
+        leftCamProcessor.generateBuckets(proj.getWidth(), proj.getHeight(), proj.getRequiredNumFrames())
+    };
+
+    // Initialize a reconstruct
+    SLS::ReconstructorCPU reconstruct;
 
     // Run reconstructio and get the point cloud
-    auto pointCloud = reconstruct.reconstruct();
+    auto pointCloud = reconstruct.reconstruct(bucketsVec);
 
     // Get extension of output file
     auto extension = output.substr(output.find_last_of(".")+1);

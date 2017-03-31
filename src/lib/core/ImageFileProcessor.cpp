@@ -161,8 +161,10 @@ Ray ImageFileProcessor::getRay(const size_t &x, const size_t &y)
         ray.dir.w=0.0;
         ray.dir = camTransMat_*ray.dir;
         ray.dir=glm::normalize(ray.dir);
+        ray.color = getColor(x, y);
         return ray;
 }
+
 Ray ImageFileProcessor::getRay(const size_t &pixelIdx) 
 {
         glm::vec2 undistorted = undistortPixel(pixelIdx);
@@ -181,7 +183,7 @@ Ray ImageFileProcessor::getRay(const size_t &pixelIdx)
         ray.dir.w=0.0;
         ray.dir = camTransMat_*ray.dir;
         ray.dir=glm::normalize(ray.dir);
-
+        ray.color = getColor(pixelIdx);
         return ray;
 }
 
@@ -255,9 +257,7 @@ Buckets ImageFileProcessor::generateBuckets(size_t projWidth, size_t projHeight,
         }
         if (!discard) {
             auto vec2Idx = bits.to_uint_gray();
-            if (projWidth > vec2Idx.x &&
-                    projHeight > vec2Idx.y)
-                bkts[vec2Idx.x * projHeight + vec2Idx.y].push_back(i);
+            bkts[vec2Idx.x * projHeight + vec2Idx.y].push_back(getRay(i));
         }
     }
     return bkts;

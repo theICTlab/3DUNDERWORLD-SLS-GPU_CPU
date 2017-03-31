@@ -9,6 +9,7 @@ struct Ray
 {
     vec4 origin;
     vec4 dir;
+    vec3 color;     // RGB Color
 };
 
 /**

@@ -30,18 +30,12 @@ namespace SLS
 class Reconstructor
 {
 protected:
-    std::vector<ImageProcessor*> processors_;
-    Projector* projector_;
-    std::vector<uint> idx_;
 public:
-    Reconstructor():projector_{nullptr}{};
+    Reconstructor(){};
     virtual ~Reconstructor(){}
 
     //! Reconstruct, return a point cloud
-    virtual PointCloud reconstruct()=0;
-
-    //! Add a camera pointer to reconstructor
-    virtual void addImageProcessor(ImageProcessor* processor)=0;
+    virtual PointCloud reconstruct(const std::vector<Buckets>&)=0;
 
 };
 
