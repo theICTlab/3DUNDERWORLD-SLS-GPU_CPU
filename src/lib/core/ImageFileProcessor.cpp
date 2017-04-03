@@ -245,7 +245,7 @@ Buckets ImageFileProcessor::generateBuckets(size_t projWidth, size_t projHeight,
             auto invFrame = getNextFrame();
             unsigned char pixel = frame.at<uchar>(i % resY_, i / resY_);
             unsigned char invPixel = invFrame.at<uchar>(i % resY_, i / resY_);
-            if (invPixel > pixel && invPixel - pixel >= getThreashold(i))
+            if (invPixel > pixel && invPixel - pixel >= getThreshold(i))
                 continue;
             else if (pixel > invPixel && pixel - invPixel > getWhiteThreshold(i)){
                 bits.setBit((size_t)bitIdx);
