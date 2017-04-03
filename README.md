@@ -17,7 +17,7 @@ In this version, the reconstruction process is reimplemented both on CPU and GPU
 ### How it works
 
 The main building blocks of the libraries are `ImageProcessor` and `Reconstructor`. Image processors take images, projector parameters and camera calibration parameters as input and produce `Buckets`. `Reconstructor` combines all the Buckets to generate the point cloud.  
-![Alt text](https://cdn.rawgit.com/theICTlab/3DUNDERWORLD-SLS-GPU_CPU/dev/doc/how-it-works.svg)
+![Alt text](https://rawgit.com/theICTlab/3DUNDERWORLD-SLS-GPU_CPU/dev/doc/how-it-works.svg)
 
 
 
