@@ -49,9 +49,13 @@ int main(int argc, char** argv)
     rightCamProcessor.loadConfig(rightConfigFile);
     leftCamProcessor.loadConfig(leftConfigFile);
 
+    // Construct a projector parameter provider
     SLS::Projector proj(p.get<size_t>("width"),p.get<size_t>("height"));
 
-    // Generate reconstruction buckets from image processors
+    // Generate reconstruction buckets from image processors.
+    // generateBuckets function requires parameter extracted from the `Projector` object,
+    // namely projector width, height and number of frames required to reconstruct with the 
+    // projected patterns.
     std::vector<SLS::Buckets> bucketsVec
     {
         rightCamProcessor.generateBuckets(proj.getWidth(), proj.getHeight(), proj.getRequiredNumFrames()),

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="24cm" height="17cm" viewBox="181 125 473 338" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="25cm" height="17cm" viewBox="162 125 492 338" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g>
     <polygon style="fill: #ffffff" points="183,226 235.2,226 247.2,238 247.2,260 183,260 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="183,226 235.2,226 247.2,238 247.2,260 183,260 "/>
@@ -57,12 +57,12 @@
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="311.027,215.764 306.146,205.705 311.116,208.265 316.145,205.824 "/>
   </g>
   <g>
-    <polygon style="fill: #ffffff" points="597.342,279.624 641.842,279.624 653.842,291.624 653.842,329.624 597.342,329.624 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="597.342,279.624 641.842,279.624 653.842,291.624 653.842,329.624 597.342,329.624 "/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="641.842,279.624 641.842,291.624 653.842,291.624 "/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="604.342" y="304.524">
-      <tspan x="604.342" y="304.524">Point</tspan>
-      <tspan x="604.342" y="320.524">Cloud</tspan>
+    <polygon style="fill: #ffffff" points="597.342,278.328 641.842,278.328 653.842,290.328 653.842,328.328 597.342,328.328 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="597.342,278.328 641.842,278.328 653.842,290.328 653.842,328.328 597.342,328.328 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="641.842,278.328 641.842,290.328 653.842,290.328 "/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="604.342" y="303.228">
+      <tspan x="604.342" y="303.228">Point</tspan>
+      <tspan x="604.342" y="319.228">Cloud</tspan>
     </text>
   </g>
   <g>
@@ -71,9 +71,9 @@
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="518,282.764 513,272.764 518,275.264 523,272.764 "/>
   </g>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="573.7" y1="304" x2="587.609" y2="304.367"/>
-    <polygon style="fill: #000000" points="595.107,304.565 584.978,309.299 587.609,304.367 585.242,299.303 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="595.107,304.565 584.978,309.299 587.609,304.367 585.242,299.303 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="573.7" y1="304" x2="587.61" y2="303.605"/>
+    <polygon style="fill: #000000" points="595.107,303.392 585.253,308.674 587.61,303.605 584.969,298.678 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="595.107,303.392 585.253,308.674 587.61,303.605 584.969,298.678 "/>
   </g>
   <g>
     <polygon style="fill: #ffffff" points="182.99,340.856 235.19,340.856 247.19,352.856 247.19,374.856 182.99,374.856 "/>
@@ -127,5 +127,24 @@
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="449.89,359.856 518,359.856 518,332.736 "/>
     <polygon style="fill: #000000" points="518,325.236 523,335.236 518,332.736 513,335.236 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="518,325.236 523,335.236 518,332.736 513,335.236 "/>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="163.99,275.314 246.99,275.314 258.99,287.314 258.99,325.314 163.99,325.314 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="163.99,275.314 246.99,275.314 258.99,287.314 258.99,325.314 163.99,325.314 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="246.99,275.314 246.99,287.314 258.99,287.314 "/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="170.99" y="300.214">
+      <tspan x="170.99" y="300.214">Projector </tspan>
+      <tspan x="170.99" y="316.214">Parameters</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="258.99,300.314 311.001,300.314 311.001,281.736 "/>
+    <polygon style="fill: #000000" points="311.001,274.236 316.001,284.236 311.001,281.736 306.001,284.236 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="311.001,274.236 316.001,284.236 311.001,281.736 306.001,284.236 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="258.99,300.314 310.991,300.314 310.991,323.12 "/>
+    <polygon style="fill: #000000" points="310.991,330.62 305.991,320.62 310.991,323.12 315.991,320.62 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.991,330.62 305.991,320.62 310.991,323.12 315.991,320.62 "/>
   </g>
 </svg>

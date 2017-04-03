@@ -7,12 +7,20 @@ Structured light scanner is a tool to reconstruct point cloud from series of ima
 
 In this version, the reconstruction process is reimplemented both on CPU and GPU. Both versions accelerate the reconstruction time. Especially the later one. 
 
+
 ## Dependencies
 * OpenCV2
 * CUDA (6.0+)
 * glm
 
 ## Howto
+### How it works
+
+The main building blocks of the libraries are `ImageProcessor` and `Reconstructor`. Image processors take images, projector parameters and camera calibration parameters as input and produce `Buckets`. `Reconstructor` combines all the Buckets to generate the point cloud.  
+![Alt text](https://cdn.rawgit.com/theICTlab/3DUNDERWORLD-SLS-GPU_CPU/dev/doc/how-it-works.svg)
+
+
+
 ### Compile and run demo binaries
 Demo binaries and data is included.  A CMake script is included to compile the binaries and libraries. 
 ```bash

@@ -26,7 +26,11 @@
 #include "Ray.h"
 
 namespace SLS {
-/*! Base class of camera
+
+using Bucket = std::vector<Ray>;
+using Buckets = std::vector<Bucket>;
+
+/*! Base class of image processor
  *
  * The camera defined here is a specific image input device for reconstruction
  * which includes the full acquisition pipeline.
@@ -53,10 +57,6 @@ namespace SLS {
  * parameters.
  *
  */
-
-using Bucket = std::vector<Ray>;
-using Buckets = std::vector<Bucket>;
-
 class ImageProcessor {
 protected:
     // Name of camera
