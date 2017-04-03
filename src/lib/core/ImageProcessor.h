@@ -32,14 +32,12 @@ using Buckets = std::vector<Bucket>;
 
 /*! Base class of image processor
  *
- * The camera defined here is a specific image input device for reconstruction
- * which includes the full acquisition pipeline.
- *
+ * The image processor includes the full acquisition pipeline.
  * ```
- * +-------+  +-----------+ +--------+   +--------+
- * | Get   |  |Undistort  | |Compute |   |Cast    |
- * | Image +-->Image      +->Mask    +--->Ray     |
- * +-------+  +-----------+ +--------+   +--------+
+ * +-------+  +-----------+ +--------+   +--------+   +--------+
+ * | Get   |  |Undistort  | |Compute |   |Cast    |   |Genearte|
+ * | Image +-->Image      +->Mask    +--->Ray     +--->Buckets |
+ * +-------+  +-----------+ +--------+   +--------+   +--------+
  * ```
  *
  * * The image acquisition is implemented as a forward iterator (getNextFrame)
@@ -53,9 +51,26 @@ using Buckets = std::vector<Bucket>;
  * than a threshold, the pixel is considered invalid and would be `0` in the
  * mask.
  *
- * * The camera can also cast a ray into the 3D space based on the intrinsic
+ * * The camera casts a ray into the 3D space based on the intrinsic
  * parameters.
  *
+ * * A buckets of rays is generated to pass to reconstructor.
+ *
+ * The Buckets is the data structure to hash the ray into projector pixel indices.
+ *
+ * ```
+ * ProjPixels(Buckets)   Rays
+ * +------------------+  +---+---+---+
+ * |       0          +->+R0 |R1 |R2 |
+ * +------------------+  +-------+---+
+ * |       1          +->+R3 |
+ * +------------------+  +----
+ *
+ * +------------------+  +---+
+ * |       n          +->+Rm |
+ * +------------------+  +---+
+ *
+ * ```
  */
 class ImageProcessor {
 protected:
@@ -103,7 +118,7 @@ public:
         y = resY_;
     }
 
-    const unsigned char &getThreashold(const size_t &idx)
+    const unsigned char &getThreshold(const size_t &idx)
     {
         return thresholds_[idx];
     }
@@ -134,18 +149,21 @@ public:
 
     // Interfaces
     /**
-     *!  Get a ray in world space by given pixel
-     *
-     * \param x x coordinate of pixel
-     * \param y y coordinate of pixel
-     *
-     * \return Ray shot from camera to this pixel
-     */
-
-    // Reconstruction relies on find intersection of two rays at the same point
-    // from two cameras. The rays can be get from the following functions.
+    *!  Get a ray in world space by given pixel
+    * \param x x coordinate of pixel
+    * \param y y coordinate of pixel
+    *
+    * \return Ray shot from camera to this pixel
+    */
     virtual Ray getRay(const size_t &x, const size_t &y) = 0;
 
+    /**
+     * ! Get a ray by pixel index.
+     *
+     * \param idx pixel index
+     *
+     * \returns Ray shot from the pixel.
+     */
     virtual Ray getRay(const size_t &idx) = 0;
 
     virtual void setResolution(const size_t &x, const size_t &y)

@@ -50,13 +50,13 @@ std::array<glm::vec3, 2> ReconstructorCPU::intersectionOfBucketMinDist_(
 }
 
 PointCloud ReconstructorCPU::reconstruct(
-    const std::vector<Buckets>& multiBuckets)
+    const std::vector<Buckets>& bucketsArray)
 {
     PointCloud res;
     LOG::startTimer();
-    for (size_t i = 0; i < multiBuckets[0].size(); i++) {
+    for (size_t i = 0; i < bucketsArray[0].size(); i++) {
         std::array<glm::vec3, 2> point =
-            intersectionOfBucket_(multiBuckets[0][i], multiBuckets[1][i]);
+            intersectionOfBucket_(bucketsArray[0][i], bucketsArray[1][i]);
         if (glm::all(glm::equal(point[0], glm::vec3(0.0))) &&
             glm::all(glm::equal(point[1], glm::vec3(0.0))))
             continue;

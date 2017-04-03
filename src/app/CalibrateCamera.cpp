@@ -11,7 +11,6 @@ int main(int argc, char** argv)
     ImageFileProcessor cam("calibCam");
 
     // Calibrator takes a camera as input and output camera configuration.
-    std::cout<<"Input param: "<<p.get<std::string>("images")<<std::endl;
-    Calibrator::Calibrate(&cam, "../../data/alexander/rightCam/calib", p.get<std::string>("output"));
+    Calibrator::Calibrate(&cam, p.get<std::string>("images"), p.get<std::string>("output"));
     return 0;
 }

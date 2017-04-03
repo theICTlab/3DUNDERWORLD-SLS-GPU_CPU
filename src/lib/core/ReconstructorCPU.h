@@ -6,29 +6,7 @@
 namespace SLS {
 
 // CPU reconstructor
-/*! Reconstruction buckets of cameras
- *
- * In the reconstruction, camera pixels are assigned to different projector
- * pixels.
- * Generally, one projector pixels contains more than one camera pixel. For each
- * camera, we assign
- * pixels to projector pixels, and call those projector pixels buckets.
- * ```
- * ProjPixels(Buckets)   Camera pixels
- * +------------------+  +---+---+---+
- * |       0          +->+   |   |   |
- * +------------------+  +-------+---+
- * |       1          +->+   |
- * +------------------+  +----
- *
- * +------------------+  +---+---+
- * |       n          +->+   |   |
- * +------------------+  +---+---+
- *
- * ```
- * The camera pixels in the same bucket of two different cameras are considered
- * correspondent pixels,
- * depth then can be extracted from those pixels.
+/*! Reconstruct point cloud from buckets provided by image processor.
  */
 class ReconstructorCPU : public Reconstructor {
 private:
@@ -60,8 +38,13 @@ private:
 
 public:
 
-    // Interfaces
-    //! Reconstruct point cloud.
-    PointCloud reconstruct(const std::vector<Buckets>& multiBuckets) override;
+    /**
+     * !Synopsis  
+     *
+     * \param bucketsArray buckets for reconstruction
+     *
+     * \returns Point cloud
+     */
+    PointCloud reconstruct(const std::vector<Buckets>& bucketsArray) override;
 };
 }  // namespace SLS

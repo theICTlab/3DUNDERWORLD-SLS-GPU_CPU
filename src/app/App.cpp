@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     // Initialize a reconstruct
     SLS::ReconstructorCPU reconstruct;
 
-    // Run reconstructio and get the point cloud
+    // Run reconstruction and get the point cloud
     auto pointCloud = reconstruct.reconstruct(bucketsVec);
 
     // Get extension of output file
