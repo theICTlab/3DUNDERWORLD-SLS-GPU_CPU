@@ -61,7 +61,7 @@ options:
   -r, --rightcam       Right camera image folder (string)
   -L, --leftconfig     Left camera configuration file (string)
   -R, --rightconfig    Right camera configuration file (string)
-  -o, --output         Right camera configuration file (string)
+  -o, --output         Output folder (string)
   -f, --format         Suffix of image files, e.g. jpg (string)
   -w, --width          Projector width (unsigned long)
   -h, --height         Projector height (unsigned long)
