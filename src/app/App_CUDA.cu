@@ -9,7 +9,7 @@ int main(int argc, char** argv)
     p.add<std::string>("rightcam", 'r',"Right camera image folder", true);
     p.add<std::string>("leftconfig", 'L',"Left camera configuration file", true);
     p.add<std::string>("rightconfig", 'R',"Right camera configuration file", true);
-    p.add<std::string>("output", 'o',"Right camera configuration file", true);
+    p.add<std::string>("output", 'o',"Output folder", true);
     p.add<std::string>("format", 'f',"Suffix of image files, e.g. jpg", true);
     p.add<size_t>("width", 'w',"Projector width", true);
     p.add<size_t>("height", 'h',"Projector height", true);
