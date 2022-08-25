@@ -38,12 +38,12 @@ int main(int argc, char** argv)
 
     // Initialize two file readers to load images from file
     SLS::ImageFileProcessor rightCamProcessor("rightCamProcessor");
-    SLS::ImageFileProcessor leftCamProcessor("rightCamProcessor");
+    SLS::ImageFileProcessor leftCamProcessor("leftCamProcessor");
 
     // Load images
     // void loadImages( const std::string &folder, std::string prefix, size_t numDigits, size_t startIdx, std::string suffix )
-    rightCamProcessor.loadImages(rightCameraFolder, "", 4, 0,suffix);
-    leftCamProcessor.loadImages(leftCameraFolder, "", 4, 0, suffix);
+    rightCamProcessor.loadImages(rightCameraFolder, "", 4, 1,suffix);
+    leftCamProcessor.loadImages(leftCameraFolder, "", 4, 1, suffix);
 
     // Load configurations, mainly calibration parameters
     rightCamProcessor.loadConfig(rightConfigFile);
