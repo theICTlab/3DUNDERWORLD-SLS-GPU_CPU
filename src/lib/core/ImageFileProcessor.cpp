@@ -20,7 +20,7 @@ void ImageFileProcessor::loadImages(const std::string& folder, std::string prefi
         jpgss<<prefix<<std::setfill('0')<<std::setw(numDigits)<<images_.size()+startIdx<<"."<<suffix;
         std::string fName = ss.str()+jpgss.str();
         LOG::writeLog("Loading file: %s \n", fName.c_str());
-        cv::Mat img=cv::imread(fName, CV_LOAD_IMAGE_COLOR);
+        cv::Mat img=cv::imread(fName, cv::IMREAD_COLOR);
         if (!img.data)
             break;
         else 
@@ -30,7 +30,7 @@ void ImageFileProcessor::loadImages(const std::string& folder, std::string prefi
                 img.copyTo(litImage_);
 
             cv::Mat gray;
-            cv::cvtColor(img, gray, CV_BGR2GRAY);
+            cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
             images_.push_back(gray.clone());
         }
         img.release();
@@ -256,7 +256,9 @@ Buckets ImageFileProcessor::generateBuckets(size_t projWidth, size_t projHeight,
             }
         }
         if (!discard) {
-            auto vec2Idx = bits.to_uint_gray();
+            glm::uvec2 vec2Idx = bits.to_uint_gray();
+
+            auto len= vec2Idx.x * projHeight + vec2Idx.y;
             bkts[vec2Idx.x * projHeight + vec2Idx.y].push_back(getRay(i));
         }
     }

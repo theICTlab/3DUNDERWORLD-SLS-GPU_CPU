@@ -25,9 +25,9 @@ class Calibrator {
                                       const std::string &windowName)
     {
         cv::Mat textImg;
-        cv::cvtColor(img, textImg, CV_GRAY2RGB);
-        cv::putText(textImg, text, cvPoint(20, 70), cv::FONT_HERSHEY_SIMPLEX,
-                    3.0, cvScalar(0, 0, 255), 2, CV_AA);
+        cv::cvtColor(img, textImg, cv::COLOR_BGR2GRAY);
+        cv::putText(textImg, text, cv::Point(20, 70), cv::FONT_HERSHEY_SIMPLEX,
+                    3.0, cv::Scalar(0, 0, 255), 2, cv::LINE_AA);
         cv::imshow(windowName, textImg);
         textImg.release();
     }
@@ -38,7 +38,7 @@ class Calibrator {
      * /param img   Input image
      * /return 4 external points
      */
-    static cv::vector<cv::Point2f> manualMarkCheckBoard(cv::Mat img);
+    static std::vector<cv::Point2f> manualMarkCheckBoard(cv::Mat img);
 
     /*! Extract corners in an image
      *
@@ -50,8 +50,8 @@ class Calibrator {
      * \return
      */
     static bool findCornersInCamImg(const cv::Mat &img,
-                                    cv::vector<cv::Point2f> &camCorners,
-                                    cv::vector<cv::Point3f> &objCorners,
+                                    std::vector<cv::Point2f> &camCorners,
+                                    std::vector<cv::Point3f> &objCorners,
                                     cv::Size squareSize);
     /*! Mark a white pixel on \p img image. 
      */

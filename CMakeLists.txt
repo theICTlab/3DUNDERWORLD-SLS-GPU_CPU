@@ -34,8 +34,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package( GLM REQUIRED )
 include_directories(${GLM_INCLUDE_DIR})
 
-
-find_package( OpenCV REQUIRED )
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+find_package( OpenCV 4.0 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 #Detecting CUDA

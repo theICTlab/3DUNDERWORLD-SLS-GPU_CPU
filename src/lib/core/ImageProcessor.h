@@ -20,7 +20,7 @@
 #include <array>
 #include <glm/glm.hpp>
 #include <iostream>
-#include <opencv2/opencv.hpp>
+#include <opencv4/opencv2/opencv.hpp>
 #include <string>
 #include "DynamicBitset.h"
 #include "Ray.h"
