@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install glm
-    - run: wget https://github.com/g-truc/glm/archive/refs/tags/0.9.9.8.tar.gz && tar -xzvf 0.9.9.8.tar.gz && cd glm-0.9.9.8 && cmake . && make && sudo make install && cd ..
+      run: wget https://github.com/g-truc/glm/archive/refs/tags/0.9.9.8.tar.gz && tar -xzvf 0.9.9.8.tar.gz && cd glm-0.9.9.8 && cmake . && make && sudo make install && cd ..
     - name: Install dependencies
       run: sudo apt-get install -y libopencv-dev
     - name: Checkout submodules
