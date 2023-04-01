@@ -1,0 +1,25 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: sudo apt-get install -y libopencv-dev
+    - name: Checkout submodules
+      uses: textbook/git-checkout-submodule-action@2.1.1
+    - name: config
+      run: mkdir build && cd build && cmake .. -DGTEST=ON -DENABLE_CUDA=OFF -DTEST_DATA_PATH="../../data/" -DTEST_REF_PATH="../../test/data/"
+    - name: build
+      run: make
+    - name: test
+      run: make test
