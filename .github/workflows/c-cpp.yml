@@ -16,7 +16,7 @@ jobs:
     - name: Install dependencies
       run: sudo apt-get install -y libopencv-dev
     - name: Checkout submodules
-      uses: textbook/git-checkout-submodule-action@2.1.1
+      run: git submodule update --recursive --remote
     - name: config
       run: mkdir build && cd build && cmake .. -DGTEST=ON -DENABLE_CUDA=OFF -DTEST_DATA_PATH="../../data/" -DTEST_REF_PATH="../../test/data/"
     - name: build
