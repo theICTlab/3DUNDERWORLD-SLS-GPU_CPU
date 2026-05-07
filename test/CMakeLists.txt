@@ -4,7 +4,7 @@ add_definitions(-DTEST_REF_PATH=\"${CMAKE_SOURCE_DIR}/test/data\")
 # Grab gtest
 include(ExternalProject)
 ExternalProject_Add(gtest
-    URL https://github.com/google/googletest/archive/release-1.8.0.zip
+    URL https://github.com/google/googletest/releases/download/v1.17.0/googletest-1.17.0.tar.gz
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
     INSTALL_COMMAND ""
     )
@@ -17,14 +17,16 @@ find_package(Threads REQUIRED)
 ##### Unit test #######
 include_directories(${source_dir}/googletest/include)
 set(GTEST_LIBRARIES
-    ${binary_dir}/googlemock/gtest/libgtest.a
-    ${binary_dir}/googlemock/gtest/libgtest_main.a)
+        ${binary_dir}/lib/libgtest.a
+        ${binary_dir}/lib/libgtest_main.a)
 
 
 add_executable(runCPUTest RunTest.cpp)
 add_dependencies(runCPUTest gtest)
 target_link_libraries(runCPUTest ${GTEST_LIBRARIES} Threads::Threads)
 target_link_libraries(runCPUTest core)
+include(GoogleTest)
+gtest_discover_tests(runCPUTest)
 
 # Use test 
 if (COVERAGE)
