@@ -15,6 +15,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install glm
       run: wget https://github.com/g-truc/glm/archive/0.9.8.3.tar.gz && tar -xzvf 0.9.8.3.tar.gz && cd glm-0.9.8.3 && cmake . && make && sudo make install && cd ..
+    - name: Update package lists
+      run: sudo apt-get update
     - name: Install dependencies
       run: sudo apt-get install -y libopencv-dev
     - name: Checkout submodules
@@ -22,6 +24,8 @@ jobs:
     - name: config
       run: mkdir build && cd build && cmake .. -DGTEST=ON -DENABLE_CUDA=OFF -DTEST_DATA_PATH="../../data/" -DTEST_REF_PATH="../../test/data/"
     - name: build
+      working-directory: build
       run: make
     - name: test
+      working-directory: build
       run: make test
