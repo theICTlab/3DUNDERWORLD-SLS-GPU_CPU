@@ -28,4 +28,4 @@ jobs:
       run: make
     - name: test
       working-directory: build
-      run: make test
+      run: ctest --rerun-failed --output-on-failure
