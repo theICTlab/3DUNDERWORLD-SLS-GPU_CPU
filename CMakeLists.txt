@@ -19,7 +19,7 @@ if(NOT WIN32)
     set(BoldWhite   "${Esc}[1;37m")
 endif()
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 project( SLS )
 set (VERSION_MAJOR 4)
@@ -75,7 +75,7 @@ if (${USE_CUDA})
 endif(${USE_CUDA})
 
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -O3")
+set(CMAKE_CXX_FLAGS "-std=c++20 -g -Wall")
 
 if (GTEST)
     enable_testing()
@@ -85,7 +85,7 @@ endif (GTEST)
 # Enable code coverage
 option (COVERAGE "Build with coverage test, require GTEST=on" OFF)
 if (COVERAGE AND GTEST)
-    set (CMAKE_CXX_FLAGS "-std=c++11 -g -O0 -fprofile-arcs -ftest-coverage")
+    set (CMAKE_CXX_FLAGS "-std=c++20 -g -O0 -fprofile-arcs -ftest-coverage")
     set (CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
     set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
 endif()

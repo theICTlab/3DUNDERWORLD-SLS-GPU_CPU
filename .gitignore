@@ -8,5 +8,6 @@ temp
 !data/alexander
 YCM-Generator
 *.swp
-
+.idea
+data
 
