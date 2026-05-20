@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Capture frames from a V4L2 USB camera and save as JPEG files.
+#
+# Usage: save_frames <camera_index> <output_dir> <num_frames>
+# Example: save_frames 0 /tmp/left_cam 10
+#          -> /tmp/left_cam/1.jpg .. /tmp/left_cam/10.jpg
+
+set -euo pipefail
+
+usage() {
+    echo "Usage: $0 <camera_index> <output_dir> <num_frames>"
+    echo "Example: $0 0 /tmp/left_cam 10"
+    exit 1
+}
+
+[[ $# -eq 3 ]] || usage
+
+CAM_INDEX="$1"
+OUT_DIR="$2"
+NUM_FRAMES="$3"
+
+[[ "$NUM_FRAMES" =~ ^[1-9][0-9]*$ ]] || {
+    echo "error: num_frames must be a positive integer" >&2
+    exit 1
+}
+
+DEVICE="/dev/video${CAM_INDEX}"
+[[ -e "$DEVICE" ]] || {
+    echo "error: camera device not found: $DEVICE" >&2
+    exit 1
+}
+
+command -v ffmpeg >/dev/null 2>&1 || {
+    echo "error: ffmpeg not found (install with: apt install ffmpeg)" >&2
+    exit 1
+}
+
+mkdir -p "$OUT_DIR"
+
+# Discard a few frames so exposure/focus can settle.
+ffmpeg -hide_banner -loglevel error -f v4l2 -i "$DEVICE" -frames:v 3 -f null - 2>/dev/null || true
+
+ffmpeg -hide_banner -loglevel error \
+    -f v4l2 -i "$DEVICE" \
+    -frames:v "$NUM_FRAMES" \
+    -q:v 2 \
+    "${OUT_DIR}/%d.JPG"
+
+echo "Saved ${NUM_FRAMES} frame(s) to ${OUT_DIR}/1.jpg .. ${OUT_DIR}/${NUM_FRAMES}.JPG"
