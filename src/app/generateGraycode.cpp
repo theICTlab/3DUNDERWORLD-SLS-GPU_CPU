@@ -1,19 +1,28 @@
-#include <iostream>
+// Shows the gray code pattern with option of moving the window to projector
+// without chrome.
 #include <GrayCode/GrayCode.hpp>
-int main()
-{
-    // Generate gray code based on the resolution of the projector.
-    SLS::GrayCode gc(1024, 768);
-    std::vector<cv::Mat> grayCodeImages = gc.generateGrayCode();
+#include <iostream>
+int main() {
+  const auto kSize = cv::Size(1920, 1080);
+  SLS::GrayCode gc(kSize.width, kSize.height);
+  const std::vector<cv::Mat> images = gc.generateGrayCode();
 
-    // Display graycode
-    std::cout<<"Press 'q' to exit\n";
-    std::cout<<"Press any key to show next image\n";
-    for (const auto & image: grayCodeImages)
-    {
-        cv::imshow("GrayCode", image);
-        if (cv::waitKey(0) == 'q')
-            break;
+  constexpr std::string_view win_name = "Setup Window";
+  cv::namedWindow(win_name.data(), cv::WINDOW_NORMAL);
+
+  for (size_t i = 0; i < images.size(); ++i) {
+    if (i == 0) {
+      std::cout << "Move window to display/projector. Any key to continue or "
+                   "'q' to exit."
+                << std::endl;
+    } else {
+      cv::setWindowProperty(win_name.data(), cv::WND_PROP_FULLSCREEN,
+                            cv::WINDOW_FULLSCREEN);
     }
-    return 0;
+    cv::imshow(win_name.data(), images[i]);
+    if (cv::waitKey(0) == 'q')
+      break;
+  }
+
+  return EXIT_SUCCESS;
 }
