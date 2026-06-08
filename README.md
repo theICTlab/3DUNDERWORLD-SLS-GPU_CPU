@@ -34,6 +34,14 @@ If CUDA is detected in your system, the cmake flag `ENABLE_CUDA` is set to `on` 
 
 You can use `cmake .. -DENABLE_CUDA=off` to disable CUDA if you don't want compile the GPU binary.
 
+To build the GPU reconstructor for AMD GPUs instead of NVIDIA, configure with `-DUSE_HIP=ON` and set the target architecture via `CMAKE_HIP_ARCHITECTURES` (for example `gfx90a` for CDNA2 / MI200, or `gfx1100` for RDNA3). This requires a [ROCm](https://rocm.docs.amd.com/) installation (7.2 or newer) providing HIP:
+```
+mkdir build && cd build
+cmake .. -DUSE_HIP=ON -DCMAKE_HIP_ARCHITECTURES=gfx90a
+make
+```
+The default `ENABLE_CUDA` (NVIDIA) path is unchanged.
+
 ### Enable test
 A test using [Google Test Framework](https://github.com/google/googletest.git) is included in the build. To use the test, enable `GTEST` flag at configuration stage.
 ```bash
