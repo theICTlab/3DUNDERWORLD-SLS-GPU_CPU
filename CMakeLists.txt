@@ -37,42 +37,56 @@ include_directories(${GLM_INCLUDE_DIR})
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 find_package(OpenCV 4.0 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
+# On Windows the prebuilt OpenCV uses include/opencv2/ but sources include
+# <opencv4/opencv2/...> (the Linux /usr/include/opencv4 layout). Provide
+# a compat dir where opencv4/ maps to the actual include root.
+if(WIN32 AND DEFINED OPENCV4_COMPAT_DIR)
+    include_directories(${OPENCV4_COMPAT_DIR})
+endif()
 
-#Detecting CUDA
-find_package(CUDA)
-# Set default ENABLE_CUDA value
-option(ENABLE_CUDA "Enable CUDA in build" OFF)
-option(GTEST "Enable Google test in buid" OFF)
-#if (NOT DEFINED ${ENABLE_CUDA})
-#    if (${CUDA_FOUND})
-#        set(ENABLE_CUDA ON)
-#    else (${CUDA_FOUND})
-#        set(ENABLE_CUDA OFF)
-#    endif(${CUDA_FOUND})
-#    message( "CUDA not defined")
-#endif (NOT DEFINED ${ENABLE_CUDA})
+# GPU backend selection: NVIDIA via ENABLE_CUDA (legacy FindCUDA), AMD via
+# USE_HIP (first-class HIP language). USE_GPU gates the shared GPU targets.
+option (ENABLE_CUDA "Enable CUDA in build" OFF)
+option (USE_HIP "Build the GPU reconstructor with HIP for AMD GPUs" OFF)
+option (GTEST "Enable Google test in buid" OFF)
+set( USE_CUDA OFF)
+set( USE_GPU OFF)
 
-if (${CUDA_FOUND} AND ${ENABLE_CUDA})
-    set(USE_CUDA ON)
-    include_directories(${CUDA_INCLUDE_DIRS})
-    set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-    list(APPEND CUDA_NVCC_FLAGS "-O2 -std=c++11 -D__STRICT_ANSI__ -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES")
-else (${CUDA_FOUND} AND ${ENABLE_CUDA})
-    set(USE_CUDA OFF)
-endif (${CUDA_FOUND} AND ${ENABLE_CUDA})
+if (USE_HIP)
+    enable_language(HIP)
+    # Default the arch only when unset; never hardcode a literal here, or
+    # -DCMAKE_HIP_ARCHITECTURES is overridden and every target arch must edit
+    # this file.
+    if (NOT DEFINED CMAKE_HIP_ARCHITECTURES OR CMAKE_HIP_ARCHITECTURES STREQUAL "")
+        set(CMAKE_HIP_ARCHITECTURES "gfx90a")
+    endif()
+    set( USE_GPU ON)
+    add_definitions(-DUSE_HIP)
+    message(STATUS "${Green}Building GPU reconstructor with HIP for ${CMAKE_HIP_ARCHITECTURES}${ColourReset}")
+else (USE_HIP)
+    #Detecting CUDA
+    find_package(CUDA)
+    if (${CUDA_FOUND} AND ${ENABLE_CUDA})
+        set( USE_CUDA ON)
+        set( USE_GPU ON)
+        include_directories(${CUDA_INCLUDE_DIRS})
+        set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+        list(APPEND CUDA_NVCC_FLAGS "-O2 -std=c++11 -D__STRICT_ANSI__ -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES")
+    endif (${CUDA_FOUND} AND ${ENABLE_CUDA})
 
-if (${CUDA_FOUND} AND NOT ${ENABLE_CUDA})
-    message(STATUS "${Yellow}CUDA is available but disabled, use -DENABLE_CUDA=ON to enable CUDA${ColourReset}")
-endif (${CUDA_FOUND} AND NOT ${ENABLE_CUDA})
+    if (${CUDA_FOUND} AND NOT ${ENABLE_CUDA})
+        message(STATUS "${Yellow}CUDA is available but disabled, use -DENABLE_CUDA=ON to enable CUDA${ColourReset}")
+    endif (${CUDA_FOUND} AND NOT ${ENABLE_CUDA})
 
-if (NOT ${CUDA_FOUND} AND ${ENABLE_CUDA})
-    message(STATUS "${Yellow}CUDA is not found${ColourReset}")
-endif (NOT ${CUDA_FOUND} AND ${ENABLE_CUDA})
+    if (NOT ${CUDA_FOUND} AND ${ENABLE_CUDA})
+        message(STATUS "${Yellow}CUDA is not found${ColourReset}")
+    endif (NOT ${CUDA_FOUND} AND ${ENABLE_CUDA})
+endif (USE_HIP)
 
 
-if (${USE_CUDA})
+if (${USE_GPU})
     add_subdirectory(./src/lib/ReconstructorCUDA)
-endif (${USE_CUDA})
+endif(${USE_GPU})
 
 
 set(CMAKE_CXX_FLAGS "-std=c++20 -g -Wall")

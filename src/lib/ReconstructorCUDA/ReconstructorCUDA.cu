@@ -1,11 +1,12 @@
-#include <device_launch_parameters.h>
+#if !defined(USE_HIP) && !defined(__HIP_PLATFORM_AMD__)
+#include <device_launch_parameters.h>  // NVIDIA-only; HIP defines these builtins intrinsically
+#endif
 #include "ReconstructorCUDA.cuh"
 #include "FileReaderCUDA.cuh"
 namespace SLS
 {
 
-ReconstructorCUDA :: ReconstructorCUDA(const size_t projX, const size_t projY): 
-    Reconstructor()
+ReconstructorCUDA :: ReconstructorCUDA(const size_t projX, const size_t projY)
 {
     projector_ = new Projector(projX, projY);
 }

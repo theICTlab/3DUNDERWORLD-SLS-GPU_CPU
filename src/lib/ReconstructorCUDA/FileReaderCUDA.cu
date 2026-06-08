@@ -1,6 +1,8 @@
 
 #include "FileReaderCUDA.cuh"
-#include <device_launch_parameters.h>
+#if !defined(USE_HIP) && !defined(__HIP_PLATFORM_AMD__)
+#include <device_launch_parameters.h>  // NVIDIA-only; HIP defines these builtins intrinsically
+#endif
 
 namespace SLS
 {
@@ -65,7 +67,7 @@ void FileReaderCUDA::computeShadowsAndThresholds()
 }
 
 void FileReaderCUDA::loadConfig(const std::string& configFile){
-    FileReader::loadConfig(configFile);
+    ImageFileProcessor::loadConfig(configFile);
     // Copy config file to GPU
     float tmpVal[9];
 

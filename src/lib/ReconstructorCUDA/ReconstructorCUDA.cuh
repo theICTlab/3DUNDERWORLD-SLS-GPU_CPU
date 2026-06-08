@@ -1,5 +1,6 @@
 #pragma once
-#include <core/Reconstructor.h>
+#include <core/ImageProcessor.h>
+#include <core/Projector.h>
 #include <core/Log.hpp>
 #include "DynamicBits.cuh"
 #include <vector>
@@ -7,14 +8,23 @@
 
 namespace SLS
 {
-class ReconstructorCUDA: public Reconstructor
+// The GPU reconstructor runs its own on-device pipeline (build buckets from the
+// cameras, then triangulate), so it owns its cameras and projector directly.
+// Upstream refactored the CPU-side Reconstructor base into a pure interface that
+// takes pre-built Buckets and renamed Camera -> ImageProcessor; this GPU class
+// is a standalone parallel pipeline rather than an implementation of that
+// interface. ImageProcessor is the renamed Camera base.
+using Camera = ImageProcessor;
+class ReconstructorCUDA
 {
 private:
+    std::vector<Camera*> cameras_;
+    Projector* projector_;
 public:
      ReconstructorCUDA(const size_t projX, const size_t projY);
-    ~ReconstructorCUDA() override;
-    void addCamera(Camera *cam) override;
-    PointCloud reconstruct() override;
+    ~ReconstructorCUDA();
+    void addCamera(Camera *cam);
+    PointCloud reconstruct();
 };
 
 struct GPUBucketsObj
