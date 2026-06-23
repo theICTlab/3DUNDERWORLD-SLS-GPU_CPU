@@ -53,13 +53,9 @@ set( USE_CUDA OFF)
 set( USE_GPU OFF)
 
 if (USE_HIP)
+    # enable_language(HIP) honors -DCMAKE_HIP_ARCHITECTURES, else auto-detects the
+    # host GPU, else errors on a no-GPU host.
     enable_language(HIP)
-    # Default the arch only when unset; never hardcode a literal here, or
-    # -DCMAKE_HIP_ARCHITECTURES is overridden and every target arch must edit
-    # this file.
-    if (NOT DEFINED CMAKE_HIP_ARCHITECTURES OR CMAKE_HIP_ARCHITECTURES STREQUAL "")
-        set(CMAKE_HIP_ARCHITECTURES "gfx90a")
-    endif()
     set( USE_GPU ON)
     add_definitions(-DUSE_HIP)
     message(STATUS "${Green}Building GPU reconstructor with HIP for ${CMAKE_HIP_ARCHITECTURES}${ColourReset}")
