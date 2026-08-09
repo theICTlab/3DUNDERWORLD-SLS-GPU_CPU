@@ -54,8 +54,15 @@
 #define cudaEventSynchronize   hipEventSynchronize
 #define cudaEventElapsedTime   hipEventElapsedTime
 
+// Abort the kernel. `trap;` is an NVPTX instruction with no amdgcn spelling;
+// clang provides __builtin_trap() in device code, which nvcc does not, so each
+// backend needs its own and neither compiles under the other.
+#define gpuTrap()              __builtin_trap()
+
 #else
 
 #include <cuda_runtime.h>
+
+#define gpuTrap()              asm("trap;")
 
 #endif
