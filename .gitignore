@@ -10,6 +10,4 @@ YCM-Generator
 *.swp
 .idea
 data
-
-build_ci_check/
-build_hip/
+build*/
