@@ -4,17 +4,24 @@ aux_source_directory(. SOURCES)
 add_executable(SLS App.cpp)
 target_link_libraries(SLS core)
 
-
-IF (${USE_CUDA})
-    cuda_add_executable(SLS_GPU ./App_CUDA.cu)
+IF(${USE_GPU})
+    if (USE_HIP)
+        set_source_files_properties(./App_CUDA.cu PROPERTIES LANGUAGE HIP)
+        add_executable(SLS_GPU ./App_CUDA.cu)
+        set_target_properties(SLS_GPU PROPERTIES HIP_ARCHITECTURES "${CMAKE_HIP_ARCHITECTURES}")
+        target_compile_features(SLS_GPU PRIVATE cxx_std_17)
+        target_compile_options(SLS_GPU PRIVATE -include ${CMAKE_SOURCE_DIR}/src/lib/ReconstructorCUDA/cuda_to_hip.h)
+    else (USE_HIP)
+        cuda_add_executable(SLS_GPU ./App_CUDA.cu)
+    endif (USE_HIP)
     target_link_libraries(SLS_GPU core sls_gpu)
-    set_target_properties(SLS_GPU
-            PROPERTIES
-            #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-            #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    )
-ENDIF (${USE_CUDA})
+    set_target_properties ( SLS_GPU
+        PROPERTIES
+        #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
+ENDIF(${USE_GPU})
 
 add_executable(calibrateCamera CalibrateCamera.cpp)
 target_link_libraries(calibrateCamera core sls_calib)

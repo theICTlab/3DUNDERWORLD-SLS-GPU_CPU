@@ -34,6 +34,16 @@ If CUDA is detected in your system, the cmake flag `ENABLE_CUDA` is set to `on` 
 
 You can use `cmake .. -DENABLE_CUDA=off` to disable CUDA if you don't want compile the GPU binary.
 
+To build the GPU reconstructor for AMD GPUs instead of NVIDIA, configure with `-DUSE_HIP=ON` and set the target architecture via `CMAKE_HIP_ARCHITECTURES` (for example `gfx90a` for CDNA2 / MI200, `gfx942` for CDNA3 / MI300, or `gfx1100` for RDNA3). This requires a [ROCm](https://rocm.docs.amd.com/) installation providing HIP; the build was tested with ROCm 7.2.
+```
+mkdir build && cd build
+cmake .. -DUSE_HIP=ON -DCMAKE_HIP_ARCHITECTURES=gfx90a
+make
+```
+If CMake does not pick up the HIP compiler from the ROCm installation, name it explicitly, for example `-DCMAKE_HIP_COMPILER=/opt/rocm/llvm/bin/clang++`. Leaving `CMAKE_HIP_ARCHITECTURES` unset makes CMake detect the architecture of the GPU in the machine, which fails on a machine without one, so build machines should set it. The default `ENABLE_CUDA` (NVIDIA) path is unchanged.
+
+On Windows the prebuilt OpenCV packages install their headers as `include/opencv2/...`, while the sources include them as `<opencv4/opencv2/...>` (the layout of the Linux distribution packages). Set `OPENCV4_COMPAT_DIR` to a directory that contains an `opencv4` entry resolving to the OpenCV include root, so that both spellings work: with a junction created by `mklink /J C:\opencv-compat\opencv4 C:\opencv\build\include`, configure with `-DOPENCV4_COMPAT_DIR=C:/opencv-compat`.
+
 ### Enable test
 A test using [Google Test Framework](https://github.com/google/googletest.git) is included in the build. To use the test, enable `GTEST` flag at configuration stage.
 ```bash

@@ -10,4 +10,4 @@ YCM-Generator
 *.swp
 .idea
 data
-
+build*/

@@ -85,7 +85,7 @@ struct Dynamic_Bitset_Array_GPU
         if (bitsPerElem > sizeof(uint)*BITS_PER_BYTE)   // Break if longer than uint
         {
             __threadfence();
-            asm("trap;");
+            gpuTrap();
         }
         unsigned char *e = &bits[(elem * bitsPerElem)/BITS_PER_BYTE];
         unsigned int res = 0;

@@ -1,0 +1,64 @@
+name: ROCm build (HIP)
+
+# Compile-only build of the GPU reconstructor with HIP for AMD GPUs. GitHub's
+# hosted runners have no AMD GPU, so this job configures and builds SLS_GPU but
+# does not run it -- mirroring how the CUDA CI (c-cpp.yml) build-checks without
+# executing on device. The steps below double as a reference for configuring
+# ROCm/HIP on a local machine: install ROCm, then point CMake at the HIP
+# compiler with -DUSE_HIP=ON and a target GPU architecture.
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+  workflow_dispatch:
+
+jobs:
+  build-hip:
+
+    runs-on: ubuntu-latest
+
+    # rocm/dev-ubuntu-24.04:*-complete ships the full ROCm toolkit (HIP compiler
+    # at /opt/rocm/llvm/bin/clang++, runtime, and roc*/hip* libraries) on top of
+    # Ubuntu 24.04. On a local machine, install ROCm from
+    # https://rocm.docs.amd.com/ instead of using this container.
+    container:
+      image: rocm/dev-ubuntu-24.04:7.2.4-complete
+
+    steps:
+    # actions/checkout needs git to do a real clone (and to fetch submodules);
+    # the ROCm dev image does not ship it, so install it before checkout.
+    - name: Install checkout prerequisites
+      run: |
+        apt-get update
+        apt-get install -y git
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    # Same host dependencies the CUDA build needs: GLM, OpenCV 4, libtiff, plus
+    # CMake and a host C++ compiler. The container runs as root, so no sudo.
+    - name: Install dependencies
+      run: |
+        apt-get update
+        apt-get install -y cmake build-essential git \
+          libglm-dev libopencv-dev libtiff-dev
+
+    # Configure for AMD GPUs. -DUSE_HIP=ON selects the HIP GPU backend (the
+    # default ENABLE_CUDA / NVIDIA path stays off). CMAKE_HIP_ARCHITECTURES pins
+    # the target GPU (gfx90a = CDNA2 / MI200; use gfx1100 for RDNA3, etc.); it is
+    # set explicitly here because the runner has no GPU to auto-detect.
+    - name: Configure (HIP)
+      run: |
+        cmake -S . -B build \
+          -DUSE_HIP=ON \
+          -DCMAKE_HIP_ARCHITECTURES=gfx90a \
+          -DCMAKE_HIP_COMPILER=/opt/rocm/llvm/bin/clang++ \
+          -DCMAKE_BUILD_TYPE=Release
+
+    # Build the GPU reconstructor only. Compilation succeeding proves the HIP
+    # port builds for the target architecture; no GPU is required.
+    - name: Build SLS_GPU
+      run: cmake --build build --target SLS_GPU -j"$(nproc)"
